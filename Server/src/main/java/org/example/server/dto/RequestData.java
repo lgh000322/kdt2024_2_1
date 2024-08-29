@@ -1,5 +1,7 @@
 package org.example.server.dto;
 
+import org.example.server.domain.user.User;
+
 public class RequestData {
     private String messageType;
     private Object data;

@@ -2,6 +2,7 @@ package org.example.server.controller.front_controller;
 
 import org.example.server.controller.Controller;
 import org.example.server.controller.MemberController;
+import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 
