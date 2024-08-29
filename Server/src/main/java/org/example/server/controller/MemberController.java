@@ -8,7 +8,7 @@ public class MemberController implements Controller {
     private final MemberService memberService;
 
 
-    public MemberController(MemberService memberService) {
+    private MemberController(MemberService memberService) {
         this.memberService = memberService;
     }
 
