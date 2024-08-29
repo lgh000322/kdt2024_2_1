@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" fx:controller="mini_project.ChatClientController" spacing="10">
+    <VBox fx:id="loginBox" spacing="10">
+        <TextField fx:id="usernameField" promptText="Username"/>
+        <PasswordField fx:id="passwordField" promptText="Password"/>
+        <Button text="Login" onAction="#handleLogin"/>
+        <Button text="Register" onAction="#handleRegister"/>
+    </VBox>
+    <VBox fx:id="chatBox" spacing="10" visible="false">
+        <ComboBox fx:id="roomComboBox" promptText="Select or create room" editable="true"/>
+        <TextArea fx:id="chatArea" editable="false"/>
+        <TextField fx:id="messageField" onAction="#handleSendMessage"/>
+        <Button text="Send" onAction="#handleSendMessage"/>
+    </VBox>
+</VBox>
