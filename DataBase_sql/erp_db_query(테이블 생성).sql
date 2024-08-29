@@ -173,19 +173,19 @@ ENGINE = InnoDB;
 -- Table `erp_db`.`received_mail`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `erp_db`.`received_mail` (
-  `receive_num` BIGINT NOT NULL AUTO_INCREMENT,
+  `received_num` BIGINT NOT NULL AUTO_INCREMENT,
   `user_num` BIGINT NOT NULL,
   `mail_num` BIGINT NOT NULL,
-  PRIMARY KEY (`receive_num`),
-  UNIQUE INDEX `receive_num_UNIQUE` (`receive_num` ASC),
-  INDEX `fk_receive_mail_user1_idx` (`user_num` ASC),
-  INDEX `fk_receive_mail_mail1_idx` (`mail_num` ASC),
-  CONSTRAINT `fk_receive_mail_user1`
+  PRIMARY KEY (`received_num`),
+  UNIQUE INDEX `received_num_UNIQUE` (`received_num` ASC),
+  INDEX `fk_received_mail_user1_idx` (`user_num` ASC),
+  INDEX `fk_received_mail_mail1_idx` (`mail_num` ASC),
+  CONSTRAINT `fk_received_mail_user1`
     FOREIGN KEY (`user_num`)
     REFERENCES `erp_db`.`user` (`user_num`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_receive_mail_mail1`
+  CONSTRAINT `fk_received_mail_mail1`
     FOREIGN KEY (`mail_num`)
     REFERENCES `erp_db`.`mail` (`mai_num`)
     ON DELETE NO ACTION
@@ -244,7 +244,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `erp_db`.`salary_log` (
   `salary_num` BIGINT NOT NULL AUTO_INCREMENT,
-  `receive_date` DATE NOT NULL,
+  `received_date` DATE NOT NULL,
   `total_salary` INT NOT NULL,
   `user_num` BIGINT NOT NULL,
   PRIMARY KEY (`salary_num`),

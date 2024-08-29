@@ -1,7 +1,8 @@
 package org.example.server.controller.front_controller;
 
+import org.example.server.controller.BoardController;
 import org.example.server.controller.Controller;
-import org.example.server.controller.MemberController;
+import org.example.server.controller.UserController;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 
@@ -17,7 +18,9 @@ public class FrontController {
      */
     private FrontController() {
         System.out.println("묵시적 프론트 컨트롤러 실행");
-        nextController.put("MemberController", MemberController.createOrGetMemberController());
+        nextController.put("UserController", UserController.createOrGetUserController());
+        nextController.put("BoardController", BoardController.createOrGetBoardController());
+
     }
 
     /**
@@ -42,8 +45,13 @@ public class FrontController {
         ResponseData result = null;
         Controller controller;
 
-        if (requestData.getMessageType().contains("member")) {
-            controller = nextController.get("MemberController");
+        if (requestData.getMessageType().contains("user")) {
+            controller = nextController.get("UserController");
+            result = controller.execute(requestData);
+        }
+
+        if (requestData.getMessageType().contains("board")) {
+            controller = nextController.get("BoardController");
             result = controller.execute(requestData);
         }
 

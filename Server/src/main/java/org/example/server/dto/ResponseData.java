@@ -1,6 +1,9 @@
 package org.example.server.dto;
 
 public class ResponseData {
+    /**
+     * messageType="성공" or "실패"
+     */
     private String messageType;
     private Object data;
 
