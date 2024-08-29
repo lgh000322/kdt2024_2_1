@@ -1,17 +1,17 @@
 package org.example.server.repository;
 
-public class MemberRepository {
-    private static MemberRepository memberRepository = null;
+public class UserRepository {
+    private static UserRepository userRepository = null;
 
-    public static MemberRepository createOrGetMemberRepository() {
-        if (memberRepository == null) {
-            memberRepository = new MemberRepository();
+    public static UserRepository createOrGetUserRepository() {
+        if (userRepository == null) {
+            userRepository = new UserRepository();
             System.out.println("싱글톤 memberRepository 생성됨");
-            return memberRepository;
+            return userRepository;
         }
 
         System.out.println("싱글톤 memberRepository를 재사용");
-        return memberRepository;
+        return userRepository;
     }
 
     /**

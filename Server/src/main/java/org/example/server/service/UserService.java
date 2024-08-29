@@ -2,24 +2,35 @@ package org.example.server.service;
 
 
 import org.example.server.db_utils.DBUtils;
-import org.example.server.repository.MemberRepository;
+import org.example.server.repository.UserRepository;
 
 import javax.sql.DataSource;
 
-public class MemberService {
-    private static MemberService memberService = null;
-    private final MemberRepository memberRepository;
+public class UserService {
+    private static UserService memberService = null;
+    private final UserRepository userRepository;
     private final DataSource dataSource;
 
-    private MemberService(MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
+    private Long id;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    private UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
         dataSource = DBUtils.createOrGetDataSource();
     }
 
 
-    public static MemberService createOrGetMemberService() {
+    public static UserService createOrGetUserService() {
         if (memberService == null) {
-            memberService = new MemberService(MemberRepository.createOrGetMemberRepository());
+            memberService = new UserService(UserRepository.createOrGetUserRepository());
+            memberService.setId(1L);
             System.out.println("싱글톤 memberService 생성됨");
             return memberService;
         }
