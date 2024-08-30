@@ -3,6 +3,7 @@ package org.example.server.controller;
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
+import org.example.server.dto.ResponseData;
 import org.example.server.service.UserService;
 
 import java.sql.SQLException;
@@ -28,13 +29,15 @@ public class UserController implements Controller {
     }
 
     @Override
-    public <T> T execute(RequestData requestData) throws SQLException {
+    public ResponseData execute(RequestData requestData) throws SQLException {
         String requestURL = requestData.getMessageType();
+        ResponseData result = null;
+
         switch (requestURL) {
             case MessageTypeConst.MESSAGE_JOIN:
                 System.out.println("회원가입 실행");
                 User user = (User) requestData.getData();
-                userService.join(user);
+                result = userService.join(user);
                 break;
 
             case MessageTypeConst.MESSAGE_LOGIN:
@@ -50,6 +53,6 @@ public class UserController implements Controller {
                 break;
         }
 
-        return null;
+        return  result;
     }
 }

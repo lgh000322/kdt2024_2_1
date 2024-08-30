@@ -2,6 +2,7 @@ package org.example.server.controller;
 
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.dto.RequestData;
+import org.example.server.dto.ResponseData;
 import org.example.server.service.MailService;
 
 public class MailController implements Controller {
@@ -22,7 +23,7 @@ public class MailController implements Controller {
     }
 
     @Override
-    public <T> T execute(RequestData requestData) {
+    public ResponseData execute(RequestData requestData) {
         return null;
     }
 }
