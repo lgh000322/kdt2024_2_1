@@ -1,6 +1,6 @@
 package org.example.server.repository;
 
-<<<<<<< Updated upstream:Server/src/main/java/org/example/server/repository/MemberRepository.java
+import org.example.server.domain.user.User;<<<<<<< Updated upstream:Server/src/main/java/org/example/server/repository/MemberRepository.java
 public class MemberRepository {
     private static MemberRepository memberRepository = null;
 =======
