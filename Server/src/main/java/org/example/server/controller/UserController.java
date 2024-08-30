@@ -1,6 +1,7 @@
 package org.example.server.controller;
 
 import org.example.server.dto.RequestData;
+import org.example.server.dto.ResponseData;
 import org.example.server.service.UserService;
 
 
@@ -24,7 +25,5 @@ public class UserController implements Controller {
     }
 
     @Override
-    public <T> T execute(RequestData requestData) {
-        return null;
-    }
+    public ResponseData execute(RequestData requestData) {return null;}
 }
