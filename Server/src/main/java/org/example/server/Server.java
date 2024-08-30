@@ -1,7 +1,7 @@
 package org.example.server;
 
 import com.google.gson.Gson;
-import org.example.server.controller.front_controller.FrontController;
+import org.example.server.controller.FrontController;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 
@@ -10,6 +10,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -57,6 +58,8 @@ public class Server {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

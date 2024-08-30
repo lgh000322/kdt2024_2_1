@@ -2,7 +2,7 @@ package org.example;
 
 
 import org.example.server.Server;
-import org.example.server.controller.front_controller.FrontController;
+import org.example.server.controller.FrontController;
 
 import java.io.IOException;
 

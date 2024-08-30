@@ -1,5 +1,6 @@
 package org.example.server.service;
 
+<<<<<<< Updated upstream:Server/src/main/java/org/example/server/service/MemberService.java
 
 import org.example.server.db_utils.DBUtils;
 import org.example.server.repository.MemberRepository;
@@ -22,27 +23,27 @@ public class MemberService {
             memberService = new MemberService(MemberRepository.createOrGetMemberRepository());
             System.out.println("싱글톤 memberService 생성됨");
             return memberService;
+=======
+import org.example.server.repository.UserRepository;
+
+public class UserService {
+    private static UserService userService = null;
+    private final UserRepository userRepository;
+
+    public static UserService createOrGetUserService() {
+        if (userService == null) {
+            userService = new UserService(UserRepository.createOrGetUserRepository());
+            System.out.println("boardService 싱글톤 생성");
+            return userService;
+>>>>>>> Stashed changes:Server/src/main/java/org/example/server/service/UserService.java
         }
 
-        System.out.println("싱글톤 memberService를 재사용");
-        return memberService;
+        System.out.println("boardService 싱글톤 반환");
+        return userService;
     }
+    
 
-    /**
-     * 아래부턴 비즈니스 로직 및 memberRepository를 호출해 쿼리문을 실행한다.
-     * 예시는 다음과 같다.
-     * public void methodEX() {
-     *         //트랜잭션 처리후 비즈니스 로직을 실행한다.
-     *         callBizz();
-     *         memberRepository.methodEX();
-     *     }
-     *
-     *     public void callBizz(){
-     *         System.out.println("비즈니스 로직");
-     *     }
-     */
-
-
-
-
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 }
