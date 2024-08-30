@@ -33,30 +33,33 @@ public class UserController implements Controller {
     @Override
     public ResponseData execute(RequestData requestData) throws SQLException {
         String requestURL = requestData.getMessageType();
-        User user = (User)requestData.getData();
         ResponseData result = null;
 
         switch (requestURL) {
-            case MessageTypeConst.MESSAGE_JOIN:
+            case MessageTypeConst.MESSAGE_JOIN -> {
                 System.out.println("회원가입 실행");
-                result = userService.join(user);
-                break;
-
-            case MessageTypeConst.MESSAGE_LOGIN:
+                User joinUser = (User)requestData.getData();
+                result = userService.join(joinUser);
+            }
+            case MessageTypeConst.MESSAGE_LOGIN -> {
                 System.out.println("로그인 실행");
-                result=userService.login(user);
-                threadLocalUser.set(user);
-                break;
-
-            case MessageTypeConst.MESSAGE_LOGOUT:
+                User loginUser = (User) requestData.getData();
+                result = userService.login(loginUser);
+                threadLocalUser.set(loginUser);
+            }
+            case MessageTypeConst.MESSAGE_LOGOUT -> {
                 System.out.println("로그아웃 실행");
                 threadLocalUser.remove();
-                break;
-
-            case MessageTypeConst.MESSAGE_SEARCH:
+            }
+            case MessageTypeConst.MESSAGE_SEARCH -> {
                 System.out.println("특정 회원 조회");
-                userService.findByUserId(user.getUserId(),threadLocalUser);
-                break;
+                User data = (User) requestData.getData();
+                userService.findByUserId(data, threadLocalUser);
+            }
+            case MessageTypeConst.MESSAGE_SEARCH_ALL -> {
+                System.out.println("모든 회원 조회");
+                userService.findAll(null);
+            }
         }
 
         return result;
