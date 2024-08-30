@@ -31,17 +31,18 @@ public class UserController implements Controller {
     @Override
     public ResponseData execute(RequestData requestData) throws SQLException {
         String requestURL = requestData.getMessageType();
+        User user = (User)requestData.getData();
         ResponseData result = null;
 
         switch (requestURL) {
             case MessageTypeConst.MESSAGE_JOIN:
                 System.out.println("회원가입 실행");
-                User user = (User) requestData.getData();
                 result = userService.join(user);
                 break;
 
             case MessageTypeConst.MESSAGE_LOGIN:
                 System.out.println("로그인 실행");
+                userService.login(user);
                 break;
 
             case MessageTypeConst.MESSAGE_LOGOUT:
