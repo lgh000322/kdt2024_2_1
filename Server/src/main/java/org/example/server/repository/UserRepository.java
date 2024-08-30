@@ -1,15 +1,15 @@
 package org.example.server.repository;
 
-import com.mysql.cj.protocol.Resultset;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
+import org.example.server.dto.ResponseData;
 
-import java.lang.reflect.Member;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.NoSuchElementException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class UserRepository {
@@ -34,8 +34,8 @@ public class UserRepository {
      * }
      */
 
-    public Optional<User> findById(Connection conn, String userId) throws SQLException {
-        String sql = "select * from user where user_id = ?";
+    public Optional<User> findUserByIDAndRole(Connection conn, String userId, Role role) throws SQLException {
+        String sql = "select * from user where user_id = ? and role = ?";
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -43,7 +43,7 @@ public class UserRepository {
         try {
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, userId);
-
+            pstmt.setString(2, role.name());
             rs = pstmt.executeQuery();
 
             User user = null;
@@ -98,6 +98,44 @@ public class UserRepository {
             throw e;
         } finally {
             close(pstmt, null);
+        }
+    }
+
+    public ResponseData findAll(Connection conn,String deptName) throws SQLException {
+        String sql = "select * from user inner join dept on user.dept_num = dept.dept_num where user.dept_name = ?";
+        List<User> list = new ArrayList<>();
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, deptName);
+            rs = pstmt.executeQuery();
+
+
+            while (rs.next()) {
+                User user = new User.Builder()
+                        .userNum(rs.getLong("user_num"))
+                        .userId(rs.getString("user_id"))
+                        .password(rs.getString("password"))
+                        .name(rs.getString("name"))
+                        .tel(rs.getString("tel"))
+                        .email(rs.getString("email"))
+                        .role(Role.fromString(rs.getString("role")))
+                        .remainedLeave(rs.getInt("remained_leave"))
+                        .positionNum(rs.getLong("position_num"))
+                        .deptNum(rs.getLong("dept_num"))
+                        .build();
+
+                list.add(user);
+            }
+
+            return new ResponseData("조회 성공", list);
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
         }
     }
 
