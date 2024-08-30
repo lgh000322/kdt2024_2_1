@@ -92,6 +92,37 @@ public class UserService {
         return responseData;
     }
 
+    public ResponseData findByUserId(String userId,ThreadLocal<User> threadLocalUser) throws SQLException {
+        //로그인을 한 적이 있으면 데이터베이스에 쿼리를 날리지 않는다.
+        if (threadLocalUser.get() != null) {
+            return new ResponseData("회원 조회 성공", threadLocalUser.get());
+        }
+
+        ResponseData responseData = null;
+        Connection con = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData=findByUserIdBizLogic(userId, con);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        }finally {
+            release(con);
+        }
+        return responseData;
+    }
+
+    private ResponseData findByUserIdBizLogic(String userId, Connection con) throws SQLException {
+        Optional<User> findUser = userRepository.findById(con, userId);
+        if (findUser.isPresent()) {
+            return new ResponseData("회원 조회 성공", findUser.get());
+        }
+
+        return new ResponseData("회원 조회 실패", null);
+    }
+
 
     private ResponseData loginBizLogic(User user, Connection con) throws SQLException {
         Optional<User> findUser = userRepository.findById(con, user.getUserId());

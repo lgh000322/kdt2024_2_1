@@ -13,10 +13,12 @@ public class UserController implements Controller {
     private static UserController userController = null;
     private final UserService userService;
 
+    //간단한 캐시 처리를 위한 threadLocal 변수
+    private ThreadLocal<User> threadLocalUser = new ThreadLocal<>();
+
     private UserController(UserService userService) {
         this.userService = userService;
     }
-
 
     public static UserController createOrGetUserController() {
         if (userController == null) {
@@ -42,18 +44,21 @@ public class UserController implements Controller {
 
             case MessageTypeConst.MESSAGE_LOGIN:
                 System.out.println("로그인 실행");
-                userService.login(user);
+                result=userService.login(user);
+                threadLocalUser.set(user);
                 break;
 
             case MessageTypeConst.MESSAGE_LOGOUT:
                 System.out.println("로그아웃 실행");
+                threadLocalUser.remove();
                 break;
 
             case MessageTypeConst.MESSAGE_SEARCH:
                 System.out.println("특정 회원 조회");
+                userService.findByUserId(user.getUserId(),threadLocalUser);
                 break;
         }
 
-        return  result;
+        return result;
     }
 }
