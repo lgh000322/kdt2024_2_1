@@ -2,10 +2,12 @@ package org.example.server.controller.front_controller;
 
 import org.example.server.controller.BoardController;
 import org.example.server.controller.Controller;
+import org.example.server.controller.MailController;
 import org.example.server.controller.UserController;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +22,7 @@ public class FrontController {
         System.out.println("묵시적 프론트 컨트롤러 실행");
         nextController.put("UserController", UserController.createOrGetUserController());
         nextController.put("BoardController", BoardController.createOrGetBoardController());
-
+        nextController.put("MailController", MailController.createOrGetMailController());
     }
 
     /**
@@ -41,7 +43,7 @@ public class FrontController {
      * @param requestData 클라이언트로부터 받은 데이터를 의미한다.
      * @return 이전에 설정한 ResponseData의 인스턴스를 반환한다.
      */
-    public ResponseData execute(RequestData requestData){
+    public ResponseData execute(RequestData requestData) throws SQLException {
         ResponseData result = null;
         Controller controller;
 
@@ -53,6 +55,11 @@ public class FrontController {
         if (requestData.getMessageType().contains("board")) {
             controller = nextController.get("BoardController");
             result = controller.execute(requestData);
+        }
+
+        if (requestData.getMessageType().contains("mail")) {
+            controller = nextController.get("MailController");
+            result=controller.execute(requestData);
         }
 
 

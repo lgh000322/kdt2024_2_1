@@ -1,7 +1,11 @@
 package org.example.server.controller;
 
+import org.example.server.consts.MessageTypeConst;
+import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
 import org.example.server.service.UserService;
+
+import java.sql.SQLException;
 
 
 public class UserController implements Controller {
@@ -24,7 +28,28 @@ public class UserController implements Controller {
     }
 
     @Override
-    public <T> T execute(RequestData requestData) {
+    public <T> T execute(RequestData requestData) throws SQLException {
+        String requestURL = requestData.getMessageType();
+        switch (requestURL) {
+            case MessageTypeConst.MESSAGE_JOIN:
+                System.out.println("회원가입 실행");
+                User user = (User) requestData.getData();
+                userService.join(user);
+                break;
+
+            case MessageTypeConst.MESSAGE_LOGIN:
+                System.out.println("로그인 실행");
+                break;
+
+            case MessageTypeConst.MESSAGE_LOGOUT:
+                System.out.println("로그아웃 실행");
+                break;
+
+            case MessageTypeConst.MESSAGE_SEARCH:
+                System.out.println("특정 회원 조회");
+                break;
+        }
+
         return null;
     }
 }
