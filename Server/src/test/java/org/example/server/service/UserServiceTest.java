@@ -37,6 +37,7 @@ class UserServiceTest {
         User user = new User.Builder()
                 .userId("dlrudgns")
                 .password("dlrudgns")
+                .role(Role.USER)
                 .build();
 
         ResponseData data = userService.login(user);
@@ -46,12 +47,16 @@ class UserServiceTest {
 
     @Test
     void findUserById() throws SQLException {
-        String id = "dlrudgns";
+        User user = new User.Builder()
+                .userId("dlrudgns")
+                .password("dlrudgns")
+                .role(Role.USER)
+                .build();
 
-        ResponseData data = userService.findByUserId(id, null);
-        User user = (User) data.getData();
+        ResponseData data = userService.findByUserId(user, null);
+        User findUserRoleUser = (User) data.getData();
 
-        System.out.println("메세지 타입: " + data.getMessageType() + ", 데이터: " + user.getUserId());
+        System.out.println("메세지 타입: " + data.getMessageType() + ", 데이터: " + findUserRoleUser.getUserId());
     }
 
 }

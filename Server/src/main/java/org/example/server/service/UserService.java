@@ -2,6 +2,7 @@ package org.example.server.service;
 
 
 import org.example.server.db_utils.DBUtils;
+import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
 import org.example.server.repository.UserRepository;
@@ -50,10 +51,11 @@ public class UserService {
 
     /**
      * 회원가입
+     *
      * @param user: json으로 받은 회원 데이터
      */
     public ResponseData join(User user) throws SQLException {
-        Connection con=null;
+        Connection con = null;
         ResponseData responseData = null;
 
         try {
@@ -63,7 +65,7 @@ public class UserService {
             con.commit();
         } catch (Exception e) {
             con.rollback();
-        }finally {
+        } finally {
             release(con);
         }
 
@@ -72,6 +74,7 @@ public class UserService {
 
     /**
      * 로그인
+     *
      * @param user 로그인 정보를 검사할 유저
      * @return
      */
@@ -82,19 +85,28 @@ public class UserService {
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = loginBizLogic(user, con);
+            responseData = loginBizLogicUser(user, con);
             con.commit();
         } catch (Exception e) {
             con.rollback();
-        }finally {
+        } finally {
             release(con);
         }
         return responseData;
     }
 
-    public ResponseData findByUserId(String userId,ThreadLocal<User> threadLocalUser) throws SQLException {
+
+    /**
+     * 특정 회원을 찾는 메소드
+     *
+     * @param user
+     * @param threadLocalUser
+     * @return
+     * @throws SQLException
+     */
+    public ResponseData findByUserId(User user, ThreadLocal<User> threadLocalUser) throws SQLException {
         //로그인을 한 적이 있으면 데이터베이스에 쿼리를 날리지 않는다.
-        if (threadLocalUser.get() != null) {
+        if (threadLocalUser != null) {
             return new ResponseData("회원 조회 성공", threadLocalUser.get());
         }
 
@@ -104,18 +116,37 @@ public class UserService {
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData=findByUserIdBizLogic(userId, con);
+            responseData = findByUserIdBizLogic(user.getUserId(), con, user.getRole());
             con.commit();
         } catch (Exception e) {
             con.rollback();
-        }finally {
+        } finally {
             release(con);
         }
         return responseData;
     }
 
-    private ResponseData findByUserIdBizLogic(String userId, Connection con) throws SQLException {
-        Optional<User> findUser = userRepository.findById(con, userId);
+    public ResponseData findAll(String deptName) throws SQLException {
+        ResponseData responseData = null;
+        Connection con = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = userRepository.findAll(con,deptName);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+        return responseData;
+    }
+
+    private ResponseData findByUserIdBizLogic(String userId, Connection con, Role role) throws SQLException {
+
+        Optional<User> findUser = userRepository.findUserByIDAndRole(con, userId, role);
+
         if (findUser.isPresent()) {
             return new ResponseData("회원 조회 성공", findUser.get());
         }
@@ -124,8 +155,10 @@ public class UserService {
     }
 
 
-    private ResponseData loginBizLogic(User user, Connection con) throws SQLException {
-        Optional<User> findUser = userRepository.findById(con, user.getUserId());
+    private ResponseData loginBizLogicUser(User user, Connection con) throws SQLException {
+        Optional<User> findUser = Optional.empty();
+
+        findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
         if (findUser.isEmpty()) {
             return new ResponseData("실패(존재하지 않는 회원)", null);
         }
@@ -140,7 +173,7 @@ public class UserService {
 
 
     private ResponseData joinBizLogic(User user, Connection con) throws SQLException {
-        Optional<User> findUser = userRepository.findById(con, user.getUserId());
+        Optional<User> findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
 
         if (findUser.isPresent()) {
             return new ResponseData("실패", null);
@@ -160,8 +193,6 @@ public class UserService {
             }
         }
     }
-
-
 
 
 }
