@@ -29,7 +29,29 @@ class UserServiceTest {
 
         ResponseData data = userService.join(user);
 
-        System.out.println(data.toString());
+        System.out.println("메세지 타입: " + data.getMessageType() + ", 데이터: " + data.getData());
+    }
+
+    @Test
+    void login_test() throws SQLException {
+        User user = new User.Builder()
+                .userId("dlrudgns")
+                .password("dlrudgns")
+                .build();
+
+        ResponseData data = userService.login(user);
+
+        System.out.println("메세지 타입: " + data.getMessageType() + ", 데이터: " + data.getData());
+    }
+
+    @Test
+    void findUserById() throws SQLException {
+        String id = "dlrudgns";
+
+        ResponseData data = userService.findByUserId(id, null);
+        User user = (User) data.getData();
+
+        System.out.println("메세지 타입: " + data.getMessageType() + ", 데이터: " + user.getUserId());
     }
 
 }

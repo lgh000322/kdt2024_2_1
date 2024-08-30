@@ -70,6 +70,75 @@ public class UserService {
         return responseData;
     }
 
+    /**
+     * 로그인
+     * @param user 로그인 정보를 검사할 유저
+     * @return
+     */
+    public ResponseData login(User user) throws SQLException {
+        ResponseData responseData = null;
+        Connection con = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = loginBizLogic(user, con);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        }finally {
+            release(con);
+        }
+        return responseData;
+    }
+
+    public ResponseData findByUserId(String userId,ThreadLocal<User> threadLocalUser) throws SQLException {
+        //로그인을 한 적이 있으면 데이터베이스에 쿼리를 날리지 않는다.
+        if (threadLocalUser.get() != null) {
+            return new ResponseData("회원 조회 성공", threadLocalUser.get());
+        }
+
+        ResponseData responseData = null;
+        Connection con = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData=findByUserIdBizLogic(userId, con);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        }finally {
+            release(con);
+        }
+        return responseData;
+    }
+
+    private ResponseData findByUserIdBizLogic(String userId, Connection con) throws SQLException {
+        Optional<User> findUser = userRepository.findById(con, userId);
+        if (findUser.isPresent()) {
+            return new ResponseData("회원 조회 성공", findUser.get());
+        }
+
+        return new ResponseData("회원 조회 실패", null);
+    }
+
+
+    private ResponseData loginBizLogic(User user, Connection con) throws SQLException {
+        Optional<User> findUser = userRepository.findById(con, user.getUserId());
+        if (findUser.isEmpty()) {
+            return new ResponseData("실패(존재하지 않는 회원)", null);
+        }
+
+        User loginUser = findUser.get();
+        if (!loginUser.getPassword().equals(user.getPassword())) {
+            return new ResponseData("로그인 실패", null);
+        }
+
+        return new ResponseData("로그인 성공", user);
+    }
+
+
     private ResponseData joinBizLogic(User user, Connection con) throws SQLException {
         Optional<User> findUser = userRepository.findById(con, user.getUserId());
 
