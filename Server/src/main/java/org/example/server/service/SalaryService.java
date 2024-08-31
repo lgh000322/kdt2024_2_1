@@ -28,6 +28,7 @@ public class SalaryService {
         System.out.println("AnswerService 싱글톤 반환");
         return salaryService;
     }
+
     public SalaryService(SalaryRepository salaryRepository, UserRepository userRepository) {
         this.salaryRepository = salaryRepository;
         this.userRepository = userRepository;
@@ -36,17 +37,17 @@ public class SalaryService {
 
     //
     public ResponseData SearchSalary(User user) throws SQLException {
-        Connection con=null;
+        Connection con = null;
         ResponseData responseData = null;
 
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = SalarySearchBizLogic(user ,con);
+            responseData = SalarySearchBizLogic(user, con);
             con.commit();
         } catch (Exception e) {
             con.rollback();
-        }finally {
+        } finally {
             release(con);
         }
 
@@ -54,16 +55,15 @@ public class SalaryService {
     }
 
     //월급조회 비즈니스로직
-    private ResponseData SalarySearchBizLogic( User user, Connection con) throws SQLException {
+    private ResponseData SalarySearchBizLogic(User user, Connection con) throws SQLException {
         //connecter와 유저ID, (관리자or직원) 을 가져와서 해당 유저의 정보를 가져옴
         Optional<User> findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
-        if(findUser.isPresent()) {
+        if (findUser.isPresent()) {
             User DBUser = findUser.get();
             //findUser가 존재한다면 Repository로가서 해당 월급을 조회시킨다.
-            salaryRepository.DBSalarySearchAll(con ,DBUser);
+            salaryRepository.DBSalarySearchAll(con, DBUser);
 
-        }
-        else {
+        } else {
             return new ResponseData("실패", null);
         }
         //userRepository.save(con, user);

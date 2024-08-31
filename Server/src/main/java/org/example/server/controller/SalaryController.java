@@ -11,11 +11,10 @@ import java.sql.SQLException;
 public class SalaryController implements Controller {
     private static SalaryController salaryController = null;
     private final SalaryService salaryService;
-    private final UserService userService;
 
     public static SalaryController createOrGetSalaryController() {
         if (salaryController == null) {
-            salaryController = new SalaryController(SalaryService.createOrGetSalaryService(),UserService.createOrGetUserService());
+            salaryController = new SalaryController(SalaryService.createOrGetSalaryService());
             System.out.println("AnswerController 싱글톤 생성");
             return salaryController;
         }
@@ -24,9 +23,8 @@ public class SalaryController implements Controller {
         return salaryController;
     }
 
-    public SalaryController(SalaryService salaryService, UserService userservice) {
+    public SalaryController(SalaryService salaryService) {
         this.salaryService = salaryService;
-        this.userService = userservice;
     }
 
 
