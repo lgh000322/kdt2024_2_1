@@ -15,8 +15,4 @@ public enum Status {
     public String getDescription() {
         return description;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/development_KimGyeonghun

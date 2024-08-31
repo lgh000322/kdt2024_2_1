@@ -149,8 +149,4 @@ public class User {
             return new User(this);
         }
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/development_KimGyeonghun

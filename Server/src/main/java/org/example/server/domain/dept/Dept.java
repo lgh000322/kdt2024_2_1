@@ -37,8 +37,4 @@ public class Dept {
     public String getDeptName() {
         return deptName;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/development_KimGyeonghun

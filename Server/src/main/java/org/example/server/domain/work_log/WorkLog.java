@@ -109,8 +109,4 @@ public class WorkLog {
     public Long getLeaveNum() {
         return leaveNum;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/development_KimGyeonghun

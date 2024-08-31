@@ -62,8 +62,6 @@ public class FrontController {
             result=controller.execute(requestData);
         }
 
-<<<<<<< HEAD
-=======
         if (requestData.getMessageType().contains("salary")) {
             controller = nextController.get("SalaryController");
             result=controller.execute(requestData);
@@ -79,7 +77,6 @@ public class FrontController {
             result=controller.execute(requestData);
         }
 
->>>>>>> origin/development_KimGyeonghun
 
         return result;
 

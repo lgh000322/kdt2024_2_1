@@ -3,7 +3,6 @@ package org.example.server.service;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
-import org.example.server.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
