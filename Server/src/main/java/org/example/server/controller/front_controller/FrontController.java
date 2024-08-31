@@ -1,9 +1,6 @@
 package org.example.server.controller.front_controller;
 
-import org.example.server.controller.BoardController;
-import org.example.server.controller.Controller;
-import org.example.server.controller.MailController;
-import org.example.server.controller.UserController;
+import org.example.server.controller.*;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 
@@ -23,6 +20,9 @@ public class FrontController {
         nextController.put("UserController", UserController.createOrGetUserController());
         nextController.put("BoardController", BoardController.createOrGetBoardController());
         nextController.put("MailController", MailController.createOrGetMailController());
+        nextController.put("SalaryController", SalaryController.createOrGetSalaryController());
+        nextController.put("WorkController", WorkController.createOrGetWorkController());
+        nextController.put("AnswerController", AnswerController.createOrGetAnswerController());
     }
 
     /**
