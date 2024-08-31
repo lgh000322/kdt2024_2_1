@@ -55,19 +55,19 @@ public class SalaryService {
 
     //월급조회 비즈니스로직
     private ResponseData SalarySearchBizLogic( User user, Connection con) throws SQLException {
-        Optional<User> findUser = userRepository.findById(con, user.getUserId());
-        if(findUser.isPresent()){
-            User nowUser = findUser.get();
-            System.out.println(nowUser.getUserId()); //테스트
-        }
-        //Optional<Salary> findUser = salaryRepository.DBSalarySearch(salary, userId, con);
+        //connecter와 유저ID, (관리자or직원) 을 가져와서 해당 유저의 정보를 가져옴
+        Optional<User> findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
+        if(findUser.isPresent()) {
+            User DBUser = findUser.get();
+            //findUser가 존재한다면 Repository로가서 해당 월급을 조회시킨다.
+            salaryRepository.DBSalarySearchAll(con ,DBUser);
 
-        if (findUser.isPresent()) {
+        }
+        else {
             return new ResponseData("실패", null);
         }
-
         //userRepository.save(con, user);
-        return new ResponseData("성공", null);
+        return new ResponseData("성공", findUser);
     }
 
     //얜 그냥 쭉쓰면됨

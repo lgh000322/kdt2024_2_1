@@ -1,6 +1,5 @@
 package org.example.server.domain.user;
 
-
 public class User {
     private Long userNum;
 

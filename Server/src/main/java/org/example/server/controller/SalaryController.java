@@ -7,7 +7,6 @@ import org.example.server.service.SalaryService;
 import org.example.server.service.UserService;
 
 import java.sql.SQLException;
-import java.util.Optional;
 
 public class SalaryController implements Controller {
     private static SalaryController salaryController = null;
@@ -35,7 +34,7 @@ public class SalaryController implements Controller {
     @Override
     public ResponseData execute(RequestData requestData) throws SQLException {
         if(requestData.getMessageType().contains("search")) {
-            User user = (User)requestData.getData();
+            User user = (User)requestData.getData(); //현재 접속한 유저정보를 가져온다.
             salaryService.SearchSalary(user);
         }
         return null;

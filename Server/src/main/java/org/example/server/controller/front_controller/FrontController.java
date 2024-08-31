@@ -1,10 +1,9 @@
-package org.example.server.controller;
+package org.example.server.controller.front_controller;
 
-<<<<<<< Updated upstream:Server/src/main/java/org/example/server/controller/front_controller/FrontController.java
+import org.example.server.controller.BoardController;
 import org.example.server.controller.Controller;
-import org.example.server.controller.MemberController;
-=======
->>>>>>> Stashed changes:Server/src/main/java/org/example/server/controller/FrontController.java
+import org.example.server.controller.MailController;
+import org.example.server.controller.UserController;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 
@@ -21,15 +20,9 @@ public class FrontController {
      */
     private FrontController() {
         System.out.println("묵시적 프론트 컨트롤러 실행");
-<<<<<<< Updated upstream:Server/src/main/java/org/example/server/controller/front_controller/FrontController.java
-        nextController.put("MemberController", MemberController.createOrGetMemberController());
-=======
         nextController.put("UserController", UserController.createOrGetUserController());
         nextController.put("BoardController", BoardController.createOrGetBoardController());
-        nextController.put("WorkController", WorkController.createOrGetWorkController());
-        nextController.put("AnswerController", AnswerController.createOrGetAnswerController());
-        nextController.put("SalaryController", SalaryController.createOrGetSalaryController());
->>>>>>> Stashed changes:Server/src/main/java/org/example/server/controller/FrontController.java
+        nextController.put("MailController", MailController.createOrGetMailController());
     }
 
     /**
@@ -54,27 +47,35 @@ public class FrontController {
         ResponseData result = null;
         Controller controller;
 
-        if (requestData.getMessageType().contains("member")) {
-            controller = nextController.get("MemberController");
+        if (requestData.getMessageType().contains("user")) {
+            controller = nextController.get("UserController");
             result = controller.execute(requestData);
         }
 
-        if (requestData.getMessageType().contains("work")) {
-            controller = nextController.get("WorkController");
+        if (requestData.getMessageType().contains("board")) {
+            controller = nextController.get("BoardController");
             result = controller.execute(requestData);
+        }
+
+        if (requestData.getMessageType().contains("mail")) {
+            controller = nextController.get("MailController");
+            result=controller.execute(requestData);
         }
 
         if (requestData.getMessageType().contains("salary")) {
             controller = nextController.get("SalaryController");
-            result = controller.execute(requestData);
+            result=controller.execute(requestData);
+        }
+
+        if (requestData.getMessageType().contains("work")) {
+            controller = nextController.get("WorkController");
+            result=controller.execute(requestData);
         }
 
         if (requestData.getMessageType().contains("answer")) {
             controller = nextController.get("AnswerController");
-            result = controller.execute(requestData);
+            result=controller.execute(requestData);
         }
-
-
 
 
         return result;

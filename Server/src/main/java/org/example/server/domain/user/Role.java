@@ -5,11 +5,9 @@ public enum Role {
     ADMIN("관리자");
 
     private final String description;
-
     public static Role fromString(String role) {
         return Role.valueOf(role.toUpperCase());
     }
-
     Role(String description) {
         this.description = description;
     }

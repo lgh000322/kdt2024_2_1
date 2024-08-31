@@ -1,7 +1,7 @@
 package org.example.server;
 
 import com.google.gson.Gson;
-import org.example.server.controller.FrontController;
+import org.example.server.controller.front_controller.FrontController;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final FrontController frontController ;
+    private final FrontController frontController;
     private final ExecutorService executorService = Executors.newFixedThreadPool(100);
 
     public Server(FrontController frontController) {
@@ -25,6 +25,7 @@ public class Server {
 
     /**
      * 메인에서는 서버 인스턴스를 생성하고 start() 메소드를 실행시켜주어야 한다.
+     *
      * @throws IOException
      */
 
@@ -40,6 +41,7 @@ public class Server {
 
     /**
      * 쓰레드 풀에서 동작하는 메소드다. 이 메소드에서는 단순히 frontController로 자신이 원래 해야만 했던 일을 위임한다.
+     *
      * @param socket 클라이언트와 서버간 연결을 유지하기위한 소켓이다. 서버와 클라이언트가 연결을 종료할 때 파라미터로 받은 이 소켓을 종료해야
      *               한다.
      */
@@ -50,7 +52,7 @@ public class Server {
             Gson gson = new Gson();
 
             boolean flag = true;
-            while(flag){
+            while (flag) {
                 String receivedJsonStr = dis.readUTF();
                 RequestData requestData = gson.fromJson(receivedJsonStr, RequestData.class);
                 ResponseData responseData = frontController.execute(requestData);
