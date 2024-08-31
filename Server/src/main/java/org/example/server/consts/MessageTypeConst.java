@@ -13,6 +13,9 @@ public abstract class MessageTypeConst {
     //회원 조회
     public static final String MESSAGE_SEARCH = "/user/search";
 
+    //모든 회원 조회
+    public static final String MESSAGE_SEARCH_ALL = "/user/search/all";
+
     //근태 조회
     public static final String MESSAGE_WORK_SEARCH = "/work/search";
 
@@ -39,7 +42,6 @@ public abstract class MessageTypeConst {
 
     //급여 내역 조회
     public static final String MESSAGE_SALARY_SEARCH = "/salary/search";
-
 
     //급여 내역 추가
     public static final String MESSAGE_SALARY_ADD = "/salary/add";
