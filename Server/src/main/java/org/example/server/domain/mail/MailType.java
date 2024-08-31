@@ -13,4 +13,8 @@ public enum MailType {
     public String getDescription() {
         return description;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/development_KimGyeonghun

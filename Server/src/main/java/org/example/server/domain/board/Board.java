@@ -80,4 +80,8 @@ public class Board {
     public Long getUserNum() {
         return userNum;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/development_KimGyeonghun

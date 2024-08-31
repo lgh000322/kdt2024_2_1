@@ -91,6 +91,7 @@ public class BoardRepository {
 
 
     /*
+<<<<<<< HEAD
     * 게시물을 저장하는 함수.
     * */
     public void saveBoard(Board board, Connection conn) throws SQLException {
@@ -125,6 +126,7 @@ public class BoardRepository {
 
 
     /*
+<<<<<<< HEAD
     * 게시물 삭제하는 함수
     * */
     public void deleteBoard(Board board, Connection conn) throws SQLException {
@@ -188,8 +190,6 @@ public class BoardRepository {
             }
         }
     }
-
-
 }
 
 

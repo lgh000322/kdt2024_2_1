@@ -4,7 +4,8 @@ import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 import org.example.server.service.BoardService;
 
-public class BoardController implements Controller {
+public class
+BoardController implements Controller {
 
     private static BoardController boardController = null;
     private final BoardService boardService;

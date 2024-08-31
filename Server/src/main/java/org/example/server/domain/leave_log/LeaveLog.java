@@ -96,4 +96,8 @@ public class LeaveLog {
     public Long getUserNum() {
         return userNum;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/development_KimGyeonghun

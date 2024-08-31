@@ -67,4 +67,8 @@ public class SalaryLog {
     public Long getUserNum() {
         return userNum;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/development_KimGyeonghun

@@ -15,4 +15,8 @@ public enum Role {
     public String getDescription() {
         return description;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/development_KimGyeonghun
