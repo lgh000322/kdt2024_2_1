@@ -51,8 +51,4 @@ public class MailStore {
     public Long getUserNum() {
         return userNum;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/development_KimGyeonghun

@@ -82,8 +82,4 @@ public class BoardAnswer {
     public Long getUserNum() {
         return userNum;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/development_KimGyeonghun

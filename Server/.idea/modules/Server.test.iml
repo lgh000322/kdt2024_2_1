@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module version="4">
-<<<<<<< HEAD
   <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/../../src/test" />
+  </component>
+  <component name="AdditionalModuleElements" dumb="true">
     <content url="file://$MODULE_DIR$/../../src/test">
-=======
-  <component name="AdditionalModuleElements">
-    <content url="file://$MODULE_DIR$/../../src/test" dumb="true">
->>>>>>> origin/development_KimGyeonghun
       <sourceFolder url="file://$MODULE_DIR$/../../src/test/java" isTestSource="true" />
     </content>
   </component>

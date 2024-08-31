@@ -81,8 +81,4 @@ public class Mail {
     public Long getMailStoreNum() {
         return mailStoreNum;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/development_KimGyeonghun
