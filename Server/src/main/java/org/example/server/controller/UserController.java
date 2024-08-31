@@ -38,7 +38,7 @@ public class UserController implements Controller {
         switch (requestURL) {
             case MessageTypeConst.MESSAGE_JOIN -> {
                 System.out.println("회원가입 실행");
-                User joinUser = (User)requestData.getData();
+                User joinUser = (User) requestData.getData();
                 result = userService.join(joinUser);
             }
             case MessageTypeConst.MESSAGE_LOGIN -> {

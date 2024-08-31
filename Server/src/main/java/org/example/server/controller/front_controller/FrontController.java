@@ -62,6 +62,24 @@ public class FrontController {
             result=controller.execute(requestData);
         }
 
+<<<<<<< HEAD
+=======
+        if (requestData.getMessageType().contains("salary")) {
+            controller = nextController.get("SalaryController");
+            result=controller.execute(requestData);
+        }
+
+        if (requestData.getMessageType().contains("work")) {
+            controller = nextController.get("WorkController");
+            result=controller.execute(requestData);
+        }
+
+        if (requestData.getMessageType().contains("answer")) {
+            controller = nextController.get("AnswerController");
+            result=controller.execute(requestData);
+        }
+
+>>>>>>> origin/development_KimGyeonghun
 
         return result;
 

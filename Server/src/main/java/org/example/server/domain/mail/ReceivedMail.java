@@ -51,4 +51,8 @@ public class ReceivedMail {
     public Long getMailNum() {
         return mailNum;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/development_KimGyeonghun

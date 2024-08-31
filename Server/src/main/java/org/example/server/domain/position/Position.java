@@ -10,4 +10,8 @@ public class Position {
     private int basicSalary;
 
     private int leavePay;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/development_KimGyeonghun
