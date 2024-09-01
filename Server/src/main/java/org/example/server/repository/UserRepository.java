@@ -72,14 +72,89 @@ public class UserRepository {
         }
     }
 
-    public void save(Connection conn, User user) throws SQLException {
+    public Optional<User> findUserById(Connection conn, String userId) throws SQLException {
+        String sql = "select * from user where user_id = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userId);
+            rs = pstmt.executeQuery();
+
+            User user = null;
+
+            if (rs.next()) {
+                user = new User.Builder()
+                        .userNum(rs.getLong("user_num"))
+                        .userId(rs.getString("user_id"))
+                        .password(rs.getString("password"))
+                        .name(rs.getString("name"))
+                        .tel(rs.getString("tel"))
+                        .email(rs.getString("email"))
+                        .role(Role.fromString(rs.getString("role")))
+                        .remainedLeave(rs.getInt("remained_leave"))
+                        .positionNum(rs.getLong("position_num"))
+                        .deptNum(rs.getLong("dept_num"))
+                        .build();
+            }
+
+            return Optional.ofNullable(user);
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public Optional<User> findUserByEmail(Connection conn, String email) throws SQLException {
+        String sql = "select * from user where email = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, email);
+            rs = pstmt.executeQuery();
+
+            User user = null;
+
+            if (rs.next()) {
+                user = new User.Builder()
+                        .userNum(rs.getLong("user_num"))
+                        .userId(rs.getString("user_id"))
+                        .password(rs.getString("password"))
+                        .name(rs.getString("name"))
+                        .tel(rs.getString("tel"))
+                        .email(rs.getString("email"))
+                        .role(Role.fromString(rs.getString("role")))
+                        .remainedLeave(rs.getInt("remained_leave"))
+                        .positionNum(rs.getLong("position_num"))
+                        .deptNum(rs.getLong("dept_num"))
+                        .build();
+            }
+
+            return Optional.ofNullable(user);
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public Long save(Connection conn, User user) throws SQLException {
         String sql = "INSERT INTO user (password, name, tel, email, role, remained_leave, position_num, dept_num, user_id) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
         try {
-            pstmt = conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 
             // 각 파라미터를 set
             pstmt.setString(1, user.getPassword());
@@ -93,15 +168,22 @@ public class UserRepository {
             pstmt.setString(9, user.getUserId());
 
             pstmt.executeUpdate();  // INSERT 실행
+            rs = pstmt.getGeneratedKeys();
+
+            if (rs.next()) {
+                return rs.getLong(1);
+            } else {
+                throw new SQLException("Creating user failed, no ID obtained.");
+            }
 
         } catch (SQLException e) {
             throw e;
         } finally {
-            close(pstmt, null);
+            close(pstmt, rs);
         }
     }
 
-    public ResponseData findAll(Connection conn,String deptName) throws SQLException {
+    public ResponseData findAll(Connection conn, String deptName) throws SQLException {
         String sql = "select * from user inner join dept on user.dept_num = dept.dept_num where user.dept_name = ?";
         List<User> list = new ArrayList<>();
         PreparedStatement pstmt = null;

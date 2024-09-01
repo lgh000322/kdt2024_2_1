@@ -2,9 +2,12 @@ package org.example.server.service;
 
 
 import org.example.server.db_utils.DBUtils;
+import org.example.server.domain.mail.MailStore;
+import org.example.server.domain.mail.MailType;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
+import org.example.server.repository.MailRepository;
 import org.example.server.repository.UserRepository;
 
 import javax.sql.DataSource;
@@ -15,17 +18,19 @@ import java.util.Optional;
 public class UserService {
     private static UserService userService = null;
     private final UserRepository userRepository;
+    private final MailRepository mailRepository;
     private final DataSource dataSource;
 
-    private UserService(UserRepository userRepository) {
+    private UserService(UserRepository userRepository,MailRepository mailRepository) {
         this.userRepository = userRepository;
+        this.mailRepository = mailRepository;
         dataSource = DBUtils.createOrGetDataSource();
     }
 
 
     public static UserService createOrGetUserService() {
         if (userService == null) {
-            userService = new UserService(UserRepository.createOrGetUserRepository());
+            userService = new UserService(UserRepository.createOrGetUserRepository(), MailRepository.createOrGetMailRepository());
             System.out.println("싱글톤 memberService 생성됨");
             return userService;
         }
@@ -126,6 +131,13 @@ public class UserService {
         return responseData;
     }
 
+    /**
+     * 모든 회원을 조회하는 메소드
+     * @param deptName
+     * @return
+     * @throws SQLException
+     */
+
     public ResponseData findAll(String deptName) throws SQLException {
         ResponseData responseData = null;
         Connection con = null;
@@ -173,13 +185,29 @@ public class UserService {
 
 
     private ResponseData joinBizLogic(User user, Connection con) throws SQLException {
-        Optional<User> findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
+        Optional<User> findUser = userRepository.findUserById(con, user.getUserId());
 
         if (findUser.isPresent()) {
             return new ResponseData("실패", null);
         }
 
-        userRepository.save(con, user);
+        //회원 저장 수행
+        Long saveUserNum = userRepository.save(con, user);
+
+        //각 회원의 메일함을 생성해야 한다.
+        MailStore mailStore = new MailStore.Builder()
+                .userNum(saveUserNum)
+                .mailType(MailType.RECEIVED)
+                .build();
+
+        //받은 메일함 저장
+        mailRepository.mailStoreSave(con, mailStore);
+
+        //메일함 종류 변경
+        mailStore.changeMailType(MailType.SEND);
+
+        //보내는 메일함 저장
+        mailRepository.mailStoreSave(con,mailStore);
         return new ResponseData("성공", null);
     }
 

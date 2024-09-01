@@ -1,8 +1,13 @@
 package org.example.server.controller;
 
+import org.example.server.consts.MessageTypeConst;
+import org.example.server.domain.mail.Mail;
+import org.example.server.dto.MailReceivedData;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 import org.example.server.service.MailService;
+
+import java.sql.SQLException;
 
 public class MailController implements Controller {
     private static MailController mailController = null;
@@ -22,7 +27,17 @@ public class MailController implements Controller {
     }
 
     @Override
-    public ResponseData execute(RequestData requestData) {
-        return null;
+    public ResponseData execute(RequestData requestData) throws SQLException {
+        String requestURL = requestData.getMessageType();
+        ResponseData result = null;
+
+        switch (requestURL) {
+            case MessageTypeConst.MESSAGE_MAIL_ADD -> {
+                MailReceivedData mailReceivedData = (MailReceivedData) requestData.getData();
+                result = mailService.mailSend(mailReceivedData);
+            }
+        }
+
+        return result;
     }
 }
