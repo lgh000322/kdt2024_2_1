@@ -26,7 +26,20 @@ class UserServiceTest {
                 .deptNum(1L)
                 .build();
 
+        User user2 = new User.Builder()
+                .userId("dlrudgns2")
+                .password("dlrudgns2")
+                .name("이경훈2")
+                .tel("010-2222-2222")
+                .email("bbb@bbb.com")
+                .role(Role.USER)
+                .remainedLeave(15)
+                .positionNum(1L)
+                .deptNum(1L)
+                .build();
+
         ResponseData data = userService.join(user);
+        userService.join(user2);
 
         System.out.println("메세지 타입: " + data.getMessageType() + ", 데이터: " + data.getData());
     }
