@@ -2,15 +2,16 @@ package org.example.server.repository;
 
 import org.example.server.domain.board.Board;
 import org.example.server.domain.user.User;
+import org.example.server.dto.ResponseData;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+
+
 
 public class BoardRepository {
     private static BoardRepository boardRepository = null;
@@ -32,10 +33,10 @@ public class BoardRepository {
 
 
 
-    /*
+    /**
     *  모든 게시물을 가져오는함수
     * */
-    public List<Board> getAllBoards(Connection conn) throws SQLException {
+    public ResponseData getAllBoards(Connection conn) throws SQLException {
 
         List<Board> boards = new ArrayList<>();
 
@@ -43,9 +44,7 @@ public class BoardRepository {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
-        String sql = "select * from board";
-
-
+        String sql = "select * from board order by board_num desc";
 
 
         try {
@@ -79,14 +78,14 @@ public class BoardRepository {
                 boards.add(board);
             }
 
+            return new ResponseData("게시물 조회 성공", boards);
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
+        } finally {
+            close(ps, rs);
         }
 
-        close(ps, rs);
-
-        return boards;
     }
 
 
@@ -94,13 +93,14 @@ public class BoardRepository {
 <<<<<<< HEAD
     * 게시물을 저장하는 함수.
     * */
-    public void saveBoard(Board board, Connection conn) throws SQLException {
+    public Long saveBoard(Board board, Connection conn) throws SQLException {
         PreparedStatement ps = null;
+        ResultSet rs = null;
 
-        //value -> 게시판 번호, 제목, 내용, 유저번호, 작성일자 순으로 입력
-        String sql = "insert into board values(?, ?, ?, ?, ?)";
+        //value -> 제목, 내용, 유저번호, 작성일자 순으로 입력
+        String sql = "insert into board values(?, ?, ?, ?)";
 
-        Long boardNum = board.getBoardNum();
+
         String title = board.getTitle();
         String contents = board.getContents();
         Long userNum = board.getUserNum();
@@ -108,20 +108,28 @@ public class BoardRepository {
 
         try{
 
-            ps = conn.prepareStatement(sql);
-            ps.setLong(1, boardNum);
-            ps.setString(2, title);
-            ps.setString(3, contents);
-            ps.setLong(4, userNum);
-            ps.setDate(5, createdDate);
+            ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            ps.setString(1, title);
+            ps.setString(2, contents);
+            ps.setLong(3, userNum);
+            ps.setDate(4, createdDate);
 
             ps.executeUpdate();
+            rs = ps.getGeneratedKeys();
+
+            if (rs.next()) {
+                return rs.getLong(1);
+            } else {
+                throw new SQLException("게시물 작성 실패.");
+            }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
+        } finally {
+            close(ps, null);
         }
 
-        close(ps, null);
     }
 
 
@@ -131,19 +139,30 @@ public class BoardRepository {
     * */
     public void deleteBoard(Board board, Connection conn) throws SQLException {
         PreparedStatement ps = null;
-        String sql = "delete from board where board_num = ?";
+        // 게시물을 삭제하는 쿼리
+        String deleteBoardSql = "delete from board where board_num = ?";
+        // 게시물의 댓글을 삭제하는 쿼리
+        String deleteAnswerSql = "delete from board_answer where board_num = ?";
 
         try{
-            ps = conn.prepareStatement(sql);
-
+            //게시물 댓글을 삭제한다.
+            ps = conn.prepareStatement(deleteAnswerSql);
             ps.setLong(1, board.getBoardNum());
             ps.executeUpdate();
 
+            //게시물을 삭제하는 쿼리
+            ps = conn.prepareStatement(deleteBoardSql);
+            ps.setLong(1, board.getBoardNum());
+            ps.executeUpdate();
+
+
         }catch(SQLException e){
             e.printStackTrace();
+            throw e;
+        } finally {
+            close(ps, null);
         }
 
-        close(ps, null);
     }
 
 
