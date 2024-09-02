@@ -1,13 +1,12 @@
 package org.example.server.repository;
 
 import org.example.server.domain.board.Board;
-import org.example.server.domain.user.User;
+import org.example.server.domain.board.BoardAnswer;
 import org.example.server.dto.ResponseData;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -30,6 +29,51 @@ public class BoardRepository {
         System.out.println("boardRepository 싱글톤 반환");
         return boardRepository;
     }
+
+
+    /**
+     * 특정 게시물(게시물 번호로 매칭) 가져오는 함수
+     */
+    public Board getOneBoard(Long boardNum,Connection conn) throws SQLException {
+
+        Board board = null;
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        // 특정 게시물 pk 값과 일치하는 게시물 데이터를 가져오는 쿼리문
+        String getBoardSql = "select * from board where board_num = ?";
+
+        try {
+            // 특정 게시물 정보를 가져오는 쿼리 실행.
+            ps = conn.prepareStatement(getBoardSql);
+            ps.setLong(1, boardNum);
+            rs = ps.executeQuery();
+
+            // 해당 게시물이 있으면 실행
+            if(rs.next()) {
+                board = new Board.Builder()
+                        .boardNum(rs.getLong("board_num"))
+                        .title(rs.getString("title"))
+                        .contents(rs.getString("contents"))
+                        .createdDate( rs.getDate("created_date").toLocalDate())
+                        .userNum(rs.getLong("user_num"))
+                        .build();
+
+            } else {
+                System.out.println("게시물 조회 실패(해당 게시물 없음)");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(ps, rs);
+        }
+
+        return board;
+    }
+
 
 
 
@@ -89,8 +133,7 @@ public class BoardRepository {
     }
 
 
-    /*
-<<<<<<< HEAD
+    /**
     * 게시물을 저장하는 함수.
     * */
     public Long saveBoard(Board board, Connection conn) throws SQLException {
@@ -133,22 +176,15 @@ public class BoardRepository {
     }
 
 
-    /*
-<<<<<<< HEAD
+    /**
     * 게시물 삭제하는 함수
     * */
     public void deleteBoard(Board board, Connection conn) throws SQLException {
         PreparedStatement ps = null;
         // 게시물을 삭제하는 쿼리
         String deleteBoardSql = "delete from board where board_num = ?";
-        // 게시물의 댓글을 삭제하는 쿼리
-        String deleteAnswerSql = "delete from board_answer where board_num = ?";
 
         try{
-            //게시물 댓글을 삭제한다.
-            ps = conn.prepareStatement(deleteAnswerSql);
-            ps.setLong(1, board.getBoardNum());
-            ps.executeUpdate();
 
             //게시물을 삭제하는 쿼리
             ps = conn.prepareStatement(deleteBoardSql);
@@ -166,7 +202,7 @@ public class BoardRepository {
     }
 
 
-    /*
+    /**
     * 게시물을 수정하는 함수
     * */
     public void updateBoard(Board board, Connection conn) throws SQLException {
@@ -209,6 +245,8 @@ public class BoardRepository {
             }
         }
     }
+
+
 }
 
 

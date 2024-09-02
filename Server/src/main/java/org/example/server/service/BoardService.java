@@ -3,6 +3,7 @@ package org.example.server.service;
 import org.example.server.db_utils.DBUtils;
 import org.example.server.domain.board.Board;
 import org.example.server.domain.board.BoardAnswer;
+import org.example.server.dto.BoardAndAnswer;
 import org.example.server.dto.ResponseData;
 import org.example.server.repository.AnswerRepository;
 import org.example.server.repository.BoardRepository;
@@ -10,11 +11,15 @@ import org.example.server.repository.BoardRepository;
 import javax.sql.DataSource;
 import java.beans.PropertyEditorSupport;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BoardService {
     private static BoardService boardService = null;
     private final BoardRepository boardRepository;
+    private final AnswerRepository answerRepository;
     private final DataSource dataSource;
 
     // 의존성 주입.
@@ -33,7 +38,36 @@ public class BoardService {
 
     public BoardService(BoardRepository boardRepository, AnswerRepository answerRepository) {
         this.boardRepository = boardRepository;
+        this.answerRepository = answerRepository;
         dataSource = DBUtils.createOrGetDataSource();
+    }
+
+
+
+
+
+
+    /**
+    * 게시물 삭제.
+    * */
+    public ResponseData removeBoard(Board board) throws SQLException {
+        Connection conn = null;
+        ResponseData responseData = null;
+
+        try{
+
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            responseData = removeBoardBizLogic(board, conn);
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+
+        return responseData;
     }
 
 
@@ -62,6 +96,8 @@ public class BoardService {
     }
 
 
+
+
     /**
     * 모든 게시물을 조회
     * */
@@ -85,6 +121,69 @@ public class BoardService {
         return responseData;
     }
 
+    /**
+    * 특정 게시물 + 해당 게시글에 달린 댓글 조회
+    * */
+    private ResponseData showOneBoard(Long boardNum) throws SQLException {
+        ResponseData responseData = null;
+        Connection conn = null;
+
+        try{
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            responseData = showOneBoardBizLogic(boardNum, conn);
+            conn.commit();
+        } catch (SQLException e) {
+            // 에러 발생시 롤백
+            conn.rollback();
+        } finally {
+            release(conn);
+        }
+        return responseData;
+    }
+
+    private ResponseData showOneBoardBizLogic(Long boardNum, Connection conn) throws SQLException {
+        Board board = null;
+        List<BoardAndAnswer> answers = new ArrayList<>();
+        BoardAndAnswer boardAndAnswer = null;
+
+        ResponseData responseData = null;
+
+
+        // 게시물 번호로 게시물 정보를 가져옴.
+        board = boardRepository.getOneBoard(boardNum, conn);
+
+        // 게시물 번호로 게시물 댓글을 가져옴.
+        //answers = AnswerRepository. ~~
+
+        //위의 가져온 게시물과 댓글로 dto 생성
+        //boardAndAnswer = new BoardAndAnswer(board, answers);
+
+        //만들어진 게시물 + 댓글 dto를 responseData로 만듦.
+        responseData = new ResponseData("특정 게시물 조회 성공", boardAndAnswer);
+
+        return responseData;
+    }
+
+
+    /**
+    * 게시물과 게시물에 달린 댓글 삭제를 구현한 로직.
+    * */
+
+    private ResponseData removeBoardBizLogic(Board board, Connection conn) throws SQLException {
+        if(board.getBoardNum() == null) {
+            return new ResponseData("게시물 삭제 실패 (없는 게시물)", null);
+        }
+
+
+        // 게시물 댓글 삭제 -> 삭제로직 구현시 추가.
+        // answerRepository.deleteAnswer()
+
+        // 게시물 삭제
+        boardRepository.deleteBoard(board, conn);
+
+        return new ResponseData("게시물 삭제 성공", null);
+    }
 
 
 
