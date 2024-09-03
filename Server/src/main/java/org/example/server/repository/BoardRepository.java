@@ -31,6 +31,10 @@ public class BoardRepository {
     }
 
 
+
+
+
+
     /**
      * 특정 게시물(게시물 번호로 매칭) 가져오는 함수
      */
@@ -78,9 +82,59 @@ public class BoardRepository {
 
 
     /**
+     * 동적 쿼리를 통해서 조건과 일치하는 게시글을 가져와야한다. (수정 필요)
+    * 검색 조건과 일치하는 모든 게시물을 가져오는 메서드
+    * */
+    public List<Board> getBoardByTitle(String boardTitle,Connection conn) throws SQLException {
+        List<Board> boards = new ArrayList<>();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String Sql = "select * from board where title like ?";
+
+        try{
+            ps = conn.prepareStatement(Sql);
+            ps.setString(1, "%" + boardTitle + "%");
+            rs = ps.executeQuery();
+
+            while(rs.next()) {
+                // 게시물 번호
+                Long boardNum = rs.getLong("board_num");
+                // 게시물 제목
+                String title = rs.getString("title");
+                // 게시물 내용
+                String contents = rs.getString("contents");
+                // 게시물 작성일
+                LocalDate createdDate = rs.getDate("created_date").toLocalDate();
+                // 게시자 번호
+                Long userNum = rs.getLong("user_num");
+
+
+                Board board = new Board.Builder()
+                        .boardNum(boardNum)
+                        .title(title)
+                        .contents(contents)
+                        .createdDate(createdDate)
+                        .userNum(userNum)
+                        .build();
+
+                boards.add(board);
+            }
+
+            return boards;
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(ps, rs);
+        }
+
+    }
+
+
+    /**
     *  모든 게시물을 가져오는함수
     * */
-    public ResponseData getAllBoards(Connection conn) throws SQLException {
+    public List<Board> getAllBoards(Connection conn) throws SQLException {
 
         List<Board> boards = new ArrayList<>();
 
@@ -122,7 +176,7 @@ public class BoardRepository {
                 boards.add(board);
             }
 
-            return new ResponseData("게시물 조회 성공", boards);
+            return boards;
 
         } catch (SQLException e) {
             throw e;
@@ -170,7 +224,7 @@ public class BoardRepository {
         } catch (SQLException e) {
             throw e;
         } finally {
-            close(ps, null);
+            close(ps, rs);
         }
 
     }
@@ -179,18 +233,20 @@ public class BoardRepository {
     /**
     * 게시물 삭제하는 함수
     * */
-    public void deleteBoard(Board board, Connection conn) throws SQLException {
+    public int deleteBoard(Long boardNum, Connection conn) throws SQLException {
+
+
         PreparedStatement ps = null;
         // 게시물을 삭제하는 쿼리
         String deleteBoardSql = "delete from board where board_num = ?";
+        int row = 0;
 
         try{
 
             //게시물을 삭제하는 쿼리
             ps = conn.prepareStatement(deleteBoardSql);
-            ps.setLong(1, board.getBoardNum());
-            ps.executeUpdate();
-
+            ps.setLong(1, boardNum);
+            row =  ps.executeUpdate();
 
         }catch(SQLException e){
             e.printStackTrace();
@@ -199,31 +255,34 @@ public class BoardRepository {
             close(ps, null);
         }
 
+        return row;
     }
 
 
     /**
     * 게시물을 수정하는 함수
     * */
-    public void updateBoard(Board board, Connection conn) throws SQLException {
+    public int updateBoard(Board board, Connection conn) throws SQLException {
         PreparedStatement ps = null;
         String sql = "update board set title = ?, contents = ? where board_num = ?";
 
-
+        int row = 0;
 
         try{
             ps = conn.prepareStatement(sql);
             ps.setString(1, board.getTitle());
             ps.setString(2, board.getContents());
             ps.setLong(3, board.getBoardNum());
-            ps.executeUpdate();
+            row = ps.executeUpdate();
+
+
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         close(ps, null);
 
+        return row; // 0 일경우 수정 실패 , 0이 아니면 수정 성공.
     }
 
 

@@ -50,7 +50,7 @@ public class BoardService {
     /**
     * 게시물 삭제.
     * */
-    public ResponseData removeBoard(Board board) throws SQLException {
+    public ResponseData removeBoard(Long boardNum) throws SQLException {
         Connection conn = null;
         ResponseData responseData = null;
 
@@ -58,7 +58,7 @@ public class BoardService {
 
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-            responseData = removeBoardBizLogic(board, conn);
+            responseData = removeBoardBizLogic(boardNum, conn);
 
 
         } catch (SQLException e) {
@@ -96,21 +96,49 @@ public class BoardService {
     }
 
 
-
-
     /**
-    * 모든 게시물을 조회
-    * */
-    private ResponseData showAllBoards(Board board) throws SQLException {
+     * 검색 조건( 게시글 제목)과 일치하는 게시글들을 조회
+     */
+    public ResponseData findBoardByTitle(String boardTitle) throws SQLException {
+
         ResponseData responseData = null;
         Connection conn = null;
+        List<Board> boards;
 
         try{
             conn = dataSource.getConnection();
             // commit을 바로 실행하지 않기위해 setAutoCommit(false)설정
             // 쿼리 실행중 에러 발생시 롤백을 위함.
             conn.setAutoCommit(false);
-            responseData = boardRepository.getAllBoards(conn);
+            boards = boardRepository.getBoardByTitle(boardTitle, conn);
+            responseData = new ResponseData("모든 게시물 조회 성공", boards);
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+        } finally {
+            release(conn);
+        }
+
+        return responseData;
+    }
+
+
+
+    /**
+    * 모든 게시물을 조회
+    * */
+    public ResponseData findAllBoards() throws SQLException {
+        ResponseData responseData = null;
+        Connection conn = null;
+        List<Board> boards;
+
+        try{
+            conn = dataSource.getConnection();
+            // commit을 바로 실행하지 않기위해 setAutoCommit(false)설정
+            // 쿼리 실행중 에러 발생시 롤백을 위함.
+            conn.setAutoCommit(false);
+            boards = boardRepository.getAllBoards(conn);
+            responseData = new ResponseData("모든 게시물 조회 성공", boards);
             conn.commit();
         } catch (SQLException e) {
             conn.rollback();
@@ -124,14 +152,14 @@ public class BoardService {
     /**
     * 특정 게시물 + 해당 게시글에 달린 댓글 조회
     * */
-    private ResponseData showOneBoard(Long boardNum) throws SQLException {
+    public ResponseData findOneBoard(Long boardNum) throws SQLException {
         ResponseData responseData = null;
         Connection conn = null;
 
         try{
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-            responseData = showOneBoardBizLogic(boardNum, conn);
+            responseData = findOneBoardBizLogic(boardNum, conn);
             conn.commit();
         } catch (SQLException e) {
             // 에러 발생시 롤백
@@ -142,12 +170,55 @@ public class BoardService {
         return responseData;
     }
 
-    private ResponseData showOneBoardBizLogic(Long boardNum, Connection conn) throws SQLException {
+    /**
+    * 게시글 수정
+    * */
+    public ResponseData updateBoard(Board board) throws SQLException {
+        ResponseData responseData = null;
+        Connection conn = null;
+
+        try{
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            responseData = updateBoardBizLogic(board,conn);
+            conn.commit();
+        } catch (SQLException e) {
+            // 에러 발생시 롤백
+            conn.rollback();
+        } finally {
+            release(conn);
+        }
+
+        return responseData;
+    }
+
+    /**
+    * 게시글 수정 비즈니스로직
+    * */
+    private ResponseData updateBoardBizLogic(Board board, Connection conn) throws SQLException {
+
+
+
+        int checkUpdate = boardRepository.updateBoard(board, conn);
+
+        // 업데이트 쿼리 실패시 0 반환.
+        if (checkUpdate == 0) {
+            return new ResponseData("게시글 수정 실패", null);
+        }
+
+        return new ResponseData("게시글 수정 성공", null);
+    }
+
+
+    /**
+     * 선택된 게시물 + 댓글을 보여주는 비즈니스 로직
+    * */
+    private ResponseData findOneBoardBizLogic(Long boardNum, Connection conn) throws SQLException {
         Board board = null;
         List<BoardAndAnswer> answers = new ArrayList<>();
         BoardAndAnswer boardAndAnswer = null;
 
-        ResponseData responseData = null;
+        ResponseData responseData;
 
 
         // 게시물 번호로 게시물 정보를 가져옴.
@@ -170,36 +241,38 @@ public class BoardService {
     * 게시물과 게시물에 달린 댓글 삭제를 구현한 로직.
     * */
 
-    private ResponseData removeBoardBizLogic(Board board, Connection conn) throws SQLException {
-        if(board.getBoardNum() == null) {
-            return new ResponseData("게시물 삭제 실패 (없는 게시물)", null);
-        }
+    private ResponseData removeBoardBizLogic(Long boardNum, Connection conn) throws SQLException {
 
-
+        int checkRemove = 0;
+        ResponseData responseData = null;
         // 게시물 댓글 삭제 -> 삭제로직 구현시 추가.
         // answerRepository.deleteAnswer()
 
         // 게시물 삭제
-        boardRepository.deleteBoard(board, conn);
+        checkRemove =  boardRepository.deleteBoard(boardNum, conn);
 
-        return new ResponseData("게시물 삭제 성공", null);
+
+        if(checkRemove == 0) {
+            return new ResponseData("게시글 삭제 실패 (일치하는 게시글 없음)", null);
+        }
+        return new ResponseData("게시글 삭제 성공", null);
     }
-
 
 
     /**
      * 게시물 저장 비즈니스 로직 구현한 메서드
-    * */
+     */
     private ResponseData saveBoardBizLogic(Board board, Connection conn) throws SQLException {
 
         // 게시물의 제목이 없거나, 공백문자만 입력할경우. 실패메세지 반환.
-        if(board.getTitle().trim().equals("") || board.getTitle() == null) {
+        if (board.getTitle().trim().equals("") || board.getTitle() == null) {
             return new ResponseData("게시물 작성 실패", null);
         }
 
         // 게시물 저장 실행
         Long saveBoardNum = boardRepository.saveBoard(board, conn);
 
+        System.out.println(saveBoardNum);
 
         return new ResponseData("게시물 작성 성공", null);
     }
