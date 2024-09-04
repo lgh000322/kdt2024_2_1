@@ -5,6 +5,7 @@ import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
 
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
 public class SalaryRepository {
@@ -22,51 +23,40 @@ public class SalaryRepository {
     }
 
     //DB에 월급내역을 등록하는 메소드
-    public ResponseData DBSalaryAdd(Connection conn, User user) throws SQLException{
-        String sql = "create * from salary_log where user_num = ?";
+    public ResponseData insertSalaryonDB(Connection conn, User user, SalaryLog salaryLog) throws SQLException{
+        String sql = "INSERT INTO salary_log (received_data, total_salary, user_num) VALUES (?, ?, ?)";
 
-        List<SalaryLog> salaryLogs = new ArrayList<>(); // 여러 개의 SalaryLog를 저장할 리스트
         PreparedStatement pstmt = null;
-        ResultSet rs = null;
 
         try {
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, user.getUserId());
+
+            // PreparedStatement에 값 설정
+            pstmt.setDate(1, Date.valueOf(salaryLog.getReceivedData())); // LocalDate -> java.sql.Date 변환
+            pstmt.setInt(2, salaryLog.getTotalSalary());
+            pstmt.setLong(3, user.getUserNum());
 
             // SQL 쿼리 실행
-            rs = pstmt.executeQuery();
+            int rowsAffected = pstmt.executeUpdate();
 
-            while (rs.next()) {
-                // SalaryLog 객체를 생성하여 리스트에 추가
-                SalaryLog salary = new SalaryLog.Builder()
-                        .salaryNum(rs.getLong("salary_num"))
-                        .receivedData(rs.getDate("received_data").toLocalDate()) // LocalDate 변환
-                        .totalSalary(rs.getInt("total_salary"))
-                        .userNum(rs.getLong("user_num"))
-                        .build();
-
-                salaryLogs.add(salary); // 리스트에 SalaryLog 추가
-            }
-
-            // 리스트가 비어 있지 않다면 조회 성공 메시지와 함께 리스트 반환
-            if (!salaryLogs.isEmpty()) {
-                return new ResponseData("월급조회 성공", salaryLogs);
+            // 삽입 성공 여부에 따라 적절한 메시지 반환
+            if (rowsAffected > 0) {
+                return new ResponseData("월급 내역 등록 성공", salaryLog);
             } else {
-                // 조회된 결과가 없을 때 적절한 메시지 반환
-                return new ResponseData("월급조회 실패", null);
+                return new ResponseData("월급 내역 등록 실패", null);
             }
 
         } catch (SQLException e) {
             e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력
             throw e; // 예외를 다시 던짐
         } finally {
-            close(pstmt, rs); // 자원 해제
+            close(pstmt, null); // PreparedStatement 자원 해제, ResultSet은 사용되지 않으므로 null 전달
         }
     }
     
     
     //특정 유저의 월급을 모두 조회시키는 메소드
-    public ResponseData DBSalarySearchAll(Connection conn, User user) throws SQLException {
+    public ResponseData searchSalaryAllOnDB(Connection conn, User user) throws SQLException {
         String sql = "select * from salary_log where user_num = ?";
 
         List<SalaryLog> salaryLogs = new ArrayList<>(); // 여러 개의 SalaryLog를 저장할 리스트

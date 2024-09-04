@@ -27,7 +27,7 @@ public class WorkRepository {
     }
 
     ///유저의 근퇴목록 모두 조회
-    public ResponseData DBWorkSearchAll(User user, Connection conn) throws SQLException {
+    public ResponseData workSearchAllonDB(User user, Connection conn) throws SQLException {
         String sql = "select * from work_log where user_num = ?";
 
         List<WorkLog> workLogs = new ArrayList<>(); // 여러 개의 WorkLog를 저장할 리스트
@@ -73,8 +73,8 @@ public class WorkRepository {
 
 
     ///////DB 출근 로직
-    public ResponseData DBWorkStart(User user, Connection conn, LocalTime startTime, Status status) throws SQLException {
-        String sql = "INSERT INTO work_log (user_num, start_time, work_date, status) VALUES (?, ?, CURDATE(), ?)";
+    public ResponseData workStartonDB(User user, Connection conn, LocalTime startTime, Status status) throws SQLException {
+        String sql = "INSERT INTO work_log (user_num, start_time, work_date, status) VALUES (?, ?, CURDATE(), ?)"; //업데이트로
         PreparedStatement pstmt = null;
 
         try {
@@ -99,89 +99,73 @@ public class WorkRepository {
     }
 
 
-    //////////// DB 퇴근 로직
-    public ResponseData DBWorkEnd(User user, Connection conn, LocalTime endTime, Status status) throws SQLException {
-        String sql = "UPDATE work_log SET end_time = ?, status = ? WHERE user_num = ? AND work_date = CURDATE()";
+    // 출근 시간 업데이트하는 메서드 (기존에 기록이 있는 경우)
+    public ResponseData updateStartWorkLogonDB(WorkLog workLog, Connection con) throws SQLException {
+        String updateSQL = "UPDATE work_log SET start_time = ?, status = ? WHERE user_num = ? AND work_date = ?";
         PreparedStatement pstmt = null;
 
         try {
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setTime(1, java.sql.Time.valueOf(endTime));
-            pstmt.setString(2, status.name());
-            pstmt.setLong(3, user.getUserNum());
-
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                return new ResponseData("퇴근 업데이트 성공", null);
-            } else {
-                return new ResponseData("퇴근 업데이트 실패", null);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        } finally {
-            close(pstmt, null);
-        }
-    }
-
-    ///////////////// DB 조퇴 로직
-    public ResponseData DBWorkEndEarly(User user, Connection conn, LocalTime endTime, Status status) throws SQLException {
-        String sql = "UPDATE work_log SET end_time = ?, status = ? WHERE user_num = ? AND work_date = CURDATE()";
-        PreparedStatement pstmt = null;
-
-        try {
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setTime(1, java.sql.Time.valueOf(endTime));
-            pstmt.setString(2, status.name());
-            pstmt.setLong(3, user.getUserNum());
-
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                return new ResponseData("조퇴 업데이트 성공", null);
-            } else {
-                return new ResponseData("조퇴 업데이트 실패", null);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        } finally {
-            close(pstmt, null);
-        }
-    }
-
-    //근퇴로그 생성
-    public ResponseData DBCreateWorkLog(WorkLog workLog, Connection con) throws SQLException {
-        String insertSQL = "INSERT INTO work_log (start_time, end_time, status, work_date, user_num, leave_num) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = con.prepareStatement(insertSQL)) {
+            pstmt = con.prepareStatement(updateSQL);
             pstmt.setTime(1, workLog.getStartTime() != null ? Time.valueOf(workLog.getStartTime()) : null);
-            pstmt.setTime(2, workLog.getEndTime() != null ? Time.valueOf(workLog.getEndTime()) : null);
-            pstmt.setString(3, workLog.getStatus().name());
+            pstmt.setString(2, workLog.getStatus().name());
+            pstmt.setLong(3, workLog.getUserNum());
             pstmt.setDate(4, Date.valueOf(workLog.getWorkDate()));
-            pstmt.setLong(5, workLog.getUserNum());
-            pstmt.setLong(6, workLog.getLeaveNum() != null ? workLog.getLeaveNum() : null);
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                return new ResponseData("WorkLog 생성 성공", workLog);
+                return new ResponseData("출근 시간 업데이트 성공", workLog);
             } else {
-                return new ResponseData("WorkLog 생성 실패", null);
+                return new ResponseData("출근 시간 업데이트 실패", null);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return new ResponseData("WorkLog 생성 중 오류 발생", null);
+            return new ResponseData("출근 시간 업데이트 중 오류 발생", null);
+        } finally {
+            close(pstmt, null);
+        }
+    }
+
+    // 퇴근 시간만 업데이트하는 메서드
+    public ResponseData updateEndWorkLogonDB(WorkLog workLog, Connection con) throws SQLException {
+        String updateSQL = "UPDATE work_log SET end_time = ?, status = ? WHERE user_num = ? AND work_date = ?";
+        PreparedStatement pstmt = null;
+
+        try {
+            pstmt = con.prepareStatement(updateSQL);
+            pstmt.setTime(1, workLog.getEndTime() != null ? Time.valueOf(workLog.getEndTime()) : null);
+            pstmt.setString(2, workLog.getStatus().name());
+            pstmt.setLong(3, workLog.getUserNum());
+            pstmt.setDate(4, Date.valueOf(workLog.getWorkDate()));
+
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                return new ResponseData("퇴근 기록 성공", workLog);
+            } else {
+                return new ResponseData("퇴근 기록 실패", null);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new ResponseData("퇴근 기록 중 오류 발생", null);
+        } finally {
+            close(pstmt, null);
         }
     }
     
     //근퇴로그 업데이트
     public ResponseData updateWorkLog(WorkLog workLog, Connection con) throws SQLException {
         String updateSQL = "UPDATE work_log SET start_time = ?, end_time = ?, status = ?, leave_num = ? WHERE log_num = ?";
-        try (PreparedStatement pstmt = con.prepareStatement(updateSQL)) {
+        PreparedStatement pstmt = null;
+
+        try {
+            pstmt = con.prepareStatement(updateSQL);
             pstmt.setTime(1, workLog.getStartTime() != null ? Time.valueOf(workLog.getStartTime()) : null);
             pstmt.setTime(2, workLog.getEndTime() != null ? Time.valueOf(workLog.getEndTime()) : null);
             pstmt.setString(3, workLog.getStatus().name());
-            pstmt.setLong(4, workLog.getLeaveNum() != null ? workLog.getLeaveNum() : null);
+            if (workLog.getLeaveNum() != null) {
+                pstmt.setLong(4, workLog.getLeaveNum());
+            } else {
+                pstmt.setNull(4, Types.BIGINT); // leave_num이 null일 경우
+            }
             pstmt.setLong(5, workLog.getLogNum());
 
             int rowsAffected = pstmt.executeUpdate();
@@ -193,24 +177,29 @@ public class WorkRepository {
         } catch (SQLException e) {
             e.printStackTrace();
             return new ResponseData("WorkLog 업데이트 중 오류 발생", null);
+        } finally {
+            close(pstmt, null);
         }
     }
-
 
     //특ㅈ겅 유저의 해당 날짜에 근퇴목록이 있는지 조회
     public Optional<WorkLog> findWorkLogByUserAndDate(Long userNum, LocalDate workDate, Connection con) throws SQLException {
         String selectSQL = "SELECT * FROM work_log WHERE user_num = ? AND work_date = ?";
-        try (PreparedStatement pstmt = con.prepareStatement(selectSQL)) {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = con.prepareStatement(selectSQL);
             pstmt.setLong(1, userNum);
             pstmt.setDate(2, Date.valueOf(workDate));
 
-            ResultSet rs = pstmt.executeQuery();
+            rs = pstmt.executeQuery();
             if (rs.next()) {
                 WorkLog workLog = new WorkLog.Builder()
                         .logNum(rs.getLong("log_num"))
                         .startTime(rs.getTime("start_time") != null ? rs.getTime("start_time").toLocalTime() : null)
                         .endTime(rs.getTime("end_time") != null ? rs.getTime("end_time").toLocalTime() : null)
-                        .status(Status.valueOf(rs.getString("status")))
+                        .status(Status.valueOf(rs.getString("status").toUpperCase()))
                         .workDate(rs.getDate("work_date").toLocalDate())
                         .userNum(rs.getLong("user_num"))
                         .leaveNum(rs.getLong("leave_num"))
@@ -222,6 +211,8 @@ public class WorkRepository {
         } catch (SQLException e) {
             e.printStackTrace();
             return Optional.empty();
+        } finally {
+            close(pstmt, rs); // 자원 해제
         }
     }
     

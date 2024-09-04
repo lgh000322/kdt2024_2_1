@@ -15,7 +15,7 @@ public class AnswerRepository {
     }
 
 
-    public void DBAnswerSearch(){
+    public void searchAnswerDB(){
         /*
         * 아마 Board쪽에서 게시글을 클릭하면 해당 BoardNum을 받아올것임
         * 그럼 여기서는 받아온 BoardNum을 통해 Board_Answer테이블의 BoardNum과
@@ -25,7 +25,7 @@ public class AnswerRepository {
         System.out.println("DB를통해 댓글을 조회");
     }
 
-    public void DBAnswerAdd() {
+    public void addAnsweronDB() {
         /*
         * Create문으로 선택되어있는 BoardNum에 답글저장
          */

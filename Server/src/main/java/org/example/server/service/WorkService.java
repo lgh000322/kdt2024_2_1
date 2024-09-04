@@ -36,13 +36,13 @@ public class WorkService {
         dataSource = DBUtils.createOrGetDataSource();
     }
     //////////////////////////////////// 비즈니스 로직 ////////////////////////////////////////
-    public ResponseData WorkSearchBizLogic(User user, Connection conn) throws SQLException {
+    public ResponseData workSearchBizLogic(User user, Connection conn) throws SQLException {
         //connecter와 유저ID, (관리자or직원) 을 가져와서 해당 유저의 정보를 가져옴
         Optional<User> findUser = userRepository.findUserByIDAndRole(conn, user.getUserId(), user.getRole());
         if (findUser.isPresent()) {
             User DBUser = findUser.get();
             //findUser가 존재한다면 Repository로가서 해당 근퇴을 조회시킨다.
-            workRepository.DBWorkSearchAll(DBUser, conn);
+            workRepository.workSearchAllonDB(DBUser, conn);
 
         } else {
             return new ResponseData("실패", null);
@@ -52,7 +52,7 @@ public class WorkService {
     }
 
     //출근 비즈니스 로직
-    private ResponseData WorkStartBizLogic(User user, Connection con) throws SQLException {
+    private ResponseData workStartBizLogic(User user, Connection con) throws SQLException {
         try {
             // 현재 접속한 유저의 정보를 가져온다.
             Optional<User> findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
@@ -81,7 +81,7 @@ public class WorkService {
                             .status(status)
                             .build();
                     //출근 로그를 생성하여 넣는다.
-                    return workRepository.DBCreateWorkLog(workLog, con);
+                    return workRepository.updateStartWorkLogonDB(workLog, con);
                 }
             } else {
                 return new ResponseData("출근 실패: 사용자 정보를 찾을 수 없습니다.", null);
@@ -93,7 +93,7 @@ public class WorkService {
     }
 
     //퇴근 비즈니스 로직
-    private ResponseData WorkEndBizLogic(User user, Connection con) throws SQLException {
+    private ResponseData workEndBizLogic(User user, Connection con) throws SQLException {
         try {
             // 현재 접속한 유저의 정보를 가져온다.
             Optional<User> findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
@@ -124,7 +124,7 @@ public class WorkService {
                             .status(status)
                             .build();
 
-                    return workRepository.updateWorkLog(workLog, con);
+                    return workRepository.updateEndWorkLogonDB(workLog, con);
                 } else {
                     // WorkLog가 없는 경우 퇴근 기록을 남길 수 없음을 알림
                     return new ResponseData("퇴근 실패: 출근 기록 없음", null);
@@ -138,64 +138,6 @@ public class WorkService {
         }
     }
 
-    //조퇴 비즈니스 로직 근데 생각해보니 얘는 필요가 없음....
-    private ResponseData WorkOutEarlyBizLogic(User user, Connection con) throws SQLException {
-        try {
-            Optional<User> findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
-
-            // 현재 접속한 유저를 가져와서 있을 경우
-            if (findUser.isPresent()) {
-                User DBUser = findUser.get(); // User 객체화
-                LocalTime endTime = LocalTime.now(); // 현재 시간을 가져온다
-                LocalDate workDate = LocalDate.now(); // 오늘 날짜를 가져온다
-
-                // 오늘 날짜로 해당 유저의 출근 정보가 있는지 검색
-                Optional<WorkLog> workLogOpt = workRepository.findWorkLogByUserAndDate(DBUser.getUserNum(), workDate, con);
-
-                if (workLogOpt.isPresent()) {
-                    // WorkLog가 존재하면 조퇴 처리
-                    WorkLog workLog = workLogOpt.get();
-
-                    // 퇴근 시간이 18시 전이면 조퇴(지각)처리 그 후 일 경우 출석 으로 처리
-                    Status status = endTime.isBefore(LocalTime.of(18, 0)) ? Status.TARDINESS : Status.ATTENDANCE;
-
-                    // WorkLog에 퇴근 시간과 상태를 업데이트
-                    workLog = new WorkLog.Builder()
-                            .logNum(workLog.getLogNum())
-                            .startTime(workLog.getStartTime())
-                            .endTime(endTime)
-                            .workDate(workDate)
-                            .userNum(DBUser.getUserNum())
-                            .status(status)
-                            .build();
-
-                    return workRepository.updateWorkLog(workLog, con);
-                } else {
-                    // 출근 기록이 없으면 조퇴를 처리할 수 없음
-                    return new ResponseData("조퇴 실패: 출근 기록이 존재하지 않습니다.", null);
-                }
-            } else {
-                return new ResponseData("조퇴 실패: 사용자 정보를 찾을 수 없습니다.", null);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return new ResponseData("조퇴 실패", null);
-        }
-    }
-
-    // 상태 결정 로직
-    private Status determineStatus(LocalTime startTime, LocalTime endTime) {
-        LocalTime standardStartTime = LocalTime.of(9, 0); // 기준 출근 시간: 09:00
-        LocalTime standardEndTime = LocalTime.of(18, 0); // 기준 퇴근 시간: 18:00
-
-        if (startTime != null && startTime.isAfter(standardStartTime)) {
-            return Status.TARDINESS; // 출근 시간이 기준 시간 이후이면 지각
-        } else if (endTime != null && endTime.isBefore(standardEndTime)) {
-            return Status.TARDINESS; // 퇴근 시간이 기준 시간보다 빨리 끝나면 조퇴인데 조퇴가 없네요?
-        } else {
-            return Status.ATTENDANCE; // 정상 출근 시간 안에 출석했으면 출석
-        }
-    }
 //////////////////////////////////////// 일반 로직 ////////////////////////////////////////
     public ResponseData SearchWork(User user) throws SQLException {
         Connection con = null;
@@ -204,7 +146,7 @@ public class WorkService {
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = WorkSearchBizLogic(user, con);
+            responseData = workSearchBizLogic(user, con);
             con.commit();
         } catch (Exception e) {
             con.rollback();
@@ -222,7 +164,7 @@ public class WorkService {
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = WorkStartBizLogic(user, con);
+            responseData = workStartBizLogic(user, con);
             con.commit();
         } catch (Exception e) {
             con.rollback();
@@ -240,7 +182,7 @@ public class WorkService {
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = WorkEndBizLogic(user, con);
+            responseData = workEndBizLogic(user, con);
             con.commit();
         } catch (Exception e) {
             con.rollback();
@@ -259,7 +201,7 @@ public class WorkService {
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = WorkOutEarlyBizLogic(user, con);
+            responseData = workEndBizLogic(user, con);
             con.commit();
         } catch (Exception e) {
             con.rollback();
