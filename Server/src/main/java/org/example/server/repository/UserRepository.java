@@ -177,6 +177,7 @@ public class UserRepository {
             }
 
         } catch (SQLException e) {
+            e.printStackTrace();
             throw e;
         } finally {
             close(pstmt, rs);
