@@ -5,7 +5,6 @@ import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
 import org.example.server.service.SalaryService;
 import org.junit.jupiter.api.Test;
-
 import java.sql.SQLException;
 
 class SalaryControllerTest {
@@ -25,7 +24,7 @@ class SalaryControllerTest {
                 .deptNum(1L)
                 .build();
 
-        ResponseData responseData = service.SearchSalary(user);
+        ResponseData responseData = service.searchSalary(user);
         System.out.println(responseData.getMessageType() + "obj:" + responseData.getData());
     }
 }

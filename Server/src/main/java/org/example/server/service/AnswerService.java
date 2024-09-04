@@ -23,11 +23,11 @@ public class AnswerService {
 
     //댓글 조회
     public void AnswerSearch(){
-            answerRepository.DBAnswerSearch();
+            answerRepository.searchAnswerDB();
     }
 
     //댓글 달기
     public void AnswerAdd() {
-            answerRepository.DBAnswerAdd();
+            answerRepository.addAnsweronDB();
     }
 }
