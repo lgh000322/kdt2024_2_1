@@ -60,8 +60,9 @@ public class BoardService {
             conn.setAutoCommit(false);
             responseData = removeBoardBizLogic(boardNum, conn);
 
-
+            conn.commit();
         } catch (SQLException e) {
+            conn.rollback();
             e.printStackTrace();
             throw e;
         }
@@ -137,6 +138,7 @@ public class BoardService {
             // commit을 바로 실행하지 않기위해 setAutoCommit(false)설정
             // 쿼리 실행중 에러 발생시 롤백을 위함.
             conn.setAutoCommit(false);
+
             boards = boardRepository.getAllBoards(conn);
             responseData = new ResponseData("모든 게시물 조회 성공", boards);
             conn.commit();
@@ -164,6 +166,7 @@ public class BoardService {
         } catch (SQLException e) {
             // 에러 발생시 롤백
             conn.rollback();
+            e.printStackTrace();
         } finally {
             release(conn);
         }
@@ -215,7 +218,7 @@ public class BoardService {
     * */
     private ResponseData findOneBoardBizLogic(Long boardNum, Connection conn) throws SQLException {
         Board board = null;
-        List<BoardAndAnswer> answers = new ArrayList<>();
+
         BoardAndAnswer boardAndAnswer = null;
 
         ResponseData responseData;
@@ -228,7 +231,7 @@ public class BoardService {
         //answers = AnswerRepository. ~~
 
         //위의 가져온 게시물과 댓글로 dto 생성
-        //boardAndAnswer = new BoardAndAnswer(board, answers);
+        boardAndAnswer = new BoardAndAnswer(board, null);
 
         //만들어진 게시물 + 댓글 dto를 responseData로 만듦.
         responseData = new ResponseData("특정 게시물 조회 성공", boardAndAnswer);

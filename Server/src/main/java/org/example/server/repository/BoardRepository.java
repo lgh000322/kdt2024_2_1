@@ -195,7 +195,7 @@ public class BoardRepository {
         ResultSet rs = null;
 
         //value -> 제목, 내용, 유저번호, 작성일자 순으로 입력
-        String sql = "insert into board values(?, ?, ?, ?)";
+        String sql = "insert into board (title, contents, user_num, created_date) values(?, ?, ?, ?)";
 
 
         String title = board.getTitle();
@@ -222,6 +222,7 @@ public class BoardRepository {
             }
 
         } catch (SQLException e) {
+            e.printStackTrace();
             throw e;
         } finally {
             close(ps, rs);
