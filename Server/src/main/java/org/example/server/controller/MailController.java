@@ -1,8 +1,8 @@
 package org.example.server.controller;
 
 import org.example.server.consts.MessageTypeConst;
-import org.example.server.domain.mail.Mail;
 import org.example.server.dto.MailReceivedData;
+import org.example.server.dto.MailSearchDto;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 import org.example.server.service.MailService;
@@ -35,6 +35,14 @@ public class MailController implements Controller {
             case MessageTypeConst.MESSAGE_MAIL_ADD -> {
                 MailReceivedData mailReceivedData = (MailReceivedData) requestData.getData();
                 result = mailService.mailSend(mailReceivedData);
+            }
+            case MessageTypeConst.MESSAGE_STORE_SEARCH -> {
+                MailSearchDto mailSearchDto = (MailSearchDto) requestData.getData();
+                result = mailService.mailSearchAll(mailSearchDto);
+            }
+            case MessageTypeConst.MESSAGE_MAIL_ONE_SEARCH ->{
+                Long mailNum = (Long) requestData.getData();
+                mailService.mailSearchOne(mailNum);
             }
         }
 

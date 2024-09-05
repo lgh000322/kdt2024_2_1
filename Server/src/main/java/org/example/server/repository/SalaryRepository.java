@@ -5,6 +5,7 @@ import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
 
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
 public class SalaryRepository {
@@ -20,10 +21,42 @@ public class SalaryRepository {
         System.out.println("SalaryRepository 싱글톤 반환");
         return salaryRepository;
     }
+
+    //DB에 월급내역을 등록하는 메소드
+    public ResponseData insertSalaryonDB(Connection conn, User user, SalaryLog salaryLog) throws SQLException{
+        String sql = "INSERT INTO salary_log (received_data, total_salary, user_num) VALUES (?, ?, ?)";
+
+        PreparedStatement pstmt = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+
+            // PreparedStatement에 값 설정
+            pstmt.setDate(1, Date.valueOf(salaryLog.getReceivedData())); // LocalDate -> java.sql.Date 변환
+            pstmt.setInt(2, salaryLog.getTotalSalary());
+            pstmt.setLong(3, user.getUserNum());
+
+            // SQL 쿼리 실행
+            int rowsAffected = pstmt.executeUpdate();
+
+            // 삽입 성공 여부에 따라 적절한 메시지 반환
+            if (rowsAffected > 0) {
+                return new ResponseData("월급 내역 등록 성공", salaryLog);
+            } else {
+                return new ResponseData("월급 내역 등록 실패", null);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력
+            throw e; // 예외를 다시 던짐
+        } finally {
+            close(pstmt, null); // PreparedStatement 자원 해제, ResultSet은 사용되지 않으므로 null 전달
+        }
+    }
     
     
     //특정 유저의 월급을 모두 조회시키는 메소드
-    public ResponseData DBSalarySearchAll(Connection conn, User user) throws SQLException {
+    public ResponseData searchSalaryAllOnDB(Connection conn, User user) throws SQLException {
         String sql = "select * from salary_log where user_num = ?";
 
         List<SalaryLog> salaryLogs = new ArrayList<>(); // 여러 개의 SalaryLog를 저장할 리스트

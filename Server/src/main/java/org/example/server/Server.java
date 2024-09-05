@@ -10,7 +10,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,13 +35,7 @@ public class Server {
         while (true) {
             Socket socket = serverSocket.accept();
             System.out.println("Client connected");
-            executorService.execute(() -> {
-                try {
-                    handleClient(socket);
-                } catch (IOException e) {
-                    System.out.println("클라이언트가 종료됨");
-                }
-            });
+            executorService.execute(() -> handleClient(socket));
         }
     }
 
@@ -52,27 +45,21 @@ public class Server {
      * @param socket 클라이언트와 서버간 연결을 유지하기위한 소켓이다. 서버와 클라이언트가 연결을 종료할 때 파라미터로 받은 이 소켓을 종료해야
      *               한다.
      */
-    private void handleClient(Socket socket) throws IOException {
-        DataInputStream dis = null;
-        DataOutputStream dos = null;
-        Socket socket2 = socket;
+    private void handleClient(Socket socket) {
         try {
-            dis = new DataInputStream(socket2.getInputStream());
-            dos = new DataOutputStream(socket2.getOutputStream());
+            DataInputStream dis = new DataInputStream(socket.getInputStream());
+            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
             Gson gson = new Gson();
 
-            String receivedJsonStr = dis.readUTF();
-            RequestData requestData = gson.fromJson(receivedJsonStr, RequestData.class);
-            ResponseData responseData = frontController.execute(requestData);
-            writeAtDataOutputStream(dos, gson, responseData);
-            dos.close();
-            dis.close();
-            socket2.close();
+            boolean flag = true;
+            while (flag) {
+                String receivedJsonStr = dis.readUTF();
+                RequestData requestData = gson.fromJson(receivedJsonStr, RequestData.class);
+                ResponseData responseData = frontController.execute(requestData);
+                writeAtDataOutputStream(dos, gson, responseData);
+            }
         } catch (IOException e) {
-            System.out.println("클라이언트와 연결이 끊김");
-            dos.close();
-            dis.close();
-            socket2.close();
+            e.printStackTrace();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
