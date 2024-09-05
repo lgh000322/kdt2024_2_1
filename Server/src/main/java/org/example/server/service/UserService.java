@@ -7,7 +7,9 @@ import org.example.server.domain.mail.MailType;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
+import org.example.server.repository.DeptRepository;
 import org.example.server.repository.MailRepository;
+import org.example.server.repository.PositionRepository;
 import org.example.server.repository.UserRepository;
 
 import javax.sql.DataSource;
@@ -19,9 +21,13 @@ public class UserService {
     private static UserService userService = null;
     private final UserRepository userRepository;
     private final MailRepository mailRepository;
+    private final DeptRepository deptRepository;
+    private final PositionRepository positionRepository;
     private final DataSource dataSource;
 
-    private UserService(UserRepository userRepository,MailRepository mailRepository) {
+    private UserService(UserRepository userRepository, MailRepository mailRepository, DeptRepository deptRepository, PositionRepository positionRepository) {
+        this.positionRepository = positionRepository;
+        this.deptRepository = deptRepository;
         this.userRepository = userRepository;
         this.mailRepository = mailRepository;
         dataSource = DBUtils.createOrGetDataSource();
@@ -30,7 +36,7 @@ public class UserService {
 
     public static UserService createOrGetUserService() {
         if (userService == null) {
-            userService = new UserService(UserRepository.createOrGetUserRepository(), MailRepository.createOrGetMailRepository());
+            userService = new UserService(UserRepository.createOrGetUserRepository(), MailRepository.createOrGetMailRepository(), DeptRepository.createOrGetDeptRepository(), PositionRepository.createOrGetPositionRepository());
             System.out.println("싱글톤 memberService 생성됨");
             return userService;
         }
@@ -192,6 +198,16 @@ public class UserService {
         }
 
         //회원 저장 수행
+
+
+        //회원의 부서를 임시부서로 설정한다.
+        Long deptNum = deptRepository.findDeptNumByDeptName(con, "임시부서");
+
+        //회원의 직책을 사원으로 설정한다.
+        Long positionNum = positionRepository.findPositionNumByPositionName(con, "사원");
+
+        user.changeDeptNum(deptNum);
+        user.changePositionNum(positionNum);
         Long saveUserNum = userRepository.save(con, user);
 
         //각 회원의 메일함을 생성해야 한다.

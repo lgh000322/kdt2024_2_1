@@ -6,6 +6,7 @@ import org.example.server.domain.mail.MailType;
 import org.example.server.domain.mail.ReceivedMail;
 import org.example.server.domain.user.User;
 import org.example.server.dto.MailReceivedData;
+import org.example.server.dto.MailSearchDto;
 import org.example.server.dto.ResponseData;
 import org.example.server.dto.UserAndMailStore;
 import org.example.server.repository.MailRepository;
@@ -57,6 +58,67 @@ public class MailService {
         }
 
         return responseData;
+    }
+
+    public ResponseData mailSearchAll(MailSearchDto mailSearchDto) throws SQLException {
+        Connection con = null;
+        ResponseData responseData = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = mailSearchBizLogic(con, mailSearchDto);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+
+        return responseData;
+    }
+
+    public ResponseData mailSearchOne(Long mailNum) throws SQLException {
+        Connection con = null;
+        ResponseData responseData = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData=mailSearchOneBizLogic(con, mailNum);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+
+        return responseData;
+    }
+
+    private ResponseData mailSearchOneBizLogic(Connection con, Long mailNum) throws SQLException {
+        Optional<Mail> mailOne = mailRepository.findMailOne(con, mailNum);
+        if (mailOne.isEmpty()) {
+            return new ResponseData("특정 메일을 조회 실패", null);
+        }
+        return new ResponseData("특정 메일 조회 성공", mailOne.get());
+    }
+
+    private ResponseData mailSearchBizLogic(Connection con, MailSearchDto mailSearchDto) throws SQLException {
+        if (mailSearchDto.getMailType() == MailType.RECEIVED) {
+            Optional<List<Mail>> sendMailAll = mailRepository.findSendMailAll(con, mailSearchDto);
+            if (sendMailAll.isEmpty()) {
+                return new ResponseData("해당 유저의 송신메일함이 비어있습니다.", null);
+            }
+
+            return new ResponseData("유저의 송신메일함의 모든 메일 조회 성공", sendMailAll.get());
+        } else {
+            Optional<List<Mail>> receivedMailAll = mailRepository.findReceivedMailAll(con, mailSearchDto);
+            if (receivedMailAll.isEmpty()) {
+                return new ResponseData("해당 유저의 수신메일함이 비어있습니다.", null);
+            }
+            return new ResponseData("유저의 수신 메일함의 모든 메일 조회 성공", receivedMailAll.get());
+        }
     }
 
     private ResponseData mailSendBizLogic(Connection con, MailReceivedData mailReceivedData) throws SQLException {

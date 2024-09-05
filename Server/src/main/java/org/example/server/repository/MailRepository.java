@@ -4,9 +4,13 @@ import org.example.server.domain.mail.Mail;
 import org.example.server.domain.mail.MailStore;
 import org.example.server.domain.mail.MailType;
 import org.example.server.domain.mail.ReceivedMail;
+import org.example.server.dto.MailSearchDto;
 import org.example.server.dto.UserAndMailStore;
+import org.example.server.service.MailService;
 
 import java.sql.*;
+import java.util.List;
+import java.util.Optional;
 
 public class MailRepository {
     private static MailRepository mailRepository = null;
@@ -111,6 +115,106 @@ public class MailRepository {
             }
 
             return userAndMailStore;
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public Optional<List<Mail>> findSendMailAll(Connection con, MailSearchDto mailSearchDto) throws SQLException {
+        String sql = "select mail.mai_num, mail.title, mail_created_date" +
+                " from mail" +
+                " left join mail_store on mail_mail_store_num = mail_store.mail_store_num" +
+                " left join user on mail_store.user_num = user.user_num" +
+                " where user.email = ?" +
+                " order by mail.mai_num desc";
+
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<Mail> result = null;
+
+        try {
+            pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, mailSearchDto.getEmail());
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Mail mail = new Mail.Builder()
+                        .mailNum(rs.getLong("mai_num"))
+                        .title(rs.getString("title"))
+                        .createdDate(rs.getDate("created_date").toLocalDate())
+                        .build();
+
+                result.add(mail);
+            }
+
+            return Optional.ofNullable(result);
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public Optional<List<Mail>> findReceivedMailAll(Connection con, MailSearchDto mailSearchDto) throws SQLException {
+        String sql = "select mail.mai_num, mail.title, mail.created_date" +
+                " from mail" +
+                " left join received_mail on mail.mai_num = received_mail.mai_num" +
+                " left join user on received_mail.user_num = user.user_num" +
+                " where user.email = ?" +
+                " order by mail.mai_num desc";
+
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<Mail> result = null;
+
+        try {
+            pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, mailSearchDto.getEmail());
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Mail mail = new Mail.Builder()
+                        .mailNum(rs.getLong("mai_num"))
+                        .title(rs.getString("title"))
+                        .createdDate(rs.getDate("created_date").toLocalDate())
+                        .build();
+
+                result.add(mail);
+            }
+
+            return Optional.ofNullable(result);
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public Optional<Mail> findMailOne(Connection con, Long mailNum) throws SQLException {
+
+        String sql = "select * from mail where mail_num = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = con.prepareStatement(sql);
+            pstmt.setLong(1, mailNum);
+            rs = pstmt.executeQuery();
+            Mail mail = null;
+            if (rs.next()) {
+                mail = new Mail.Builder()
+                        .title(rs.getString("title"))
+                        .contents(rs.getString("contents"))
+                        .createdDate(rs.getDate("created_date").toLocalDate())
+                        .build();
+            }
+            return Optional.ofNullable(mail);
 
         } catch (SQLException e) {
             throw e;
