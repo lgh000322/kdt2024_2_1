@@ -6,7 +6,9 @@ import org.example.server.domain.mail.MailStore;
 import org.example.server.domain.mail.MailType;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
+import org.example.server.dto.LeaveDay;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.UserJoinDto;
 import org.example.server.repository.DeptRepository;
 import org.example.server.repository.MailRepository;
 import org.example.server.repository.PositionRepository;
@@ -65,7 +67,7 @@ public class UserService {
      *
      * @param user: json으로 받은 회원 데이터
      */
-    public ResponseData join(User user) throws SQLException {
+    public ResponseData join(UserJoinDto user) throws SQLException {
         Connection con = null;
         ResponseData responseData = null;
 
@@ -190,8 +192,8 @@ public class UserService {
     }
 
 
-    private ResponseData joinBizLogic(User user, Connection con) throws SQLException {
-        Optional<User> findUser = userRepository.findUserById(con, user.getUserId());
+    private ResponseData joinBizLogic(UserJoinDto userJoinDto, Connection con) throws SQLException {
+        Optional<User> findUser = userRepository.findUserById(con, userJoinDto.getUserId());
 
         if (findUser.isPresent()) {
             return new ResponseData("실패", null);
@@ -204,10 +206,20 @@ public class UserService {
         Long deptNum = deptRepository.findDeptNumByDeptName(con, "임시부서");
 
         //회원의 직책을 사원으로 설정한다.
-        Long positionNum = positionRepository.findPositionNumByPositionName(con, "사원");
+        LeaveDay leaveDay = positionRepository.findPositionNumByPositionName(con, "사원");
 
-        user.changeDeptNum(deptNum);
-        user.changePositionNum(positionNum);
+        User user = new User.Builder()
+                .userId(userJoinDto.getUserId())
+                .password(userJoinDto.getPassword())
+                .email(userJoinDto.getEmail())
+                .tel(userJoinDto.getTel())
+                .name(userJoinDto.getName())
+                .role(Role.USER)
+                .deptNum(deptNum)
+                .positionNum(leaveDay.getPositionNum())
+                .remainedLeave(leaveDay.getLeaveDay())
+                .build();
+
         Long saveUserNum = userRepository.save(con, user);
 
         //각 회원의 메일함을 생성해야 한다.

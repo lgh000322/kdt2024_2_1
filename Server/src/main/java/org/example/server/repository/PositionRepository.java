@@ -1,5 +1,7 @@
 package org.example.server.repository;
 
+import org.example.server.dto.LeaveDay;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,7 +19,7 @@ public class PositionRepository {
         return positionRepository;
     }
 
-    public Long findPositionNumByPositionName(Connection con, String positionName) throws SQLException {
+    public LeaveDay findPositionNumByPositionName(Connection con, String positionName) throws SQLException {
 
         String sql = "select * from position where position_name = ?";
         PreparedStatement pstmt = null;
@@ -28,11 +30,13 @@ public class PositionRepository {
             pstmt.setString(1, positionName);
             rs = pstmt.executeQuery();
 
-            Long result = null;
+            LeaveDay leaveDay = new LeaveDay();
             if (rs.next()) {
-                result = rs.getLong("position_num");
+                leaveDay.setPositionNum(rs.getLong("position_num"));
+                leaveDay.setLeaveDay(rs.getInt("leave_day"));
+
             }
-            return result;
+            return leaveDay;
         } catch (SQLException e) {
             throw e;
         } finally {
