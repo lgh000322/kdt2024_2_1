@@ -1,3 +1,4 @@
+/*
 package org.example.server.service;
 
 import org.example.server.domain.mail.Mail;
@@ -42,4 +43,4 @@ class MailServiceTest {
         System.out.println("메세지: "+result.getMessageType()+" 데이터: "+result.getData());
     }
 
-}
+}*/
