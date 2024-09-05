@@ -2,7 +2,7 @@ package org.example.server.service;
 
 import org.example.server.db_utils.DBUtils;
 import org.example.server.domain.salary_log.SalaryLog;
-import org.example.server.domain.user.Role;
+
 import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
 import org.example.server.repository.SalaryRepository;
@@ -13,7 +13,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.Scanner;
+
 
 public class SalaryService {
     private static SalaryService salaryService = null;
@@ -103,16 +103,21 @@ public class SalaryService {
     private ResponseData searchSalaryBizLogic(User user, Connection con) throws SQLException {
         //connecter와 유저ID, (관리자or직원) 을 가져와서 해당 유저의 정보를 가져옴
         Optional<User> findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
+
         if (findUser.isPresent()) {
             User DBUser = findUser.get();
-            //findUser가 존재한다면 Repository로가서 해당 월급을 조회시킨다.
-            salaryRepository.searchSalaryAllOnDB(con, DBUser);
+            // findUser가 존재한다면 Repository로 가서 해당 월급을 조회
+            ResponseData salaryResponse = salaryRepository.searchSalaryAllOnDB(con, DBUser);
 
+            // 월급 조회 결과가 성공인 경우에만 반환
+            if ("월급조회 성공".equals(salaryResponse.getMessageType())) {
+                return new ResponseData("성공", salaryResponse.getData()); // salary 로그 리스트를 반환
+            } else {
+                return new ResponseData("월급 조회 실패", null); // 실패 시 null 반환
+            }
         } else {
-            return new ResponseData("실패", null);
+            return new ResponseData("유저 조회 실패", null); // 유저를 찾지 못한 경우
         }
-        //userRepository.save(con, user);
-        return new ResponseData("성공", findUser); //리스트를 반환함
     }
 
     //얜 그냥 쭉쓰면됨
