@@ -52,6 +52,9 @@ public abstract class MessageTypeConst {
     //메일함 조회
     public static final String MESSAGE_STORE_SEARCH = "/mail/store/search";
 
+    //특정 메일 조회
+    public static final String MESSAGE_MAIL_ONE_SEARCH = "/mail/one/search";
+
     //모든 게시판 조회
     public static final String MESSAGE_BOARD_LIST_SEARCH = "/board/list/search";
 
