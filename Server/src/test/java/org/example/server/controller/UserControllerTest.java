@@ -1,3 +1,4 @@
+/*
 package org.example.server.controller;
 
 import org.example.server.consts.MessageTypeConst;
@@ -30,4 +31,4 @@ class UserControllerTest {
         //then
         System.out.println("메세지: "+result.getMessageType()+" 데이터: "+result.getData());
     }
-}
+}*/

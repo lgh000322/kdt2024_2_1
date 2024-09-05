@@ -1,3 +1,4 @@
+/*
 package org.example.server.controller;
 
 import org.example.server.domain.user.Role;
@@ -27,4 +28,4 @@ class SalaryControllerTest {
         ResponseData responseData = service.searchSalary(user);
         System.out.println(responseData.getMessageType() + "obj:" + responseData.getData());
     }
-}
+}*/

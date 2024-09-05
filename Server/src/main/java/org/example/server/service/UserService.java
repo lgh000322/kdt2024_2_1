@@ -9,6 +9,7 @@ import org.example.server.domain.user.User;
 import org.example.server.dto.LeaveDay;
 import org.example.server.dto.ResponseData;
 import org.example.server.dto.UserJoinDto;
+import org.example.server.dto.UserLoginDto;
 import org.example.server.repository.DeptRepository;
 import org.example.server.repository.MailRepository;
 import org.example.server.repository.PositionRepository;
@@ -91,7 +92,7 @@ public class UserService {
      * @param user 로그인 정보를 검사할 유저
      * @return
      */
-    public ResponseData login(User user) throws SQLException {
+    public ResponseData login(UserLoginDto user) throws SQLException {
         ResponseData responseData = null;
         Connection con = null;
 
@@ -175,7 +176,7 @@ public class UserService {
     }
 
 
-    private ResponseData loginBizLogicUser(User user, Connection con) throws SQLException {
+    private ResponseData loginBizLogicUser(UserLoginDto user, Connection con) throws SQLException {
         Optional<User> findUser = Optional.empty();
 
         findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());

@@ -8,6 +8,7 @@ import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 import org.example.server.dto.UserJoinDto;
+import org.example.server.dto.UserLoginDto;
 import org.example.server.service.UserService;
 
 import java.lang.reflect.Type;
@@ -52,9 +53,11 @@ public class UserController implements Controller {
             }
             case MessageTypeConst.MESSAGE_LOGIN -> {
                 System.out.println("로그인 실행");
-                User loginUser = (User) requestData.getData();
-                result = userService.login(loginUser);
-                threadLocalUser.set(loginUser);
+                if (requestData.getData() instanceof LinkedTreeMap) {
+                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
+                    UserLoginDto userLoginDto = gson.fromJson(gson.toJson(map), UserLoginDto.class);
+                    result = userService.login(userLoginDto);
+                }
             }
             case MessageTypeConst.MESSAGE_LOGOUT -> {
                 System.out.println("로그아웃 실행");
