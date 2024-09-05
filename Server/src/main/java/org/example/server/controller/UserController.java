@@ -4,6 +4,7 @@ import org.example.server.consts.MessageTypeConst;
 import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.UserJoinDto;
 import org.example.server.service.UserService;
 
 import java.sql.SQLException;
@@ -38,8 +39,8 @@ public class UserController implements Controller {
         switch (requestURL) {
             case MessageTypeConst.MESSAGE_JOIN -> {
                 System.out.println("회원가입 실행");
-                User joinUser = (User) requestData.getData();
-                result = userService.join(joinUser);
+                UserJoinDto userJoinDto = (UserJoinDto) requestData.getData();
+                result = userService.join(userJoinDto);
             }
             case MessageTypeConst.MESSAGE_LOGIN -> {
                 System.out.println("로그인 실행");
