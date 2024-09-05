@@ -2,7 +2,6 @@ package org.example.server.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
-import com.google.gson.reflect.TypeToken;
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
@@ -11,7 +10,6 @@ import org.example.server.dto.UserJoinDto;
 import org.example.server.dto.UserLoginDto;
 import org.example.server.service.UserService;
 
-import java.lang.reflect.Type;
 import java.sql.SQLException;
 
 

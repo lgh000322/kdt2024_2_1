@@ -80,7 +80,7 @@ public class WorkRepository {
         try {
             pstmt = conn.prepareStatement(sql);
             pstmt.setLong(1, user.getUserNum());
-            pstmt.setTime(2, java.sql.Time.valueOf(startTime));
+            pstmt.setTime(2, Time.valueOf(startTime));
             pstmt.setString(3, status.name());
 
             int rowsAffected = pstmt.executeUpdate();

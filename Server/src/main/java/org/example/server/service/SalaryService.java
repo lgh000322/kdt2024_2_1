@@ -2,7 +2,6 @@ package org.example.server.service;
 
 import org.example.server.db_utils.DBUtils;
 import org.example.server.domain.salary_log.SalaryLog;
-import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
 import org.example.server.repository.SalaryRepository;
@@ -13,7 +12,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.Scanner;
 
 public class SalaryService {
     private static SalaryService salaryService = null;

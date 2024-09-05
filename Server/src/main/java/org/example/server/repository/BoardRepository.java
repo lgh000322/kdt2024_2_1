@@ -1,8 +1,6 @@
 package org.example.server.repository;
 
 import org.example.server.domain.board.Board;
-import org.example.server.domain.board.BoardAnswer;
-import org.example.server.dto.ResponseData;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -201,7 +199,7 @@ public class BoardRepository {
         String title = board.getTitle();
         String contents = board.getContents();
         Long userNum = board.getUserNum();
-        java.sql.Date createdDate = java.sql.Date.valueOf(board.getCreatedDate());
+        Date createdDate = Date.valueOf(board.getCreatedDate());
 
         try{
 

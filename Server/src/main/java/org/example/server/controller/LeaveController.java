@@ -1,14 +1,12 @@
 package org.example.server.controller;
 
 import org.example.server.consts.MessageTypeConst;
-import org.example.server.domain.board.Board;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 import org.example.server.service.LeaveService;
 
 import java.sql.SQLException;
 
-import static org.example.server.consts.MessageTypeConst.MESSAGE_BOARD_LIST_SEARCH;
 import static org.example.server.consts.MessageTypeConst.MESSAGE_LEAVE_REQUEST;
 
 public class LeaveController implements Controller {

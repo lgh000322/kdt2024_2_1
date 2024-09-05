@@ -2,18 +2,14 @@ package org.example.server.service;
 
 import org.example.server.db_utils.DBUtils;
 import org.example.server.domain.board.Board;
-import org.example.server.domain.board.BoardAnswer;
 import org.example.server.dto.BoardAndAnswer;
 import org.example.server.dto.ResponseData;
 import org.example.server.repository.AnswerRepository;
 import org.example.server.repository.BoardRepository;
 
 import javax.sql.DataSource;
-import java.beans.PropertyEditorSupport;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BoardService {

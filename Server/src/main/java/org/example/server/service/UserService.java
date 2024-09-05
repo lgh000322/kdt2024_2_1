@@ -6,10 +6,7 @@ import org.example.server.domain.mail.MailStore;
 import org.example.server.domain.mail.MailType;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
-import org.example.server.dto.LeaveDay;
-import org.example.server.dto.ResponseData;
-import org.example.server.dto.UserJoinDto;
-import org.example.server.dto.UserLoginDto;
+import org.example.server.dto.*;
 import org.example.server.repository.DeptRepository;
 import org.example.server.repository.MailRepository;
 import org.example.server.repository.PositionRepository;
@@ -177,19 +174,22 @@ public class UserService {
 
 
     private ResponseData loginBizLogicUser(UserLoginDto user, Connection con) throws SQLException {
-        Optional<User> findUser = Optional.empty();
+        Optional<UserInfo> findUser = Optional.empty();
 
-        findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
+        findUser = userRepository.findUserInfoByIDAndRole(con, user.getUserId(), user.getRole());
         if (findUser.isEmpty()) {
             return new ResponseData("실패(존재하지 않는 회원)", null);
         }
 
-        User loginUser = findUser.get();
-        if (!loginUser.getPassword().equals(user.getPassword())) {
+        if (!user.getPassword().equals(user.getPassword())) {
             return new ResponseData("로그인 실패", null);
         }
 
-        return new ResponseData("로그인 성공", user);
+        //이름, 사용자 번호, 이메일, 부서, 직급,
+        UserInfo userInfo = findUser.get();
+
+
+        return new ResponseData("로그인 성공", userInfo);
     }
 
 
