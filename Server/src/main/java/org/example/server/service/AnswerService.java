@@ -1,6 +1,5 @@
 package org.example.server.service;
 
-import org.example.server.dto.RequestData;
 import org.example.server.repository.AnswerRepository;
 
 public class AnswerService {

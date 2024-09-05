@@ -6,7 +6,6 @@ import org.example.server.domain.mail.MailType;
 import org.example.server.domain.mail.ReceivedMail;
 import org.example.server.dto.MailSearchDto;
 import org.example.server.dto.UserAndMailStore;
-import org.example.server.service.MailService;
 
 import java.sql.*;
 import java.util.List;

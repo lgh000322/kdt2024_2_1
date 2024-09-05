@@ -3,6 +3,7 @@ package org.example.server.repository;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.UserInfo;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -64,6 +65,41 @@ public class UserRepository {
             }
 
             return Optional.ofNullable(user);
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public Optional<UserInfo> findUserInfoByIDAndRole(Connection conn, String userId, Role role) throws SQLException {
+        String sql = "select user.user_num, user.name, user.email, dept.dept_name, position.position_name" +
+                " from user" +
+                " left join dept on user.dept_num = dept.dept_num" +
+                " left join position on user.position_num = dept.position_num" +
+                " where user_id = ? and role = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userId);
+            pstmt.setString(2, role.name());
+            rs = pstmt.executeQuery();
+
+            UserInfo userInfo = new UserInfo();
+
+            if (rs.next()) {
+                userInfo.setUserNum(rs.getLong("user.user_num"));
+                userInfo.setName(rs.getString("user.name"));
+                userInfo.setEmail(rs.getString("user.email"));
+                userInfo.setDeptName(rs.getString("dept.dept_name"));
+                userInfo.setPositionName(rs.getString("position.position_name"));
+            }
+
+            return Optional.ofNullable(userInfo);
 
         } catch (SQLException e) {
             throw e;

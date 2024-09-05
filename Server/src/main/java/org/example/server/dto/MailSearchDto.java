@@ -1,7 +1,6 @@
 package org.example.server.dto;
 
 import org.example.server.domain.mail.MailType;
-import org.example.server.domain.user.User;
 
 public class MailSearchDto {
     //클라이언트가 유저 이메일 보내준다고 가정함.

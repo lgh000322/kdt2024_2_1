@@ -2,7 +2,6 @@ package org.example.server.controller;
 
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.domain.board.Board;
-import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 import org.example.server.service.BoardService;
