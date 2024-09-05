@@ -2,7 +2,6 @@ package org.example.server.db_utils;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.example.server.domain.leave_log.LeaveLog;
 
 import javax.sql.DataSource;
 

@@ -51,4 +51,8 @@ public class MailStore {
     public Long getUserNum() {
         return userNum;
     }
+
+    public void changeMailType(MailType mailType) {
+        this.mailType = mailType;
+    }
 }
