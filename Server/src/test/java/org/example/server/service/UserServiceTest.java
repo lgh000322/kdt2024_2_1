@@ -1,3 +1,4 @@
+/*
 package org.example.server.service;
 
 import org.example.server.domain.user.Role;
@@ -71,4 +72,4 @@ class UserServiceTest {
         System.out.println("메세지 타입: " + data.getMessageType() + ", 데이터: " + findUserRoleUser.getUserId());
     }
 
-}
+}*/

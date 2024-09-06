@@ -71,6 +71,33 @@ public class WorkRepository {
     }
 
 
+    ///////DB 출근 로직
+    public ResponseData workStartonDB(User user, Connection conn, LocalTime startTime, Status status) throws SQLException {
+        String sql = "INSERT INTO work_log (user_num, start_time, work_date, status) VALUES (?, ?, CURDATE(), ?)"; //업데이트로
+        PreparedStatement pstmt = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, user.getUserNum());
+            pstmt.setTime(2, Time.valueOf(startTime));
+            pstmt.setString(3, status.name());
+
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                return new ResponseData("출근 업데이트 성공", null);
+            } else {
+                return new ResponseData("출근 업데이트 실패", null);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, null);
+        }
+    }
+
+
     // 출근 시간 업데이트하는 메서드 (기존에 기록이 있는 경우)
     public ResponseData updateStartWorkLogonDB(WorkLog workLog, Connection con) throws SQLException {
         String updateSQL = "UPDATE work_log SET start_time = ?, status = ? WHERE user_num = ? AND work_date = ?";

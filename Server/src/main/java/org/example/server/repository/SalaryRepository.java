@@ -5,8 +5,8 @@ import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
 
 import java.sql.*;
-import java.sql.Date;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SalaryRepository {
     private static SalaryRepository salaryRepository = null;

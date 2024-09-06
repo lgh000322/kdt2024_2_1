@@ -10,6 +10,7 @@ import org.example.server.dto.SalaryAddData;
 import org.example.server.service.SalaryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -129,3 +130,4 @@ class SalaryControllerTest {
     }
 
 }
+
