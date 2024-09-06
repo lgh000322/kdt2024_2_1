@@ -1,15 +1,13 @@
 # IDE 설정 파일
-/.idea/
+/.idea/*
 *.iml
 
 # 빌드 아티팩트
 /build/
-out/
 
 # Gradle 캐시
-/.gradle/
+/.gradle/*
 
 # 운영체제 파일
 .DS_Store
 Thumbs.db
-/out/
