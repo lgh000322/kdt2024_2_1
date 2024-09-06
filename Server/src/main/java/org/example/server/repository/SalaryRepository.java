@@ -23,8 +23,8 @@ public class SalaryRepository {
     }
 
     //DB에 월급내역을 등록하는 메소드
-    public ResponseData insertSalaryonDB(Connection conn, User user, SalaryLog salaryLog) throws SQLException{
-        String sql = "INSERT INTO salary_log (received_data, total_salary, user_num) VALUES (?, ?, ?)";
+    public ResponseData insertSalaryonDB(Connection conn, User user, SalaryLog salaryLog) throws SQLException {
+        String sql = "INSERT INTO salary_log (received_date, total_salary, user_num) VALUES (?, ?, ?)";
 
         PreparedStatement pstmt = null;
 
@@ -53,8 +53,8 @@ public class SalaryRepository {
             close(pstmt, null); // PreparedStatement 자원 해제, ResultSet은 사용되지 않으므로 null 전달
         }
     }
-    
-    
+
+
     //특정 유저의 월급을 모두 조회시키는 메소드
     public ResponseData searchSalaryAllOnDB(Connection conn, User user) throws SQLException {
         String sql = "select * from salary_log where user_num = ?";
@@ -65,7 +65,7 @@ public class SalaryRepository {
 
         try {
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, user.getUserId());
+            pstmt.setLong(1, user.getUserNum());
 
             // SQL 쿼리 실행
             rs = pstmt.executeQuery();
@@ -74,7 +74,7 @@ public class SalaryRepository {
                 // SalaryLog 객체를 생성하여 리스트에 추가
                 SalaryLog salary = new SalaryLog.Builder()
                         .salaryNum(rs.getLong("salary_num"))
-                        .receivedData(rs.getDate("received_data").toLocalDate()) // LocalDate 변환
+                        .receivedData(rs.getDate("received_date").toLocalDate()) // LocalDate 변환
                         .totalSalary(rs.getInt("total_salary"))
                         .userNum(rs.getLong("user_num"))
                         .build();
@@ -117,8 +117,6 @@ public class SalaryRepository {
             }
         }
     }
-
-
 
 
 }
