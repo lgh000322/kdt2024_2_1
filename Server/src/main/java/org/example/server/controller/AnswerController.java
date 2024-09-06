@@ -16,6 +16,7 @@ import org.example.server.dto.ResponseData;
 import org.example.server.dto.SalaryAddData;
 import org.example.server.service.AnswerService;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
