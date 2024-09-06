@@ -52,9 +52,6 @@ public class UserInfo {
         this.positionName = positionName;
     }
 
-
-
-
 }
 
 

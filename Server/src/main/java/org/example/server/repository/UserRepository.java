@@ -89,9 +89,10 @@ public class UserRepository {
             pstmt.setString(2, role.name());
             rs = pstmt.executeQuery();
 
-            UserInfo userInfo = new UserInfo();
+            UserInfo userInfo = null;
 
             if (rs.next()) {
+                userInfo = new UserInfo();
                 userInfo.setUserNum(rs.getLong("user.user_num"));
                 userInfo.setName(rs.getString("user.name"));
                 userInfo.setEmail(rs.getString("user.email"));
