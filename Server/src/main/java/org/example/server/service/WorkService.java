@@ -43,13 +43,12 @@ public class WorkService {
         if (findUser.isPresent()) {
             User DBUser = findUser.get();
             //findUser가 존재한다면 Repository로가서 해당 근퇴을 조회시킨다.
-            workRepository.workSearchAllonDB(DBUser, conn);
+            ResponseData workLogResponse = workRepository.workSearchAllonDB(DBUser, conn);
 
+            return new ResponseData("성공", workLogResponse.getData()); //리스트를 반환함
         } else {
             return new ResponseData("실패", null);
         }
-        //userRepository.save(con, user);
-        return new ResponseData("성공", findUser); //리스트를 반환함
     }
 
     //출근 비즈니스 로직
@@ -65,24 +64,31 @@ public class WorkService {
                 LocalDate workDate = LocalDate.now(); // 오늘 날짜를 가져온다
 
                 // 오늘 날짜에 해당 유저의 WorkLog가 있는지 검사
-                Optional<WorkLog> existingWorkLog = workRepository.findWorkLogByUserAndDate(DBUser.getUserNum(), workDate, con);
+                Optional<WorkLog> workLogOpt = workRepository.findWorkLogByUserAndDate(DBUser.getUserNum(), workDate, con);
 
-                if (existingWorkLog.isPresent()) {
-                    // 이미 오늘 날짜에 출근 기록이 있으면 처리하지 않음
-                    return new ResponseData("출근 실패: 이미 출근 기록이 있습니다.", null);
-                } else {
+                if (workLogOpt.isPresent()) { //출근 기록이 있어야 값을 업데이트 시킨다.
+
+                    // WorkLog가 존재하면 퇴근 시간과 상태를 업데이트
+                    WorkLog workLog = workLogOpt.get();
+
                     // 시작 시간이 9시 이후면 지각, 아닐 경우 정상 출근임을 Status 객체로 넣는다.
                     Status status = startTime.isAfter(LocalTime.of(9, 0)) ? Status.TARDINESS : Status.ATTENDANCE;
 
-                    // 새로운 WorkLog를 생성하고 데이터베이스에 저장
-                    WorkLog workLog = new WorkLog.Builder()
-                            .userNum(DBUser.getUserNum())
+                    // 새로운 WorkLog를 생성하고 데이터베이스에 업데이트
+                    workLog = new WorkLog.Builder()
+                            .logNum(workLog.getLogNum())
                             .startTime(startTime)
+                            .endTime(workLog.getEndTime())
                             .workDate(workDate)
+                            .userNum(DBUser.getUserNum())
                             .status(status)
                             .build();
                     //출근 로그를 생성하여 넣는다.
                     return workRepository.updateStartWorkLogonDB(workLog, con);
+
+                } else {
+                    // 이미 오늘 날짜에 출근 기록이 있으면 처리하지 않음
+                    return new ResponseData("출근 실패: 출근 기록이 없습니다.", null);
                 }
             } else {
                 return new ResponseData("출근 실패: 사용자 정보를 찾을 수 없습니다.", null);
@@ -193,7 +199,6 @@ public class WorkService {
 
         return responseData;
     }
-    
 
     public ResponseData EarlyOutWork(User user) throws SQLException{
         Connection con = null;
