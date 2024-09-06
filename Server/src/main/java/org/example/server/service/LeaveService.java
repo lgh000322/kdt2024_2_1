@@ -42,7 +42,7 @@ public class LeaveService {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
 
-            responseData = findAllLeaveLogBizLogic(conn);
+         /*   responseData = findAllLeaveLogBizLogic(conn);*/
             conn.commit();
 
         } catch (SQLException e) {
@@ -56,12 +56,12 @@ public class LeaveService {
         return responseData;
     }
 
-    private ResponseData findAllLeaveLogBizLogic(Connection conn) throws SQLException {
+   /* private ResponseData findAllLeaveLogBizLogic(Connection conn) throws SQLException {
 
         List<LeaveLog> leaveLogs = leaveRepository.getLeaveLogs(conn);
 
         return new ResponseData("휴가 조회 성공", leaveLogs);
-    }
+    }*/
 
 
     private ResponseData updateLeaveBizLogic(LeaveLog leaveLog, Connection conn) throws SQLException {
