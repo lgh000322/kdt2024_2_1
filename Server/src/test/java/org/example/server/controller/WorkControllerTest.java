@@ -1,21 +1,34 @@
 package org.example.server.controller;
 
+import com.google.gson.internal.LinkedTreeMap;
+import org.example.server.consts.MessageTypeConst;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
+import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 import org.example.server.service.WorkService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class WorkControllerTest {
-    WorkService workService = WorkService.createOrGetWorkService();
+    WorkService workService;
+    WorkController workController;
+
+    @BeforeEach
+    void setup() {
+        workService = WorkService.createOrGetWorkService(); // WorkService 싱글톤 생성
+        workController = WorkController.createOrGetWorkController(); // WorkController 싱글톤 생성
+    }
 
     @Test
-    void 출근 () throws SQLException {
-        // User 객체를 생성하여 테스트에 사용
+    void 출근_테스트() throws SQLException {
+        // 테스트용 User 객체 생성
         User user = new User.Builder()
                 .userId("김가나")
                 .password("pass123")
@@ -28,26 +41,91 @@ class WorkControllerTest {
                 .deptNum(2L)
                 .build();
 
+        // RequestData 생성
+        RequestData requestData = new RequestData();
+        requestData.setMessageType(MessageTypeConst.MESSAGE_WORK_START);
 
-        //근퇴기록 모두 조회
-        // searchSalary 메서드를 호출하여 ResponseData를 받음
-        //ResponseData responseData = workService.SearchWork(user);
+        // 데이터를 LinkedTreeMap에 담아서 RequestData에 설정
+        LinkedTreeMap<String, Object> data = new LinkedTreeMap<>();
+        data.put("userId", user.getUserId());
+        data.put("name", user.getName());
+        data.put("role", user.getRole().name());
 
+        requestData.setData(data);
 
+        // execute 메서드 실행
+        ResponseData responseData = workController.execute(requestData);
 
-        //출근해서 현재 시스템시간으로 출근시간 업데이트
-        //startTime과 status와 workDate userNum만 객체를 생성하여 해당 정보만 업데이트 시켰기때문에 longnum과 퇴근시간은 null값으로 나올것임
-        //DB에는 퇴근시간과 status가 제대로 조회되었음. 오늘날짜로 조회하기때문에 다른날에 값이 바뀔일 없음.
-        //ResponseData responseData = workService.StartWork(user);
+        System.out.println("Response Message: " + responseData.getMessageType());
+        System.out.println("Response Data: " + responseData.getData());
+    }
 
-        //퇴근하여 현재 시스템시간으로 퇴근시간 업데이트
-        ResponseData responseData = workService.EndWork(user);
+    @Test
+    void 퇴근_테스트() throws SQLException {
+        // 테스트용 User 객체 생성
+        User user = new User.Builder()
+                .userId("김가나")
+                .password("pass123")
+                .name("kimgana")
+                .tel("123-456-7890")
+                .email("gana@example.com")
+                .role(Role.USER)
+                .remainedLeave(15)
+                .positionNum(2L)
+                .deptNum(2L)
+                .build();
 
+        // RequestData 생성
+        RequestData requestData = new RequestData();
+        requestData.setMessageType(MessageTypeConst.MESSAGE_WORK_FINISH);
 
+        // 데이터를 LinkedTreeMap에 담아서 RequestData에 설정
+        LinkedTreeMap<String, Object> data = new LinkedTreeMap<>();
+        data.put("userId", user.getUserId());
+        data.put("name", user.getName());
+        data.put("role", user.getRole().name());
 
-        // 결과를 출력
-        System.out.println("Work_Message: " + responseData.getMessageType());
-        System.out.println("Work_Data: " + responseData.getData());
+        requestData.setData(data);
 
+        // execute 메서드 실행
+        ResponseData responseData = workController.execute(requestData);
+
+        // 결과 출력 및 검증
+        System.out.println("Response Message: " + responseData.getMessageType());
+        System.out.println("Response Data: " + responseData.getData());
+    }
+    @Test
+    void 근퇴내역_조회_테스트() throws SQLException {
+        // 테스트용 User 객체 생성
+        User user = new User.Builder()
+                .userId("김가나")
+                .password("pass123")
+                .name("kimgana")
+                .tel("123-456-7890")
+                .email("gana@example.com")
+                .role(Role.USER)
+                .remainedLeave(15)
+                .positionNum(2L)
+                .deptNum(2L)
+                .build();
+
+        // RequestData 생성
+        RequestData requestData = new RequestData();
+        requestData.setMessageType(MessageTypeConst.MESSAGE_WORK_SEARCH);
+
+        // 데이터를 LinkedTreeMap에 담아서 RequestData에 설정
+        LinkedTreeMap<String, Object> data = new LinkedTreeMap<>();
+        data.put("userId", user.getUserId());
+        data.put("name", user.getName());
+        data.put("role", user.getRole().name());
+
+        requestData.setData(data);
+
+        // execute 메서드 실행
+        ResponseData responseData = workController.execute(requestData);
+
+        // 결과 출력 및 검증
+        System.out.println("Response Message: " + responseData.getMessageType());
+        System.out.println("Response Data: " + responseData.getData());
     }
 }
