@@ -1,6 +1,7 @@
 package org.example.server.repository;
 
 import org.example.server.domain.leave_log.LeaveLog;
+import org.example.server.dto.LeaveLogForUserDto;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -93,34 +94,39 @@ public class LeaveRepository {
     }
 
 
+    /**
+    * 휴가 조회 -> admin 의 휴가 조회.
+    * */
+
+
 
     /**
-    * 휴가 조회
+    * 휴가 조회 -> user 의 휴가조회.
     * */
-    public List<LeaveLog> getLeaveLogs(Connection conn) throws SQLException {
+    public List<LeaveLogForUserDto> getLeaveLogsForUser(Long userNum,Connection conn) throws SQLException {
 
-        LeaveLog leaveLog;
-        List<LeaveLog> leaveLogs = new ArrayList<LeaveLog>();
+        LeaveLogForUserDto leaveLogForUserDto;
+        List<LeaveLogForUserDto> leaveLogForUserDtos = new ArrayList<>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 
-        String sql = "select * from leave_log";
+        String sql = "select request_date, start_date, end_date, acceptance_status from leave_log where user_num = ?";
 
         try{
 
             ps = conn.prepareStatement(sql);
+            ps.setLong(1, userNum);
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                leaveLog = new LeaveLog.Builder()
+                leaveLogForUserDto = new LeaveLogForUserDto.Builder()
                         .requestDate(rs.getDate("request_date").toLocalDate())
                         .startDate(rs.getDate("start_date").toLocalDate())
                         .endDate(rs.getDate("end_date").toLocalDate())
-                        .acceptanceStatus(rs.getBoolean("acceptance_status"))
-                        .userNum(rs.getLong("user_num"))
+                        .status(rs.getBoolean("acceptance_status"))
                         .build();
 
-                leaveLogs.add(leaveLog);
+                leaveLogForUserDtos.add(leaveLogForUserDto);
             }
 
         } catch (SQLException e) {
@@ -129,7 +135,7 @@ public class LeaveRepository {
         } finally {
             close(ps, rs);
         }
-        return leaveLogs;
+        return leaveLogForUserDtos;
     }
 
 
