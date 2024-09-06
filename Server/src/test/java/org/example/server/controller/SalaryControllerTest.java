@@ -1,21 +1,32 @@
 package org.example.server.controller;
 
+import com.google.gson.internal.LinkedTreeMap;
+import org.example.server.consts.MessageTypeConst;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
+import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 import org.example.server.dto.SalaryAddData;
 import org.example.server.service.SalaryService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 import java.util.Optional;
 
 class SalaryControllerTest {
-    SalaryService service = SalaryService.createOrGetSalaryService();
+    SalaryController salaryController;
+    SalaryService salaryService;
 
-    //해당 유저에 대한 월급내역을 가져오는것을 확인할 수 있음.
-    /*@Test
-    void 조회() throws SQLException {
-        // User 객체를 생성하여 테스트에 사용
+    @BeforeEach
+    void setup() {
+        // SalaryService와 SalaryController의 싱글톤 인스턴스를 생성
+        salaryService = SalaryService.createOrGetSalaryService();
+        salaryController = SalaryController.createOrGetSalaryController();
+    }
+
+    @Test
+    void 급여_내역_조회_테스트() throws SQLException {
+        // 테스트용 User 객체 생성
         User user = new User.Builder()
                 .userId("김가나")
                 .password("pass123")
@@ -28,22 +39,28 @@ class SalaryControllerTest {
                 .deptNum(2L)
                 .build();
 
-        //  접속한 유저의 월급 내역 조회
-        // searchSalary 메서드를 호출하여 ResponseData를 받음
-        //ResponseData responseData = service.searchSalary(user);
+        // RequestData 생성 (MESSAGE_SALARY_SEARCH)
+        RequestData requestData = new RequestData();
+        requestData.setMessageType(MessageTypeConst.MESSAGE_SALARY_SEARCH);
 
+        // 데이터를 LinkedTreeMap에 담아서 RequestData에 설정
+        LinkedTreeMap<String, Object> data = new LinkedTreeMap<>();
+        data.put("userId", user.getUserId());
+        data.put("name", user.getName());
+        data.put("role", user.getRole().name());
 
-        //   관리자가 특정 유저에게 월급내역을 추가(월급주는것)
-        ResponseData responseData = service.addSalary(user);
+        requestData.setData(data);
 
-        // 결과를 출력
+        // execute 메서드 실행 (급여 조회)
+        ResponseData responseData = salaryController.execute(requestData);
+
+        // 결과 검증
         System.out.println("Message: " + responseData.getMessageType());
         System.out.println("Data: " + responseData.getData());
-    }*/
-
+    }
 
     @Test
-    void 관리자_급여추가_테스트() throws SQLException {
+    void 관리자_급여_추가_테스트() throws SQLException {
         // 관리자(임관리)
         User adminUser = new User.Builder()
                 .userId("admin")
@@ -62,20 +79,27 @@ class SalaryControllerTest {
                 .userNum(5L)  // user_num 5
                 .build();
 
-        // SalaryAddData 객체 생성 (관리자와 직원 정보 함께 전달)
-        SalaryAddData salaryAddData = new SalaryAddData(adminUser, normalUser);
+        // RequestData 생성 (MESSAGE_SALARY_ADD)
+        RequestData requestData = new RequestData();
+        requestData.setMessageType(MessageTypeConst.MESSAGE_SALARY_ADD);
 
-        // 관리자가 급여를 추가하는 로직 테스트
-        ResponseData result = service.addSalary(salaryAddData.getNormalUser());
+        // 데이터를 LinkedTreeMap에 담아서 RequestData에 설정
+        LinkedTreeMap<String, Object> data = new LinkedTreeMap<>();
+        data.put("normalUser", normalUser);
+        data.put("admin", adminUser);
 
-        // 결과를 출력
-        System.out.println("Admin Salary ADD Message: " + result.getMessageType());
-        System.out.println("Admin Salary ADD Data: " + result.getData());
+        requestData.setData(data);
 
+        // execute 메서드 실행 (급여 추가)
+        ResponseData responseData = salaryController.execute(requestData);
+
+        // 결과 검증
+        System.out.println("Message: " + responseData.getMessageType());
+        System.out.println("Data: " + responseData.getData());
     }
 
     @Test
-    void 비관리자가_급여추가_테스트() throws SQLException {
+    void 비관리자_급여_추가_테스트() throws SQLException {
         // 일반 유저 정보 설정 (오자차)
         User normalUser = new User.Builder()
                 .userId("ojacha")
@@ -85,21 +109,23 @@ class SalaryControllerTest {
                 .userNum(5L)  // user_num 5
                 .build();
 
-        // 일반 유저가 급여를 추가하려는 경우
-        SalaryAddData salaryAddData = new SalaryAddData(normalUser, normalUser); // 일반 유저가 자신에게 급여 추가 시도
+        // RequestData 생성 (MESSAGE_SALARY_ADD)
+        RequestData requestData = new RequestData();
+        requestData.setMessageType(MessageTypeConst.MESSAGE_SALARY_ADD);
 
-        ResponseData result;
-        if (salaryAddData.getAdminUser().getRole() == Role.ADMIN) {
-            result = service.addSalary(salaryAddData.getNormalUser());
-        } else {
-            // 관리자가 아닌 경우 권한 없음 처리
-            result = new ResponseData("권한 없음: 관리자만 급여 내역을 추가할 수 있습니다.", null);
-        }
+        // 데이터를 LinkedTreeMap에 담아서 RequestData에 설정
+        LinkedTreeMap<String, Object> data = new LinkedTreeMap<>();
+        data.put("normalUser", normalUser);
+        data.put("admin", normalUser);  // 일반 유저가 관리자 역할을 하려는 경우
 
-        // 결과를 출력
-        System.out.println("not Admin Salary ADD Message: " + result.getMessageType());
-        System.out.println("not Admin Salary ADD Data: " + result.getData());
+        requestData.setData(data);
 
+        // execute 메서드 실행 (비관리자가 급여 추가 시도)
+        ResponseData responseData = salaryController.execute(requestData);
+
+        // 결과 검증
+        System.out.println("Message: " + responseData.getMessageType());
+        System.out.println("Data: " + responseData.getData());
     }
 
 }
