@@ -1,5 +1,7 @@
 package org.example.server.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
@@ -35,12 +37,16 @@ public class UserController implements Controller {
     public ResponseData execute(RequestData requestData) throws SQLException {
         String requestURL = requestData.getMessageType();
         ResponseData result = null;
+        Gson gson = new Gson();
 
         switch (requestURL) {
             case MessageTypeConst.MESSAGE_JOIN -> {
                 System.out.println("회원가입 실행");
-                UserJoinDto userJoinDto = (UserJoinDto) requestData.getData();
-                result = userService.join(userJoinDto);
+                if (requestData.getData() instanceof LinkedTreeMap) {
+                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
+                    UserJoinDto userJoinDto = gson.fromJson(gson.toJson(map), UserJoinDto.class);
+                    result = userService.join(userJoinDto);
+                }
             }
             case MessageTypeConst.MESSAGE_LOGIN -> {
                 System.out.println("로그인 실행");
