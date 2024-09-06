@@ -6,22 +6,20 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="201.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="201.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.controller.AdminUserManagementController">
    <children>
       <ImageView fitHeight="162.0" fitWidth="124.0" layoutX="14.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true" />
-      <Label layoutX="148.0" layoutY="23.0" style="-fx-font-size: 13px;" text="이름:" />
-      <Label fx:id="userName" layoutX="185.0" layoutY="23.0" style="-fx-font-size: 13px;" text="사용자명" />
-      <Label layoutX="148.0" layoutY="48.0" style="-fx-font-size: 13px;" text="휴대폰:" />
-      <Label fx:id="userTel1" layoutX="198.0" layoutY="49.0" style="-fx-font-size: 13px;" text="휴대번호" />
-      <Label layoutX="148.0" layoutY="73.0" style="-fx-font-size: 13px;" text="이메일:" />
-      <Label fx:id="userEmail" layoutX="198.0" layoutY="73.0" style="-fx-font-size: 11px;" text="사용자 이메일" />
-      <Label layoutX="147.0" layoutY="98.0" style="-fx-font-size: 13px;" text="소속:" />
-      <ComboBox layoutX="186.0" layoutY="95.0" prefWidth="100.0" promptText="ㅇㅇ" />
-      <Label layoutX="147.0" layoutY="123.0" style="-fx-font-size: 13px;" text="직위/직책:" />
-      <ComboBox layoutX="215.0" layoutY="120.0" prefWidth="100.0" promptText="ㅇㅇ" />
-      <Label layoutX="147.0" layoutY="148.0" style="-fx-font-size: 13px;" text="내선:" />
-      <Label fx:id="userTel2" layoutX="185.0" layoutY="148.0" style="-fx-font-size: 13px;" text="사용자 자리 번호" />
-      <Button layoutX="258.0" layoutY="173.0" mnemonicParsing="false" text="저장" />
-      <Button layoutX="305.0" layoutY="173.0" mnemonicParsing="false" text="취소" />
+      <Label layoutX="148.0" layoutY="34.0" style="-fx-font-size: 13px;" text="이름:" />
+      <Label fx:id="userName" layoutX="185.0" layoutY="34.0" style="-fx-font-size: 13px;" text="사용자명" />
+      <Label layoutX="148.0" layoutY="59.0" style="-fx-font-size: 13px;" text="휴대폰:" />
+      <Label fx:id="userTel" layoutX="198.0" layoutY="60.0" style="-fx-font-size: 13px;" text="휴대번호" />
+      <Label layoutX="148.0" layoutY="84.0" style="-fx-font-size: 13px;" text="이메일:" />
+      <Label fx:id="userEmail" layoutX="198.0" layoutY="84.0" style="-fx-font-size: 11px;" text="사용자 이메일" />
+      <Label layoutX="147.0" layoutY="109.0" style="-fx-font-size: 13px;" text="소속:" />
+      <ComboBox layoutX="186.0" layoutY="106.0" prefWidth="100.0" />
+      <Label layoutX="147.0" layoutY="134.0" style="-fx-font-size: 13px;" text="직위/직책:" />
+      <ComboBox fx:id="positionComboBox" layoutX="215.0" layoutY="131.0" prefWidth="100.0" />
+      <Button fx:id="saveBtn" layoutX="258.0" layoutY="173.0" mnemonicParsing="false" text="저장" />
+      <Button fx:id="cancelBtn" layoutX="305.0" layoutY="173.0" mnemonicParsing="false" text="취소" />
    </children>
 </AnchorPane>

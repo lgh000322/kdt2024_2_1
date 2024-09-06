@@ -18,30 +18,43 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class UserUiController {
-
+	/* 좌측 사용자 정보 및 현재시간 창 */
     @FXML
     private ImageView userImage;
 
     @FXML
-    private Label userName;
+    private Label userName = new Label();
 
     @FXML
-    private Label userTel1;
+    private Label userTel1 = new Label();
 
     @FXML
-    private Label userEmail;
+    private Label userEmail = new Label();
 
     @FXML
-    private Label userDept;
+    private Label userDept = new Label();
     
     @FXML
-    private Label userPosition;
+    private Label userPosition = new Label();
     
     @FXML
     private Label currentTime;
 
+    
+    /* 로그아웃 버튼 */
     @FXML
-    private Button deletePost;
+    private Button logout;
+    
+    
+    /* 근태기록 탭 */
+    @FXML
+    private DatePicker selectWorkDate;
+
+    @FXML
+    private ComboBox<String> workComboList;
+    
+    @FXML
+    private Button startWork;
 
     @FXML
     private Button endWork;
@@ -49,36 +62,37 @@ public class UserUiController {
     @FXML
     private Button leaveEarly;
 
+    
+    /* 휴가신청 탭 */
     @FXML
     private Button leaveRequest;
+    
 
-    @FXML
-    private Button logout;
-
-    @FXML
-    private TextField qnaTitle;
-
+    /* 급여내역 탭 */
     @FXML
     private DatePicker selectMoneyDate;
 
+    
+    /* 메일함 탭 */
+    
+    
+    /* Q&A 탭 */
     @FXML
-    private DatePicker selectWorkDate;
-
-    @FXML
-    private Button startWork;
+    private TextField qnaTitle;
 
     @FXML
     private Button titleSearchBtn;
 
     @FXML
-    private Button updatePost;
-
-    @FXML
-    private ComboBox<String> workComboList;
-
-    @FXML
     private Button writePost;
     
+    @FXML
+    private Button updatePost;
+    
+    @FXML
+    private Button deletePost;
+
+    /* 현재시간 표시 */
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     
     @FXML
@@ -95,6 +109,7 @@ public class UserUiController {
         workComboList.getItems().addAll("출근", "결근", "조퇴");
     }
     
+    /* 좌측 사용자 정보 표시 */
     public void setUserData(UserInfo userInfo) {
     	userName.setText(userInfo.getName());
     	userTel1.setText(userInfo.getTel());
@@ -102,4 +117,6 @@ public class UserUiController {
     	userDept.setText(userInfo.getDeptName());
     	userPosition.setText(userInfo.getPositionName());
     }
+    
+    
 }

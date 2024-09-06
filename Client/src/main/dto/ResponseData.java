@@ -1,30 +1,34 @@
 package main.dto;
 
-public class ResponseData {
+public class ResponseData<T> {
     /**
      * messageType="성공" or "실패"
      */
     private String messageType;
-    private Object data;
-
-    public ResponseData(String messageType, Object data) {
-        this.messageType = messageType;
-        this.data = data;
-    }
-
+    private T data;
+    
     public String getMessageType() {
-        return messageType;
-    }
+		return messageType;
+	}
 
-    public void setMessageType(String messageType) {
+	public void setMessageType(String messageType) {
+		this.messageType = messageType;
+	}
+
+	public T getData() {
+		return data;
+	}
+
+	public void setData(T data) {
+		this.data = data;
+	}
+
+	
+
+    public ResponseData(String messageType, T data) {
         this.messageType = messageType;
-    }
-
-    public Object getData() {
-        return data;
-    }
-
-    public void setData(Object data) {
         this.data = data;
     }
+
+   
 }

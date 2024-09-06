@@ -7,7 +7,6 @@ import java.io.IOException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
-import java.util.Map;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -23,8 +22,10 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import main.consts.MessageTypeConst;
 import main.domain.user.Role;
+import main.domain.user.User;
 import main.dto.RequestData;
 import main.dto.ResponseData;
+import main.dto.UserInfo;
 import main.dto.UserLoginDto;
 
 import main.util.ServerConnectUtils;
@@ -113,31 +114,32 @@ public class LoginController {
 		        dos.writeUTF(jsonSendStr);
 		        dos.flush();
 		        String jsonReceivedStr = dis.readUTF();
-		        ResponseData responseData = gson.fromJson(jsonReceivedStr, ResponseData.class);
-		        String messageType = responseData.getMessageType();
-		        // TypeToken을 사용하여 Map 타입으로 변환
-		        Type type = new TypeToken<Map<String, Object>>() {}.getType();
-		        // responseData의 데이터를 Map으로 파싱
-		        Map<String, Object> map = gson.fromJson(gson.toJson(responseData.getData()), type);
-		        	
-	        	String userId = (String)map.get("userId");
-	        	String password= (String)map.get("userPwd");
-		        	
+		        Type responseType=new TypeToken<ResponseData<UserInfo>>(){}.getType();
+		        ResponseData<UserInfo> responseData=gson.fromJson(jsonReceivedStr, responseType);
+		        String messageType=responseData.getMessageType();
+		        
 		        if (messageType.contains("성공")) {
+		        	UserInfo userInfo=responseData.getData();
+			        
 		        	if (userLoginDto.getRole() == Role.USER) {
+		        		
 		        		Platform.runLater(() -> {
 			                try {
 			                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/user_ui/UserUi.fxml"));
 			                    Parent loginRoot = fxmlLoader.load();
 
+			                    UserUiController userUiController=fxmlLoader.getController();
+			                    userUiController.setUserData(userInfo);
 			                    Stage loginStage = new Stage();
 			                    loginStage.setTitle("인사 시스템 (사용자)");
 			                    loginStage.setScene(new Scene(loginRoot));
 
 			                    Stage currentStage = (Stage) loginBtn.getScene().getWindow();
 			                    currentStage.hide();
-
+			                    
 			                    loginStage.show();
+			                    
+			                    
 			                } catch (IOException e) {
 			                    e.printStackTrace();
 			                }
