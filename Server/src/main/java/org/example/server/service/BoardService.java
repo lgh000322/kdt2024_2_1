@@ -2,8 +2,7 @@ package org.example.server.service;
 
 import org.example.server.db_utils.DBUtils;
 import org.example.server.domain.board.Board;
-import org.example.server.dto.BoardAndAnswer;
-import org.example.server.dto.ResponseData;
+import org.example.server.dto.*;
 import org.example.server.repository.AnswerRepository;
 import org.example.server.repository.BoardRepository;
 
@@ -71,7 +70,7 @@ public class BoardService {
     /**
      *  게시물 작성.
     * */
-    public ResponseData createBoard(Board board) throws SQLException {
+    public ResponseData createBoard(BoardSaveDto board) throws SQLException {
         Connection conn = null;
         ResponseData responseData = null;
 
@@ -100,7 +99,7 @@ public class BoardService {
 
         ResponseData responseData = null;
         Connection conn = null;
-        List<Board> boards;
+        List<BoardFindAllDto> boards;
 
         try{
             conn = dataSource.getConnection();
@@ -122,12 +121,12 @@ public class BoardService {
 
 
     /**
-    * 모든 게시물을 조회
+    * 모든 게시물을 조회 , 검색조건과 일치하는 게시물 조회
     * */
-    public ResponseData findAllBoards() throws SQLException {
+    public ResponseData findAllBoards(String title) throws SQLException {
         ResponseData responseData = null;
         Connection conn = null;
-        List<Board> boards;
+
 
         try{
             conn = dataSource.getConnection();
@@ -135,13 +134,28 @@ public class BoardService {
             // 쿼리 실행중 에러 발생시 롤백을 위함.
             conn.setAutoCommit(false);
 
-            boards = boardRepository.getAllBoards(conn);
-            responseData = new ResponseData("모든 게시물 조회 성공", boards);
+            responseData = findAllBoardsBizLogic(title, conn);
+
             conn.commit();
         } catch (SQLException e) {
             conn.rollback();
         } finally {
             release(conn);
+        }
+
+        return responseData;
+    }
+
+    private ResponseData findAllBoardsBizLogic(String title, Connection conn) throws SQLException {
+        List<BoardFindAllDto> boards;
+        ResponseData responseData = null;
+
+        if(title == null || title.trim().equals("")) {
+            boards = boardRepository.getAllBoards(conn);
+            responseData = new ResponseData("모든 게시물 조회 성공", boards);
+        } else {
+            boards = boardRepository.getBoardByTitle(title, conn);
+            responseData = new ResponseData("검색조건과 일치한 게시물 조회 성공", boards);
         }
 
         return responseData;
@@ -172,7 +186,7 @@ public class BoardService {
     /**
     * 게시글 수정
     * */
-    public ResponseData updateBoard(Board board) throws SQLException {
+    public ResponseData updateBoard(BoardUpdateDto board) throws SQLException {
         ResponseData responseData = null;
         Connection conn = null;
 
@@ -194,7 +208,7 @@ public class BoardService {
     /**
     * 게시글 수정 비즈니스로직
     * */
-    private ResponseData updateBoardBizLogic(Board board, Connection conn) throws SQLException {
+    private ResponseData updateBoardBizLogic(BoardUpdateDto board, Connection conn) throws SQLException {
 
 
 
@@ -213,7 +227,8 @@ public class BoardService {
      * 선택된 게시물 + 댓글을 보여주는 비즈니스 로직
     * */
     private ResponseData findOneBoardBizLogic(Long boardNum, Connection conn) throws SQLException {
-        Board board = null;
+        BoardInfoDto boardInfoDto = null;
+        List<AnswerInBoardDto> answerInBoardDtos = null;
 
         BoardAndAnswer boardAndAnswer = null;
 
@@ -221,13 +236,13 @@ public class BoardService {
 
 
         // 게시물 번호로 게시물 정보를 가져옴.
-        board = boardRepository.getOneBoard(boardNum, conn);
+        boardInfoDto = boardRepository.getOneBoard(boardNum, conn);
 
         // 게시물 번호로 게시물 댓글을 가져옴.
         //answers = AnswerRepository. ~~
 
         //위의 가져온 게시물과 댓글로 dto 생성
-        boardAndAnswer = new BoardAndAnswer(board, null);
+        boardAndAnswer = new BoardAndAnswer(boardInfoDto, answerInBoardDtos);
 
         //만들어진 게시물 + 댓글 dto를 responseData로 만듦.
         responseData = new ResponseData("특정 게시물 조회 성공", boardAndAnswer);
@@ -261,7 +276,7 @@ public class BoardService {
     /**
      * 게시물 저장 비즈니스 로직 구현한 메서드
      */
-    private ResponseData saveBoardBizLogic(Board board, Connection conn) throws SQLException {
+    private ResponseData saveBoardBizLogic(BoardSaveDto board, Connection conn) throws SQLException {
 
         // 게시물의 제목이 없거나, 공백문자만 입력할경우. 실패메세지 반환.
         if (board.getTitle().trim().equals("") || board.getTitle() == null) {
@@ -270,6 +285,10 @@ public class BoardService {
 
         // 게시물 저장 실행
         Long saveBoardNum = boardRepository.saveBoard(board, conn);
+
+        if(saveBoardNum == null) {
+            return new ResponseData("게시물 작성 실패", null);
+        }
 
         System.out.println(saveBoardNum);
 
