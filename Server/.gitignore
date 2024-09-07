@@ -1,0 +1,13 @@
+# IDE 설정 파일
+/.idea/*
+*.iml
+
+# 빌드 아티팩트
+/build/
+
+# Gradle 캐시
+/.gradle/*
+
+# 운영체제 파일
+.DS_Store
+Thumbs.db
