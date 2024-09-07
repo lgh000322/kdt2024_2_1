@@ -18,6 +18,8 @@ public class BoardAndAnswer {
         return answerInBoard;
     }
 
+
+
     public BoardAndAnswer(BoardInfoDto boardInfoDto, List<AnswerInBoardDto> answerInBoard) {
         this.boardInfoDto = boardInfoDto;
         this.answerInBoard = answerInBoard;

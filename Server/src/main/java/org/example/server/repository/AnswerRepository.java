@@ -3,6 +3,7 @@ package org.example.server.repository;
 import org.example.server.domain.board.Board;
 import org.example.server.domain.board.BoardAnswer;
 import org.example.server.domain.user.User;
+import org.example.server.dto.AnswerInBoardDto;
 import org.example.server.dto.ResponseData;
 
 import java.sql.*;
@@ -70,13 +71,22 @@ public class AnswerRepository {
         }
     }
 
-    //하나의 게시물을 검색하여 해당 게시물의 댓글들을 조회하는 DB메소드
+    // 게시물을 검색하여 해당 게시물의 댓글들을 조회하는 DB 메소드
     public ResponseData searchBoardAndTakeAnswerOnDB(Connection con, Board board) throws SQLException {
-        String sql = "SELECT answer_num, content, board_num, user_num, created_date FROM board_answer WHERE board_num = ?";
+        /*
+        2024-09-07수정
+         */
+
+        // SQL 쿼리: userNum을 이용하여 user 테이블에서 userId와 게시글에 달린 댓글을 조회
+        String sql = "SELECT u.user_id, ba.content " +
+                "FROM board_answer ba " +
+                "JOIN user u ON ba.user_num = u.user_num " +
+                "WHERE ba.board_num = ?";
+
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
-        List<BoardAnswer> answers = new ArrayList<>(); // 댓글 리스트 생성
+        List<AnswerInBoardDto> answers = new ArrayList<>(); // 댓글 리스트 생성
 
         try {
             pstmt = con.prepareStatement(sql);
@@ -84,14 +94,11 @@ public class AnswerRepository {
 
             rs = pstmt.executeQuery();
 
-            // 쿼리 결과를 처리하여 BoardAnswer 객체로 변환
+            // 쿼리 결과를 처리하여 AnswerInBoardDto 객체로 변환
             while (rs.next()) {
-                BoardAnswer answer = new BoardAnswer.Builder()
-                        .answerNum(rs.getLong("answer_num"))
-                        .contents(rs.getString("content"))
-                        .boardNum(rs.getLong("board_num"))
-                        .userNum(rs.getLong("user_num"))
-                        .createdDate(rs.getDate("created_date").toLocalDate())
+                AnswerInBoardDto answer = new AnswerInBoardDto.Builder()
+                        .answerUserId(rs.getString("user_id")) // user 테이블에서 가져온 user_id
+                        .answerContent(rs.getString("content")) // 댓글 내용
                         .build();
                 answers.add(answer); // 리스트에 추가
             }
