@@ -81,4 +81,8 @@ public class Mail {
     public Long getMailStoreNum() {
         return mailStoreNum;
     }
+
+    public void changeMailStoreNum(Long mailStoreNum) {
+        this.mailStoreNum = mailStoreNum;
+    }
 }
