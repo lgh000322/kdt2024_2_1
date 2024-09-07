@@ -3,9 +3,9 @@ package org.example.server.repository;
 import org.example.server.domain.user.User;
 import org.example.server.domain.work_log.Status;
 import org.example.server.domain.work_log.WorkLog;
-import org.example.server.dto.AdminWorkData;
+import org.example.server.dto.work_dto.AdminWorkData;
 import org.example.server.dto.ResponseData;
-import org.example.server.dto.UserWorkData;
+import org.example.server.dto.user_dto.UserWorkData;
 
 import java.sql.*;
 import java.time.LocalDate;

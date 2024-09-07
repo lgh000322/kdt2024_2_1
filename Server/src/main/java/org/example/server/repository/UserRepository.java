@@ -3,7 +3,7 @@ package org.example.server.repository;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
-import org.example.server.dto.UserInfo;
+import org.example.server.dto.user_dto.UserInfo;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

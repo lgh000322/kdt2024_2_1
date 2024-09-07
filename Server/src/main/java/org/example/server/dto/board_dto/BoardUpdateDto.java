@@ -1,6 +1,4 @@
-package org.example.server.dto;
-
-import java.time.LocalDate;
+package org.example.server.dto.board_dto;
 
 public class BoardUpdateDto {
 

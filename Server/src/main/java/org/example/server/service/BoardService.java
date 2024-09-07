@@ -1,8 +1,9 @@
 package org.example.server.service;
 
 import org.example.server.db_utils.DBUtils;
-import org.example.server.domain.board.Board;
 import org.example.server.dto.*;
+import org.example.server.dto.answer_dto.AnswerInBoardDto;
+import org.example.server.dto.board_dto.*;
 import org.example.server.repository.AnswerRepository;
 import org.example.server.repository.BoardRepository;
 
@@ -228,6 +229,7 @@ public class BoardService {
     * */
     private ResponseData findOneBoardBizLogic(Long boardNum, Connection conn) throws SQLException {
         BoardInfoDto boardInfoDto = null;
+
         List<AnswerInBoardDto> answerInBoardDtos = null;
 
         BoardAndAnswer boardAndAnswer = null;
@@ -239,7 +241,7 @@ public class BoardService {
         boardInfoDto = boardRepository.getOneBoard(boardNum, conn);
 
         // 게시물 번호로 게시물 댓글을 가져옴.
-        //answers = AnswerRepository. ~~
+        answerInBoardDtos = answerRepository.searchBoardAndTakeAnswerOnDB(conn, boardNum);
 
         //위의 가져온 게시물과 댓글로 dto 생성
         boardAndAnswer = new BoardAndAnswer(boardInfoDto, answerInBoardDtos);

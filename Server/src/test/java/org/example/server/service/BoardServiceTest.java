@@ -1,19 +1,15 @@
 package org.example.server.service;
 
-import org.example.server.domain.board.Board;
-import org.example.server.domain.board.BoardAnswer;
 import org.example.server.dto.*;
-import org.example.server.repository.BoardRepository;
-import org.junit.jupiter.api.Assertions;
+import org.example.server.dto.board_dto.BoardFindAllDto;
+import org.example.server.dto.board_dto.BoardSaveDto;
+import org.example.server.dto.board_dto.BoardUpdateDto;
 import org.junit.jupiter.api.Test;
 
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
-
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class BoardServiceTest {
 

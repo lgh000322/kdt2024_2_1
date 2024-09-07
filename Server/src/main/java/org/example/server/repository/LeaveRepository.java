@@ -1,7 +1,10 @@
 package org.example.server.repository;
 
 import org.example.server.domain.leave_log.LeaveLog;
-import org.example.server.dto.LeaveLogForUserDto;
+import org.example.server.dto.leave_dto.ForRequestLeaveDto;
+import org.example.server.dto.leave_dto.ForUpdateLeaveDto;
+import org.example.server.dto.leave_dto.LeaveLogOfAdminDto;
+import org.example.server.dto.leave_dto.LeaveLogOfUserDto;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,7 +32,7 @@ public class LeaveRepository {
     /**
     *  휴가신청
     * */
-    public Long createLeave(LeaveLog leaveLog, Connection conn) throws SQLException {
+    public Long createLeave(ForRequestLeaveDto forRequestLeaveDto, Connection conn) throws SQLException {
         String sql = "insert into leave_log " +
                 "(request_date, start_date, end_date, acceptance_status, user_num)" +
                 " values (?, ?, ?, ?, ?)";
@@ -37,11 +40,11 @@ public class LeaveRepository {
         PreparedStatement ps = conn.prepareStatement(sql);
         ResultSet rs = null;
 
-        java.sql.Date requestDate = java.sql.Date.valueOf(leaveLog.getRequestDate());
-        java.sql.Date startDate = java.sql.Date.valueOf(leaveLog.getStartDate());
-        java.sql.Date endDate = java.sql.Date.valueOf(leaveLog.getEndDate());
-        boolean status = leaveLog.isAcceptanceStatus();
-        Long userNum = leaveLog.getUserNum();
+        java.sql.Date requestDate = java.sql.Date.valueOf(forRequestLeaveDto.getRequestDate());
+        java.sql.Date startDate = java.sql.Date.valueOf(forRequestLeaveDto.getStartDate());
+        java.sql.Date endDate = java.sql.Date.valueOf(forRequestLeaveDto.getEndDate());
+        boolean status = forRequestLeaveDto.isAcceptanceStatus();
+        Long userNum = forRequestLeaveDto.getUserNum();
 
         try {
             ps.setDate(1, requestDate);
@@ -69,9 +72,9 @@ public class LeaveRepository {
 
 
     /**
-    *  휴가 상태 업데이트 ( 관리자가 실행)
+    *  휴가 상태 업데이트 (관리자가 실행)
     * */
-    public int updateLeave(LeaveLog leaveLog, Connection conn) throws SQLException {
+    public int updateLeave(ForUpdateLeaveDto forUpdateLeaveDto, Connection conn) throws SQLException {
         PreparedStatement ps = null;
 
         String sql = "update leave_log set " +
@@ -81,8 +84,8 @@ public class LeaveRepository {
 
         try{
             ps = conn.prepareStatement(sql);
-            ps.setBoolean(1, leaveLog.isAcceptanceStatus());
-            ps.setLong(2,leaveLog.getLeaveNum());
+            ps.setBoolean(1, forUpdateLeaveDto.isAcceptanceStatus());
+            ps.setLong(2,forUpdateLeaveDto.getLeaveNum());
             row = ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -95,38 +98,75 @@ public class LeaveRepository {
 
 
     /**
-    * 휴가 조회 -> admin 의 휴가 조회.
+    * 휴가 조회 -> admin 의 휴가 조회. ( 모든 유저 휴가조회)
     * */
+    public List<LeaveLogOfAdminDto> getLeaveLogOfAdmin(Connection conn) throws SQLException {
+        LeaveLogOfAdminDto leaveLogOfAdminDto = null;
+        List<LeaveLogOfAdminDto> leaveLogOfAdminDtos = new ArrayList<>();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
+        //모든 leave_log를 가져오기위한 쿼리
+        String sql = "select request_date, start_date, end_date, acceptance_status" +
+                " from leave_log";
+
+        try{
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+               leaveLogOfAdminDto = new LeaveLogOfAdminDto.Builder()
+                        .requestDate(rs.getDate("request_date"))
+                        .startDate(rs.getDate("start_date"))
+                        .endDate(rs.getDate("end_date"))
+                        .status(rs.getBoolean("acceptance_status"))
+                        .build();
+
+                leaveLogOfAdminDtos.add(leaveLogOfAdminDto);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+        return leaveLogOfAdminDtos;
+    }
+
+
+    /**
+    *  휴가 조회 -> admin의 휴가조회 (특정 유저 휴가조회)
+    * */
 
 
     /**
     * 휴가 조회 -> user 의 휴가조회.
     * */
-    public List<LeaveLogForUserDto> getLeaveLogsForUser(Long userNum,Connection conn) throws SQLException {
+    public List<LeaveLogOfUserDto> getLeaveLogsOfUser(String userId, Connection conn) throws SQLException {
 
-        LeaveLogForUserDto leaveLogForUserDto;
-        List<LeaveLogForUserDto> leaveLogForUserDtos = new ArrayList<>();
+        LeaveLogOfUserDto leaveLogOfUserDto;
+        List<LeaveLogOfUserDto> leaveLogOfUserDtos = new ArrayList<>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 
-        String sql = "select request_date, start_date, end_date, acceptance_status from leave_log where user_num = ?";
+        String sql = "select request_date, start_date, end_date, acceptance_status " +
+                "from leave_log where user_id = ?";
 
         try{
 
             ps = conn.prepareStatement(sql);
-            ps.setLong(1, userNum);
+            ps.setString(1, userId);
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                leaveLogForUserDto = new LeaveLogForUserDto.Builder()
-                        .requestDate(rs.getDate("request_date").toLocalDate())
-                        .startDate(rs.getDate("start_date").toLocalDate())
-                        .endDate(rs.getDate("end_date").toLocalDate())
+                leaveLogOfUserDto = new LeaveLogOfUserDto.Builder()
+                        .requestDate(rs.getDate("request_date"))
+                        .startDate(rs.getDate("start_date"))
+                        .endDate(rs.getDate("end_date"))
                         .status(rs.getBoolean("acceptance_status"))
                         .build();
 
-                leaveLogForUserDtos.add(leaveLogForUserDto);
+                leaveLogOfUserDtos.add(leaveLogOfUserDto);
             }
 
         } catch (SQLException e) {
@@ -135,7 +175,7 @@ public class LeaveRepository {
         } finally {
             close(ps, rs);
         }
-        return leaveLogForUserDtos;
+        return leaveLogOfUserDtos;
     }
 
 

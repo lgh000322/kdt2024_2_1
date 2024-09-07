@@ -1,4 +1,4 @@
-package org.example.server.dto;
+package org.example.server.dto.answer_dto;
 import org.example.server.domain.board.Board;
 import org.example.server.domain.board.BoardAnswer;
 import org.example.server.domain.user.User;

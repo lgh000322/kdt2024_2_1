@@ -1,4 +1,4 @@
-package org.example.server.dto;
+package org.example.server.dto.answer_dto;
 
 public class AnswerInBoardDto {
     private String answerUserId;

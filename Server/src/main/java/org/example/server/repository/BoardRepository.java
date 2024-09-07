@@ -1,7 +1,9 @@
 package org.example.server.repository;
 
-import org.example.server.domain.board.Board;
-import org.example.server.dto.*;
+import org.example.server.dto.board_dto.BoardFindAllDto;
+import org.example.server.dto.board_dto.BoardInfoDto;
+import org.example.server.dto.board_dto.BoardSaveDto;
+import org.example.server.dto.board_dto.BoardUpdateDto;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -35,7 +37,7 @@ public class BoardRepository {
     /**
      * 특정 게시물(게시물 번호로 매칭) 가져오는 함수
      */
-    public BoardInfoDto getOneBoard(Long boardNum,Connection conn) throws SQLException {
+    public BoardInfoDto getOneBoard(Long boardNum, Connection conn) throws SQLException {
 
         BoardInfoDto boardInfoDto = null;
 
@@ -84,7 +86,7 @@ public class BoardRepository {
      * 동적 쿼리를 통해서 조건과 일치하는 게시글을 가져와야한다. (수정 필요)
     * 검색 조건과 일치하는 모든 게시물을 가져오는 메서드
     * */
-    public List<BoardFindAllDto> getBoardByTitle(String boardTitle,Connection conn) throws SQLException {
+    public List<BoardFindAllDto> getBoardByTitle(String boardTitle, Connection conn) throws SQLException {
         List<BoardFindAllDto> boards = new ArrayList<>();
         PreparedStatement ps = null;
         ResultSet rs = null;

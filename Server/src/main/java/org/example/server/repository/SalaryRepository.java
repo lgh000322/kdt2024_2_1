@@ -3,9 +3,9 @@ package org.example.server.repository;
 import org.example.server.domain.salary_log.SalaryLog;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
-import org.example.server.dto.AdminSalaryData;
+import org.example.server.dto.salary_dto.AdminSalaryData;
 import org.example.server.dto.ResponseData;
-import org.example.server.dto.UserSalaryData;
+import org.example.server.dto.user_dto.UserSalaryData;
 
 import java.sql.*;
 import java.util.ArrayList;
