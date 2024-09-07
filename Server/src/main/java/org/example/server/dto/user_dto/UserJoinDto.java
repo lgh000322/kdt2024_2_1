@@ -1,4 +1,4 @@
-package org.example.server.dto;
+package org.example.server.dto.user_dto;
 
 public class UserJoinDto {
     private String userId;

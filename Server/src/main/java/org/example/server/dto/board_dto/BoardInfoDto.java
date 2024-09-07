@@ -1,6 +1,4 @@
-package org.example.server.dto;
-
-import java.util.List;
+package org.example.server.dto.board_dto;
 
 public class BoardInfoDto {
 

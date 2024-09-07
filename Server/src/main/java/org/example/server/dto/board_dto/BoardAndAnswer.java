@@ -1,4 +1,6 @@
-package org.example.server.dto;
+package org.example.server.dto.board_dto;
+
+import org.example.server.dto.answer_dto.AnswerInBoardDto;
 
 import java.util.List;
 

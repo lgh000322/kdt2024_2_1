@@ -3,8 +3,9 @@ package org.example.server.controller;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import org.example.server.consts.MessageTypeConst;
-import org.example.server.domain.board.Board;
 import org.example.server.dto.*;
+import org.example.server.dto.board_dto.BoardSaveDto;
+import org.example.server.dto.board_dto.BoardUpdateDto;
 import org.example.server.service.BoardService;
 
 import java.sql.SQLException;
@@ -73,6 +74,7 @@ public class BoardController implements Controller {
                 if (requestData.getData() instanceof LinkedTreeMap) {
                     LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
                     BoardSaveDto boardSaveDto = gson.fromJson(gson.toJson(map), BoardSaveDto.class);
+
                     result = boardService.createBoard(boardSaveDto);
                 }
 

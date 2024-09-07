@@ -3,7 +3,7 @@ package org.example.server.repository;
 import org.example.server.domain.board.Board;
 import org.example.server.domain.board.BoardAnswer;
 import org.example.server.domain.user.User;
-import org.example.server.dto.AnswerInBoardDto;
+import org.example.server.dto.answer_dto.AnswerInBoardDto;
 import org.example.server.dto.ResponseData;
 
 import java.sql.*;
@@ -72,11 +72,10 @@ public class AnswerRepository {
     }
 
     // 게시물을 검색하여 해당 게시물의 댓글들을 조회하는 DB 메소드
-    public ResponseData searchBoardAndTakeAnswerOnDB(Connection con, Board board) throws SQLException {
+    public List<AnswerInBoardDto> searchBoardAndTakeAnswerOnDB(Connection con, Long boardNum) throws SQLException {
         /*
         2024-09-07수정
          */
-
         // SQL 쿼리: userNum을 이용하여 user 테이블에서 userId와 게시글에 달린 댓글을 조회
         String sql = "SELECT u.user_id, ba.content " +
                 "FROM board_answer ba " +
@@ -90,7 +89,7 @@ public class AnswerRepository {
 
         try {
             pstmt = con.prepareStatement(sql);
-            pstmt.setLong(1, board.getBoardNum()); // 게시물 번호로 조회
+            pstmt.setLong(1, boardNum); // 게시물 번호로 조회
 
             rs = pstmt.executeQuery();
 
@@ -103,20 +102,14 @@ public class AnswerRepository {
                 answers.add(answer); // 리스트에 추가
             }
 
-            // 댓글 리스트가 비어있지 않다면 성공 메시지와 함께 반환
-            if (!answers.isEmpty()) {
-                return new ResponseData("댓글 조회 성공", answers);
-            } else {
-                return new ResponseData("댓글이 없습니다.", null);
-            }
-
         } catch (SQLException e) {
             e.printStackTrace();
-            return new ResponseData("댓글 조회 중 오류 발생", null);
+            throw new SQLException("댓글 조회 실패.");
         } finally {
             // 리소스 해제
             close(pstmt, rs);
         }
+        return answers;
     }
 
 

@@ -2,12 +2,17 @@ package org.example.server.service;
 
 import org.example.server.db_utils.DBUtils;
 import org.example.server.domain.leave_log.LeaveLog;
-import org.example.server.dto.ResponseData;
+import org.example.server.dto.*;
+import org.example.server.dto.leave_dto.ForFindLeaveDto;
+import org.example.server.dto.leave_dto.ForRequestLeaveDto;
+import org.example.server.dto.leave_dto.ForUpdateLeaveDto;
+import org.example.server.dto.leave_dto.LeaveLogOfUserDto;
 import org.example.server.repository.LeaveRepository;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LeaveService {
@@ -33,7 +38,10 @@ public class LeaveService {
     }
 
 
-    private ResponseData findAllLeaveLog() throws SQLException {
+    /**
+    * 휴가 조회 메서드
+    * */
+    public ResponseData findLeaveLog(ForFindLeaveDto forFindLeaveDto) throws SQLException {
 
         Connection conn = null;
         ResponseData responseData = null;
@@ -42,7 +50,7 @@ public class LeaveService {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
 
-         /*   responseData = findAllLeaveLogBizLogic(conn);*/
+            responseData = findAllLeaveLogBizLogic(forFindLeaveDto, conn);
             conn.commit();
 
         } catch (SQLException e) {
@@ -56,15 +64,56 @@ public class LeaveService {
         return responseData;
     }
 
-   /* private ResponseData findAllLeaveLogBizLogic(Connection conn) throws SQLException {
 
-        List<LeaveLog> leaveLogs = leaveRepository.getLeaveLogs(conn);
+    /**
+    * 휴가 수정 메서드
+    * */
+    public ResponseData updateLeaveLog(ForUpdateLeaveDto forUpdateLeaveDto) throws SQLException {
+        ResponseData responseData = null;
+        Connection conn = null;
 
-        return new ResponseData("휴가 조회 성공", leaveLogs);
-    }*/
+        try{
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+
+            responseData = updateLeaveBizLogic(forUpdateLeaveDto, conn);
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            e.printStackTrace();
+            throw e;
+        }
+        return responseData;
+    }
+
+    /**
+    * 휴가 신청 메서드
+    * */
+    public ResponseData requestLeave(ForRequestLeaveDto forRequestLeaveDto) throws SQLException{
+        ResponseData responseData = null;
+        Connection conn = null;
+
+        try{
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+
+            responseData = requestLeaveBizLogic(forRequestLeaveDto, conn);
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            e.printStackTrace();
+            throw e;
+        }
+        return responseData;
+    }
 
 
-    private ResponseData updateLeaveBizLogic(LeaveLog leaveLog, Connection conn) throws SQLException {
+
+
+    /**
+    * 휴가 수정 비즈니스 로직
+    * */
+    public ResponseData updateLeaveBizLogic(ForUpdateLeaveDto leaveLog, Connection conn) throws SQLException {
 
         int checkUpdate = leaveRepository.updateLeave(leaveLog, conn);
 
@@ -81,29 +130,53 @@ public class LeaveService {
     /**
      * 휴가 신청 로직
      * */
-    private ResponseData requestLeaveBizLogic(LeaveLog leaveLog, Connection conn) throws SQLException {
+    public ResponseData requestLeaveBizLogic(ForRequestLeaveDto forRequestLeaveDto, Connection conn) throws SQLException {
 
 
 
-        if(leaveLog.getRequestDate() == null) {
+        if(forRequestLeaveDto.getRequestDate() == null) {
             return new ResponseData("휴가 신청 실패 (요청 날짜 미입력)", null);
         }
 
-        if(leaveLog.getStartDate() == null) {
+        if(forRequestLeaveDto.getStartDate() == null) {
             return new ResponseData("휴가 신청 실패 (시작 날짜 미입력)", null);
         }
 
-        if(leaveLog.getEndDate() == null) {
+        if(forRequestLeaveDto.getEndDate() == null) {
             return new ResponseData("휴가 신청 실패 (종료 날짜 미입력)", null);
         }
 
-        Long createLeaveNum = leaveRepository.createLeave(leaveLog, conn);
+        Long createLeaveNum = leaveRepository.createLeave(forRequestLeaveDto, conn);
         System.out.println(createLeaveNum);
 
 
         return new ResponseData("휴가 신청 성공", null);
     }
 
+
+
+    /**
+     *  유저, 관리자의 휴가로그조회 로직.
+     * */
+    private ResponseData findAllLeaveLogBizLogic(ForFindLeaveDto forFindLeaveDto, Connection conn) throws SQLException {
+
+        List<LeaveLogOfUserDto> leaveLogOfUserDtos = new ArrayList<>();
+        ResponseData responseData = null;
+
+        //관리자일 경우 관리자가 볼수 있는 모든 직원의 휴가를 보여줌
+        if(forFindLeaveDto.getUserRoleDto().getDescription() == "관리자") {
+            // 관리자 휴가로그dto만들어서 리스폰스데이터에 넣어줄 예정.
+
+        } else if (forFindLeaveDto.getUserRoleDto().getDescription() == "일반 유저") {
+            // 일반 유저일경우 유저 아이디를 통해서 해당 유저의 휴가 로그를 찾음.
+            leaveLogOfUserDtos = leaveRepository.getLeaveLogsOfUser(forFindLeaveDto.getUserId(), conn);
+            responseData = new ResponseData("일반 유저 휴가로그 조회 성공", leaveLogOfUserDtos);
+        }
+
+
+
+        return responseData;
+    }
 
 
 

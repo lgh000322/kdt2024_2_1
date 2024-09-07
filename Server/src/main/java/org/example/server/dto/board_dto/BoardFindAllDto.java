@@ -1,4 +1,4 @@
-package org.example.server.dto;
+package org.example.server.dto.board_dto;
 
 import java.time.LocalDate;
 

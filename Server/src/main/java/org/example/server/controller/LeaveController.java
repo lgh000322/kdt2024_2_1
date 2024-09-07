@@ -1,6 +1,9 @@
 package org.example.server.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import org.example.server.consts.MessageTypeConst;
+import org.example.server.dto.leave_dto.ForFindLeaveDto;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 import org.example.server.service.LeaveService;
@@ -37,10 +40,12 @@ public class LeaveController implements Controller {
     public ResponseData execute(RequestData requestData) throws SQLException {
         String requestURL = requestData.getMessageType();
         ResponseData result = null;
+        Gson gson = new Gson();
 
         switch (requestURL) {
             case MESSAGE_LEAVE_REQUEST -> {
                 System.out.println("휴가 신청 실행");
+
 
             }
             case MessageTypeConst.MESSAGE_LEAVE_EDIT -> {
@@ -49,6 +54,12 @@ public class LeaveController implements Controller {
             }
             case MessageTypeConst.MESSAGE_LEAVE_SEARCH -> {
                 System.out.println("휴가 조회 실행");
+
+                if (requestData.getData() instanceof LinkedTreeMap) {
+                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
+                    ForFindLeaveDto forFindLeaveDto = gson.fromJson(gson.toJson(map), ForFindLeaveDto.class);
+                    result = leaveService.findLeaveLog(forFindLeaveDto);
+                }
 
             }
 

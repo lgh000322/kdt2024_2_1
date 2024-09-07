@@ -3,12 +3,10 @@ package org.example.server.controller;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import org.example.server.consts.MessageTypeConst;
-import org.example.server.domain.board.Board;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
-import org.example.server.dto.SalaryAddData;
 import org.example.server.service.SalaryService;
 
 import java.sql.SQLException;

@@ -1,4 +1,4 @@
-package org.example.server.dto;
+package org.example.server.dto.work_dto;
 
 public class AdminWorkData {
     private Long userNum; // 근퇴번호 PK

@@ -4,20 +4,16 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
-import org.example.server.dto.AdminWorkData;
+import org.example.server.dto.work_dto.AdminWorkData;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
-import org.example.server.dto.UserWorkData;
+import org.example.server.dto.user_dto.UserWorkData;
 import org.example.server.service.WorkService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class WorkControllerTest {
     WorkService workService;

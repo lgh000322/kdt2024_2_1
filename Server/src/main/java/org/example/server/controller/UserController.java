@@ -6,8 +6,8 @@ import org.example.server.consts.MessageTypeConst;
 import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
-import org.example.server.dto.UserJoinDto;
-import org.example.server.dto.UserLoginDto;
+import org.example.server.dto.user_dto.UserJoinDto;
+import org.example.server.dto.user_dto.UserLoginDto;
 import org.example.server.service.UserService;
 
 import java.sql.SQLException;

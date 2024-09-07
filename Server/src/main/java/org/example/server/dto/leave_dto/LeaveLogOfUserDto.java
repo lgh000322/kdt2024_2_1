@@ -1,23 +1,30 @@
-package org.example.server.dto;
+package org.example.server.dto.leave_dto;
 
-import java.time.LocalDate;
+//db 날짜와 호환되는 date 라이브러리 임포트.
+import java.sql.Date;
 
-public class LeaveLogForUserDto {
 
-    private LocalDate requestDate;
-    private LocalDate startDate;
-    private LocalDate endDate;
+/**
+ *
+ *  휴가 정보를 User 에게 보내기위한 dto
+ * */
+public class LeaveLogOfUserDto {
+
+    private Date requestDate;
+    private Date startDate;
+    private Date endDate;
     private Boolean status;
 
-    public LocalDate getRequestDate() {
+
+    public Date getRequestDate() {
         return requestDate;
     }
 
-    public LocalDate getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public LocalDate getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
@@ -25,7 +32,7 @@ public class LeaveLogForUserDto {
         return status;
     }
 
-    public LeaveLogForUserDto(Builder builder) {
+    public LeaveLogOfUserDto(Builder builder) {
         this.requestDate = builder.requestDate;
         this.startDate = builder.startDate;
         this.endDate = builder.endDate;
@@ -33,22 +40,22 @@ public class LeaveLogForUserDto {
     }
 
     public static class Builder {
-        private LocalDate requestDate;
-        private LocalDate startDate;
-        private LocalDate endDate;
+        private Date requestDate;
+        private Date startDate;
+        private Date endDate;
         private Boolean status;
 
-        public Builder requestDate(LocalDate requestDate) {
+        public Builder requestDate(Date requestDate) {
             this.requestDate = requestDate;
             return this;
         }
 
-        public Builder startDate(LocalDate startDate) {
+        public Builder startDate(Date startDate) {
             this.startDate = startDate;
             return this;
         }
 
-        public Builder endDate(LocalDate endDate) {
+        public Builder endDate(Date endDate) {
             this.endDate = endDate;
             return this;
         }
@@ -58,7 +65,7 @@ public class LeaveLogForUserDto {
             return this;
         }
 
-        public LeaveLogForUserDto build() {return new LeaveLogForUserDto(this);}
+        public LeaveLogOfUserDto build() {return new LeaveLogOfUserDto(this);}
 
     }
 }
