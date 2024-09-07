@@ -3,6 +3,7 @@ package org.example.server.service;
 import org.example.server.db_utils.DBUtils;
 import org.example.server.domain.salary_log.SalaryLog;
 
+import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
 import org.example.server.repository.SalaryRepository;
@@ -99,26 +100,28 @@ public class SalaryService {
         return salaryRepository.insertSalaryonDB(con, user, salaryLog);
     }
 
-    //월급조회 비즈니스로직
     private ResponseData searchSalaryBizLogic(User user, Connection con) throws SQLException {
+        /*
+        2024-09-07수정
+         */
         //connecter와 유저ID, (관리자or직원) 을 가져와서 해당 유저의 정보를 가져옴
         Optional<User> findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
+        ResponseData salaryResponse = null;
 
         if (findUser.isPresent()) {
             User DBUser = findUser.get();
-            // findUser가 존재한다면 Repository로 가서 해당 월급을 조회
-            ResponseData salaryResponse = salaryRepository.searchSalaryAllOnDB(con, DBUser);
-
-            // 월급 조회 결과가 성공인 경우에만 반환
-            if ("월급조회 성공".equals(salaryResponse.getMessageType())) {
-                return new ResponseData("성공", salaryResponse.getData()); // salary 로그 리스트를 반환
-            } else {
-                return new ResponseData("월급 조회 실패", null); // 실패 시 null 반환
+            if (DBUser.getRole() == Role.ADMIN) { // 관리자인 경우 전체 월급 데이터를 가져옴
+                salaryResponse = salaryRepository.searchSalaryAdminOnDB(con); // 관리자의 월급 데이터 조회
+            } else { // 일반 유저의 월급을 조회
+                salaryResponse = salaryRepository.searchSalaryUserOnDB(con, DBUser); // 일반 유저의 월급 데이터 조회
             }
         } else {
-            return new ResponseData("유저 조회 실패", null); // 유저를 찾지 못한 경우
+            return new ResponseData("User not found", null);  // 사용자가 없을 경우 반환
         }
+
+        return salaryResponse;
     }
+
 
     //얜 그냥 쭉쓰면됨
     private void release(Connection con) {

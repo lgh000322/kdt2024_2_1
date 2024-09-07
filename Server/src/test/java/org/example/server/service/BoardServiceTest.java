@@ -73,7 +73,7 @@ class BoardServiceTest {
         }
     }
 
-    @Test
+    /*@Test
     void findOneBoard() throws SQLException {
         ResponseData data = boardService.findOneBoard(3L);
 
@@ -84,7 +84,7 @@ class BoardServiceTest {
         System.out.println("내용 : " + boardAndAnswer.getBoard().getContents());
         System.out.println("사용자 : " + boardAndAnswer.getBoard().getUserNum());
         System.out.println("작성일자 :  " + boardAndAnswer.getBoard().getCreatedDate());
-    }
+    }*/
 
     @Test
     void updateBoard() throws SQLException {

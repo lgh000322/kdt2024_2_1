@@ -1,6 +1,7 @@
 package org.example.server.service;
 
 import org.example.server.db_utils.DBUtils;
+import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.domain.work_log.Status;
 import org.example.server.domain.work_log.WorkLog;
@@ -38,17 +39,25 @@ public class WorkService {
     }
     //////////////////////////////////// 비즈니스 로직 ////////////////////////////////////////
     public ResponseData workSearchBizLogic(User user, Connection conn) throws SQLException {
+        /*
+        2024-09-07수정
+         */
+        ResponseData workLogResponse = null;
+
         //connecter와 유저ID, (관리자or직원) 을 가져와서 해당 유저의 정보를 가져옴
         Optional<User> findUser = userRepository.findUserByIDAndRole(conn, user.getUserId(), user.getRole());
         if (findUser.isPresent()) {
             User DBUser = findUser.get();
-            //findUser가 존재한다면 Repository로가서 해당 근퇴을 조회시킨다.
-            ResponseData workLogResponse = workRepository.workSearchAllonDB(DBUser, conn);
-
-            return new ResponseData("성공", workLogResponse.getData()); //리스트를 반환함
-        } else {
-            return new ResponseData("실패", null);
+            if (DBUser.getRole() == Role.USER)
+                //findUser가 존재한다면 Repository로가서 해당 근퇴을 조회시킨다.
+                workLogResponse = workRepository.UserworkSearchAllonDB(DBUser, conn); //특정 유저의 월급리스트 반환
+            else
+                workLogResponse = workRepository.AdminworkSearchAllonDB(conn); //월급보단 유저테이블을 반환시키게
         }
+        else{
+            return new ResponseData("User not found", null);  // 사용자가 없을 경우 반환
+        }
+        return workLogResponse;
     }
 
     //출근 비즈니스 로직
