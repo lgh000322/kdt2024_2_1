@@ -1,4 +1,4 @@
-package org.example.server.dto;
+package org.example.server.dto.leave_dto;
 
 public class LeaveDay {
     private Long positionNum;

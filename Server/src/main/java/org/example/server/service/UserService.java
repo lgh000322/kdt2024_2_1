@@ -7,6 +7,7 @@ import org.example.server.domain.mail.MailType;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.*;
+import org.example.server.dto.leave_dto.LeaveDay;
 import org.example.server.dto.user_dto.UserInfo;
 import org.example.server.dto.user_dto.UserJoinDto;
 import org.example.server.dto.user_dto.UserLoginDto;
