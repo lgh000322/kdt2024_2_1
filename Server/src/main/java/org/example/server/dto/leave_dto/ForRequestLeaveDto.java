@@ -16,7 +16,7 @@ public class ForRequestLeaveDto {
 
     private Long userNum;
 
-    private ForUpdateLeaveDto(ForUpdateLeaveDto.Builder builder) {
+    private ForRequestLeaveDto(Builder builder) {
         this.leaveNum = builder.leaveNum;
         this.requestDate=builder.requestDate;
         this.startDate=builder.startDate;
@@ -38,38 +38,38 @@ public class ForRequestLeaveDto {
 
         private Long userNum;
 
-        public ForUpdateLeaveDto.Builder leaveNum(Long leaveNum) {
+        public Builder leaveNum(Long leaveNum) {
             this.leaveNum = leaveNum;
             return this;
         }
 
-        public ForUpdateLeaveDto.Builder requestDate(LocalDate requestDate) {
+        public Builder requestDate(LocalDate requestDate) {
             this.requestDate = requestDate;
             return this;
         }
 
-        public ForUpdateLeaveDto.Builder startDate(LocalDate startDate) {
+        public Builder startDate(LocalDate startDate) {
             this.startDate = startDate;
             return this;
         }
 
-        public ForUpdateLeaveDto.Builder endDate(LocalDate endDate) {
-            this.endDate = endDate;
-            return this;
-        }
-
-        public ForUpdateLeaveDto.Builder acceptanceStatus(boolean acceptanceStatus) {
+        public Builder acceptanceStatus(boolean acceptanceStatus) {
             this.acceptanceStatus = acceptanceStatus;
             return this;
         }
 
-        public ForUpdateLeaveDto.Builder userNum(Long userNum) {
+        public Builder endDate(LocalDate endDate) {
+            this.endDate = endDate;
+            return this;
+        }
+
+        public Builder userNum(Long userNum) {
             this.userNum = userNum;
             return this;
         }
 
-        public ForUpdateLeaveDto build() {
-            return new ForUpdateLeaveDto(this);
+        public ForRequestLeaveDto build() {
+            return new ForRequestLeaveDto(this);
         }
 
     }

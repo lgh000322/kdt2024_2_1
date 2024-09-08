@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import org.example.server.controller.front_controller.FrontController;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
+import org.example.server.scheduler.Scheduler;
+import org.example.server.service.SchedulerService;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -18,9 +20,11 @@ public class Server {
 
     private final FrontController frontController;
     private final ExecutorService executorService = Executors.newFixedThreadPool(100);
+    private final Scheduler scheduler;
 
     public Server(FrontController frontController) {
         this.frontController = frontController;
+        this.scheduler = new Scheduler(SchedulerService.createOrGetSchedulerService());
     }
 
     /**
@@ -30,6 +34,7 @@ public class Server {
      */
 
     public void start() throws IOException {
+        scheduler.start();
         ServerSocket serverSocket = new ServerSocket(50001);
         System.out.println("Server 시작");
         while (true) {

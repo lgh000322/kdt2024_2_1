@@ -1,4 +1,4 @@
-package org.example.server.dto;
+package org.example.server.dto.mail_dto;
 
 import org.example.server.domain.mail.MailType;
 

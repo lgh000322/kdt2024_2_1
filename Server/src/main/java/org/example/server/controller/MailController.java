@@ -1,8 +1,8 @@
 package org.example.server.controller;
 
 import org.example.server.consts.MessageTypeConst;
-import org.example.server.dto.MailReceivedData;
-import org.example.server.dto.MailSearchDto;
+import org.example.server.dto.mail_dto.MailReceivedData;
+import org.example.server.dto.mail_dto.MailSearchDto;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 import org.example.server.service.MailService;

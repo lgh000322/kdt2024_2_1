@@ -6,12 +6,14 @@ import org.example.server.domain.board.BoardAnswer;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.answer_dto.AnswerInBoardDto;
 import org.example.server.repository.AnswerRepository;
 import org.example.server.repository.UserRepository;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 public class AnswerService {
@@ -83,7 +85,7 @@ public class AnswerService {
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = searchBoardBizLogic(board, con);
+            responseData = searchAnswerBizLogic(board, con);
             con.commit();
         } catch (Exception e) {
             con.rollback();
@@ -93,15 +95,17 @@ public class AnswerService {
         return responseData;
     }
 
-    public ResponseData searchBoardBizLogic(Board board, Connection con) throws SQLException {
+    public ResponseData searchAnswerBizLogic(Board board, Connection con) throws SQLException {
         //가져온 board의 게시물 번호로 해당 번호에 달린 board_answer들을 가져온다. 댓글들은 모두가 볼 수 있는거니까
 
-        ResponseData answerResponse = answerRepository.searchBoardAndTakeAnswerOnDB(con, board);
+        List<AnswerInBoardDto> foundedAnswers = answerRepository.searchBoardAndTakeAnswerOnDB(con, board.getBoardNum());
 
-        if(answerResponse != null)
-            return new ResponseData("성공",answerResponse.getData());
-        else
+
+        if (foundedAnswers.size() > 0) {
+            return new ResponseData("성공", foundedAnswers);
+        } else {
             return new ResponseData("실패", null);
+        }
     }
 
 

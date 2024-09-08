@@ -4,8 +4,8 @@ import org.example.server.domain.mail.Mail;
 import org.example.server.domain.mail.MailStore;
 import org.example.server.domain.mail.MailType;
 import org.example.server.domain.mail.ReceivedMail;
-import org.example.server.dto.MailSearchDto;
-import org.example.server.dto.UserAndMailStore;
+import org.example.server.dto.mail_dto.MailSearchDto;
+import org.example.server.dto.mail_dto.UserAndMailStore;
 
 import java.sql.*;
 import java.util.List;
