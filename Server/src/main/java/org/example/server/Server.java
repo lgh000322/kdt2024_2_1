@@ -19,12 +19,13 @@ import java.util.concurrent.Executors;
 public class Server {
 
     private final FrontController frontController;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(100);
+    private final ExecutorService executorService;
     private final Scheduler scheduler;
 
     public Server(FrontController frontController) {
         this.frontController = frontController;
         this.scheduler = new Scheduler(SchedulerService.createOrGetSchedulerService());
+        this.executorService = Executors.newFixedThreadPool(100);
     }
 
     /**
