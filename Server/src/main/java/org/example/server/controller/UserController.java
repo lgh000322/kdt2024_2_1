@@ -17,9 +17,6 @@ public class UserController implements Controller {
     private static UserController userController = null;
     private final UserService userService;
 
-    //간단한 캐시 처리를 위한 threadLocal 변수
-    private ThreadLocal<User> threadLocalUser = new ThreadLocal<>();
-
     private UserController(UserService userService) {
         this.userService = userService;
     }
@@ -59,12 +56,11 @@ public class UserController implements Controller {
             }
             case MessageTypeConst.MESSAGE_LOGOUT -> {
                 System.out.println("로그아웃 실행");
-                threadLocalUser.remove();
             }
             case MessageTypeConst.MESSAGE_SEARCH -> {
                 System.out.println("특정 회원 조회");
                 User data = (User) requestData.getData();
-                userService.findByUserId(data, threadLocalUser);
+                userService.findByUserId(data);
             }
             case MessageTypeConst.MESSAGE_SEARCH_ALL -> {
                 System.out.println("모든 회원 조회");
