@@ -115,15 +115,11 @@ public class UserService {
      * 특정 회원을 찾는 메소드
      *
      * @param user
-     * @param threadLocalUser
      * @return
      * @throws SQLException
      */
-    public ResponseData findByUserId(User user, ThreadLocal<User> threadLocalUser) throws SQLException {
-        //로그인을 한 적이 있으면 데이터베이스에 쿼리를 날리지 않는다.
-        if (threadLocalUser != null) {
-            return new ResponseData("회원 조회 성공", threadLocalUser.get());
-        }
+    public ResponseData findByUserId(User user) throws SQLException {
+
 
         ResponseData responseData = null;
         Connection con = null;
