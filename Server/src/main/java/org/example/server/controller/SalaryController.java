@@ -36,7 +36,6 @@ public class SalaryController implements Controller {
         String requestURL = requestData.getMessageType();
         ResponseData result = null;
         Gson gson = new Gson();
-
         switch (requestURL) {
             case MessageTypeConst.MESSAGE_SALARY_SEARCH -> {
                 System.out.println("급여내역 조회 실행");

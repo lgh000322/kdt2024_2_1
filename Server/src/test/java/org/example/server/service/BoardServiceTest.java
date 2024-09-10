@@ -1,11 +1,10 @@
 package org.example.server.service;
 
-import org.example.server.dto.*;
+import org.example.server.dto.ResponseData;
 import org.example.server.dto.board_dto.BoardFindAllDto;
 import org.example.server.dto.board_dto.BoardSaveDto;
 import org.example.server.dto.board_dto.BoardUpdateDto;
 import org.junit.jupiter.api.Test;
-
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -94,7 +93,5 @@ class BoardServiceTest {
 
         ResponseData data = boardService.updateBoard(board);
         System.out.println("메세지 타입: " + data.getMessageType() + ", 데이터: " + data.getData());
-
-
     }
 }
