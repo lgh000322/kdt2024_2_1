@@ -36,16 +36,16 @@ public class AnswerController implements Controller {
         this.answerService = answerService;
     }
 
-    // Gson 생성 시 LocalDate 직렬화/역직렬화 추가
-    private static final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) -> context.serialize(src.toString()))
-            .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) -> LocalDate.parse(json.getAsString()))
-            .create();
-
     @Override
     public ResponseData execute(RequestData requestData) throws SQLException {
         String requestURL = requestData.getMessageType();
         ResponseData result = null;
+
+        // Gson 생성 시 LocalDate 직렬화/역직렬화 추가
+        Gson gson=new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) -> context.serialize(src.toString()))
+                .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) -> LocalDate.parse(json.getAsString()))
+                .create();
 
         switch (requestURL) {
             case MessageTypeConst.MESSAGE_ANSWER_ADD -> {
