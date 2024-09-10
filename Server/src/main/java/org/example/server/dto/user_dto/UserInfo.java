@@ -10,7 +10,18 @@ public class UserInfo {
 
     private String deptName;
 
+
+    private String tel;
+
     private String positionName;
+
+    public String getTel() {
+        return tel;
+    }
+
+    public void setTel(String tel) {
+        this.tel = tel;
+    }
 
     public Long getUserNum() {
         return userNum;

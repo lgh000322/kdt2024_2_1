@@ -2,6 +2,7 @@ package org.example.server.scheduler;
 
 import org.example.server.service.SchedulerService;
 
+import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -85,16 +86,26 @@ public class Scheduler {
     private void morningTask() {
         // 아침 8시에 수행할 로직을 구현
         System.out.println("아침 8시 작업 실행");
-//        schedulerService.methodA();// 모든 회원에 대한 근태기록을 저장한다.(출근처리 -> 결근)
-        //출근 찍으면 -> 출근으로 변경
+        /*try {
+            schedulerService.morningAct();
+        } catch (SQLException e) {
+            System.out.println("아침 스케줄링 수행중 오류가 발생했습니다.");
+            e.printStackTrace();
+        }*/
+
     }
 
     // 오후 6시 10분에 수행할 작업
-    private void eveningTask() {
+    private void eveningTask()  {
         // 오후 6시 10분에 수행할 로직을 구현
         // 현재 출석한 회원중 퇴근버튼을 누르지 않은 회원을 결근으로 전환한다.
         System.out.println("저녁 6시 10분 작업 실행");
-        // 여기서 다른 로직을 수행할 수 있음
-//        schedulerService.methodB();//현재 출근상태인 출근 기록에서 퇴근 처리를 누르지 않은 근태기록을 결근으로 변경
+        /*try {
+            schedulerService.eveningAct();
+        } catch (SQLException e) {
+            System.out.println("저녁 스케줄링 수행중 오류가 발생했습니다.");
+            e.printStackTrace();
+        }*/
+
     }
 }
