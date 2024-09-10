@@ -175,7 +175,7 @@ public class UserService {
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = userRepository.findAll(con,deptName);
+            responseData = userRepository.findAllByDeptName(con,deptName);
             con.commit();
         } catch (Exception e) {
             con.rollback();

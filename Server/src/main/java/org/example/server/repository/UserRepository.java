@@ -74,10 +74,10 @@ public class UserRepository {
     }
 
     public Optional<UserInfo> findUserInfoByIDAndRole(Connection conn, String userId, Role role) throws SQLException {
-        String sql = "select user.user_num, user.name, user.email, dept.dept_name, position.position_name" +
+        String sql = "select user.user_num, user.name, user.email, user.tel, dept.dept_name, position.position_name" +
                 " from user" +
                 " left join dept on user.dept_num = dept.dept_num" +
-                " left join position on user.position_num = dept.position_num" +
+                " left join position on user.position_num = position.position_num" +
                 " where user_id = ? and role = ?";
 
         PreparedStatement pstmt = null;
@@ -94,6 +94,7 @@ public class UserRepository {
             if (rs.next()) {
                 userInfo = new UserInfo();
                 userInfo.setUserNum(rs.getLong("user.user_num"));
+                userInfo.setTel(rs.getString("user.tel"));
                 userInfo.setName(rs.getString("user.name"));
                 userInfo.setEmail(rs.getString("user.email"));
                 userInfo.setDeptName(rs.getString("dept.dept_name"));
@@ -221,7 +222,7 @@ public class UserRepository {
         }
     }
 
-    public ResponseData findAll(Connection conn, String deptName) throws SQLException {
+    public ResponseData findAllByDeptName(Connection conn, String deptName) throws SQLException {
         String sql = "select * from user inner join dept on user.dept_num = dept.dept_num where user.dept_name = ?";
         List<User> list = new ArrayList<>();
         PreparedStatement pstmt = null;
@@ -252,6 +253,41 @@ public class UserRepository {
 
             return new ResponseData("조회 성공", list);
 
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public List<User> findAll(Connection conn) throws SQLException {
+        String sql = "select * from user";
+        List<User> list = new ArrayList<>();
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+
+            while (rs.next()) {
+                User user = new User.Builder()
+                        .userNum(rs.getLong("user_num"))
+                        .userId(rs.getString("user_id"))
+                        .password(rs.getString("password"))
+                        .name(rs.getString("name"))
+                        .tel(rs.getString("tel"))
+                        .email(rs.getString("email"))
+                        .role(Role.fromString(rs.getString("role")))
+                        .remainedLeave(rs.getInt("remained_leave"))
+                        .positionNum(rs.getLong("position_num"))
+                        .deptNum(rs.getLong("dept_num"))
+                        .build();
+
+                list.add(user);
+            }
+            return list;
         } catch (SQLException e) {
             throw e;
         } finally {
