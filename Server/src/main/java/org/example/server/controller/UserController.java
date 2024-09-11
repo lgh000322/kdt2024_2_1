@@ -1,7 +1,10 @@
 package org.example.server.controller;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
+import org.example.server.adapter.LocalDateTypeAdapter;
+import org.example.server.adapter.LocalTimeTypeAdapter;
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
@@ -11,6 +14,8 @@ import org.example.server.dto.user_dto.UserLoginDto;
 import org.example.server.service.UserService;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 
 public class UserController implements Controller {
@@ -35,7 +40,10 @@ public class UserController implements Controller {
     public ResponseData execute(RequestData requestData) throws SQLException {
         String requestURL = requestData.getMessageType();
         ResponseData result = null;
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
+                .registerTypeAdapter(LocalTime.class, new LocalTimeTypeAdapter())
+                .create();
 
         switch (requestURL) {
             case MessageTypeConst.MESSAGE_JOIN -> {
@@ -67,14 +75,13 @@ public class UserController implements Controller {
             }
             case MessageTypeConst.MESSAGE_SEARCH_ALL -> {
                 System.out.println("모든 회원 조회");
-                result=userService.findAll(null);
+                result=userService.findAll();
             }
             case MessageTypeConst.MESSAGE_USER_ID_VALIDATION -> {
-                if (requestData.getData() instanceof LinkedTreeMap) {
+                if (requestData.getData() instanceof String) {
                     System.out.println("아이디 중복 검사");
-                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
-                    String userId = gson.fromJson(gson.toJson(map), String.class);
-                    result = userService.idValidation(userId);
+                    String userId = (String) requestData.getData();  // 바로 String으로 캐스팅
+                    result = userService.idValidation(userId);  // userId 유효성 검사
                 }
             }
         }
