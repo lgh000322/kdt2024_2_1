@@ -10,12 +10,27 @@ import org.example.server.dto.user_dto.UserRoleDto;
  *  그리고 관리자의 경우 유저명을치면 해당 유저의 tel이나 email을 넘겨주어야함.
 * */
 public class ForFindLeaveDto {
+
+
+
+    private UserRoleDto userRoleDto;
+    private String userName;
+    private String userId;
+
     public UserRoleDto getUserRoleDto() {
         return userRoleDto;
     }
 
     public void setUserRoleDto(UserRoleDto userRoleDto) {
         this.userRoleDto = userRoleDto;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getUserId() {
@@ -25,18 +40,4 @@ public class ForFindLeaveDto {
     public void setUserId(String userId) {
         this.userId = userId;
     }
-
-
-    public String getTel() {
-        return tel;
-    }
-
-    public void setTel(String tel) {
-        this.tel = tel;
-    }
-
-    private UserRoleDto userRoleDto;
-    private String userId;
-    private String tel;
-
 }

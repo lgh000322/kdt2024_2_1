@@ -8,10 +8,27 @@ import java.sql.Date;
 * */
 public class LeaveLogOfAdminDto
 {
+
+
+    private Long leaveNum;
+    private String userName;
     private Date requestDate;
     private Date startDate;
     private Date endDate;
+    private String deptName;
     private Boolean status;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public Long getLeaveNum() {
+        return leaveNum;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
 
 
     public Date getRequestDate() {
@@ -35,6 +52,10 @@ public class LeaveLogOfAdminDto
         this.startDate = builder.startDate;
         this.endDate = builder.endDate;
         this.status = builder.status;
+        this.deptName = builder.deptName;
+        this.leaveNum = builder.leaveNum;
+        this.userName = builder.userName;
+
     }
 
     public static class Builder {
@@ -42,6 +63,10 @@ public class LeaveLogOfAdminDto
         private Date startDate;
         private Date endDate;
         private Boolean status;
+        private String deptName;
+
+        private Long leaveNum;
+        private String userName;
 
         public LeaveLogOfAdminDto.Builder requestDate(Date requestDate) {
             this.requestDate = requestDate;
@@ -62,6 +87,24 @@ public class LeaveLogOfAdminDto
             this.status = status;
             return this;
         }
+
+        public LeaveLogOfAdminDto.Builder deptName(String deptName) {
+            this.deptName = deptName;
+            return this;
+        }
+
+
+        public LeaveLogOfAdminDto.Builder leaveNum(Long leaveNum) {
+            this.leaveNum = leaveNum;
+            return this;
+        }
+
+        public LeaveLogOfAdminDto.Builder userName(String userName) {
+            this.userName = userName;
+            return this;
+        }
+
+
 
         public LeaveLogOfAdminDto build() {
             return new LeaveLogOfAdminDto(this);

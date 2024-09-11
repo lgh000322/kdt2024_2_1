@@ -1,8 +1,9 @@
 package org.example.server.dto.leave_dto;
 
 //db 날짜와 호환되는 date 라이브러리 임포트.
-import java.sql.Date;
 
+
+import java.util.Date;
 
 /**
  *

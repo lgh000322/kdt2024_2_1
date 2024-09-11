@@ -27,6 +27,8 @@ public class UserRepository {
         return userRepository;
     }
 
+
+
     /**
      * 아래부턴 쿼리문을 작성한다.
      * 예시는 다음과 같다.
@@ -34,6 +36,34 @@ public class UserRepository {
      * System.out.println("memberRepository 실행");
      * }
      */
+
+
+    /**
+     * 휴가일수 수정 메서드 -> leaveService 에서 사용
+     * */
+    public int updateRemainedLeave(String userId, int remainedLeave, Connection conn) throws SQLException {
+        PreparedStatement pstmt = null;
+
+        String sql = "update user set remained_leave = ? where user_id = ?";
+        int row = 0;
+
+        try{
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, remainedLeave);
+            pstmt.setString(2, userId);
+            row = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, null);
+        }
+
+        return row; // 0 일경우 수정 실패 , 0이 아니면 수정 성공.
+    }
+
+
 
     public Optional<User> findUserByIDAndRole(Connection conn, String userId, Role role) throws SQLException {
         String sql = "select * from user where user_id = ? and role = ?";
@@ -258,6 +288,7 @@ public class UserRepository {
             close(pstmt, rs);
         }
     }
+
 
 
     private static void close(PreparedStatement pstmt, ResultSet rs) {

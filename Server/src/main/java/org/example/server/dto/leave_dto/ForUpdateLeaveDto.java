@@ -1,72 +1,69 @@
 package org.example.server.dto.leave_dto;
 
-import java.time.LocalDate;
+
+import java.util.Date;
 
 public class ForUpdateLeaveDto {
 
     private Long leaveNum;
 
-    private LocalDate requestDate;
+    private Date startDate;
 
-    private LocalDate startDate;
+    private Date endDate;
 
-    private LocalDate endDate;
+    private String userId;
 
-    private boolean acceptanceStatus;
-
-    private Long userNum;
+    private Status status;
 
     private ForUpdateLeaveDto(Builder builder) {
         this.leaveNum = builder.leaveNum;
-        this.requestDate=builder.requestDate;
+        this.status = builder.status;
         this.startDate=builder.startDate;
         this.endDate=builder.endDate;
-        this.acceptanceStatus=builder.acceptanceStatus;
-        this.userNum = builder.userNum;
+
+        this.userId = builder.userId;
+
     }
 
     public static class Builder{
         private Long leaveNum;
 
-        private LocalDate requestDate;
+        private Status status;
 
-        private LocalDate startDate;
+        private Date startDate;
 
-        private LocalDate endDate;
+        private Date endDate;
 
-        private boolean acceptanceStatus;
-
-        private Long userNum;
+        private String userId;
 
         public Builder leaveNum(Long leaveNum) {
             this.leaveNum = leaveNum;
             return this;
         }
 
-        public Builder requestDate(LocalDate requestDate) {
-            this.requestDate = requestDate;
+        public Builder status(Status status) {
+            this.status = status;
             return this;
         }
 
-        public Builder startDate(LocalDate startDate) {
+        public Builder startDate(Date startDate) {
             this.startDate = startDate;
             return this;
         }
 
-        public Builder endDate(LocalDate endDate) {
+        public Builder endDate(Date endDate) {
             this.endDate = endDate;
             return this;
         }
 
-        public Builder acceptanceStatus(boolean acceptanceStatus) {
-            this.acceptanceStatus = acceptanceStatus;
+
+
+        public Builder userId(String userId) {
+            this.userId = userId;
             return this;
         }
 
-        public Builder userNum(Long userNum) {
-            this.userNum = userNum;
-            return this;
-        }
+
 
         public ForUpdateLeaveDto build() {
             return new ForUpdateLeaveDto(this);
@@ -77,23 +74,20 @@ public class ForUpdateLeaveDto {
         return leaveNum;
     }
 
-    public LocalDate getRequestDate() {
-        return requestDate;
+    public Status getStatus() {
+        return status;
     }
 
-    public LocalDate getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public LocalDate getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public boolean isAcceptanceStatus() {
-        return acceptanceStatus;
-    }
 
-    public Long getUserNum() {
-        return userNum;
+    public String getUserId() {
+        return userId;
     }
 }
