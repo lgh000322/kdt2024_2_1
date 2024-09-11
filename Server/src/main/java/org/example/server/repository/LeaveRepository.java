@@ -6,10 +6,8 @@ import org.example.server.dto.leave_dto.ForUpdateLeaveDto;
 import org.example.server.dto.leave_dto.LeaveLogOfAdminDto;
 import org.example.server.dto.leave_dto.LeaveLogOfUserDto;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,6 +136,51 @@ public class LeaveRepository {
     *  휴가 조회 -> admin의 휴가조회 (특정 유저 휴가조회)
     * */
 
+
+    /**
+     * 회원번호와 오늘 날짜로 휴가허가가 난 사람이 있는지
+     */
+
+    public LeaveLog findByUserNum(Connection con, Long userNum, LocalDate now) throws SQLException {
+        Date date = Date.valueOf(now);
+        String sql = "select * from leave_log" +
+                " where user_num = ? and" +
+                " start_date >= ? and" +
+                " end_date <= ? and" +
+                " acceptance_status = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = con.prepareStatement(sql);
+            pstmt.setLong(1,userNum);
+            pstmt.setDate(2,date);
+            pstmt.setDate(3,date);
+            pstmt.setBoolean(4, true);
+            rs = pstmt.executeQuery();
+
+
+            LeaveLog leaveLog = null;
+            if (rs.next()) {
+                leaveLog = new LeaveLog.Builder()
+                        .leaveNum(rs.getLong("leave_num"))
+                        .requestDate(rs.getDate("request_date").toLocalDate())
+                        .startDate(rs.getDate("start_date").toLocalDate())
+                        .endDate(rs.getDate("end_date").toLocalDate())
+                        .acceptanceStatus(rs.getBoolean("acceptance_status"))
+                        .userNum(rs.getLong("user_num"))
+                        .build();
+            }
+
+            return leaveLog;
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
 
     /**
     * 휴가 조회 -> user 의 휴가조회.

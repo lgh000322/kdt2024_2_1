@@ -2,9 +2,9 @@ package org.example.server.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonSerializer;
 import com.google.gson.internal.LinkedTreeMap;
+import org.example.server.adapter.LocalDateTypeAdapter;
+import org.example.server.adapter.LocalTimeTypeAdapter;
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.domain.board.Board;
 import org.example.server.domain.board.BoardAnswer;
@@ -16,6 +16,7 @@ import org.example.server.service.AnswerService;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class AnswerController implements Controller {
     private static AnswerController answerController = null;
@@ -43,8 +44,8 @@ public class AnswerController implements Controller {
 
         // Gson 생성 시 LocalDate 직렬화/역직렬화 추가
         Gson gson=new GsonBuilder()
-                .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) -> context.serialize(src.toString()))
-                .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) -> LocalDate.parse(json.getAsString()))
+                .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
+                .registerTypeAdapter(LocalTime.class, new LocalTimeTypeAdapter())
                 .create();
 
         switch (requestURL) {

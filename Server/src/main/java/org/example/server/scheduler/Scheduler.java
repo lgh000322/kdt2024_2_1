@@ -36,7 +36,7 @@ public class Scheduler {
 
     public void start() {
         System.out.println("출근기록 자동저장 스케줄러 실행");
-        scheduleTask(LocalTime.of(8, 0), this::morningTask, "아침 8시에 데이터베이스 저장 로직 호출");
+        scheduleTask(LocalTime.of(13, 21), this::morningTask, "아침 8시에 데이터베이스 저장 로직 호출");
         scheduleTask(LocalTime.of(18, 10), this::eveningTask, "저녁 6시 10분에 데이터베이스 저장 로직 호출");
     }
 
@@ -86,12 +86,12 @@ public class Scheduler {
     private void morningTask() {
         // 아침 8시에 수행할 로직을 구현
         System.out.println("아침 8시 작업 실행");
-        /*try {
+        try {
             schedulerService.morningAct();
         } catch (SQLException e) {
             System.out.println("아침 스케줄링 수행중 오류가 발생했습니다.");
             e.printStackTrace();
-        }*/
+        }
 
     }
 
@@ -100,12 +100,12 @@ public class Scheduler {
         // 오후 6시 10분에 수행할 로직을 구현
         // 현재 출석한 회원중 퇴근버튼을 누르지 않은 회원을 결근으로 전환한다.
         System.out.println("저녁 6시 10분 작업 실행");
-        /*try {
+        try {
             schedulerService.eveningAct();
         } catch (SQLException e) {
             System.out.println("저녁 스케줄링 수행중 오류가 발생했습니다.");
             e.printStackTrace();
-        }*/
+        }
 
     }
 }

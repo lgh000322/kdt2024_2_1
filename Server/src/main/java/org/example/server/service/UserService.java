@@ -20,6 +20,7 @@ import org.example.server.repository.UserRepository;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 public class UserService {
@@ -163,19 +164,18 @@ public class UserService {
 
     /**
      * 모든 회원을 조회하는 메소드
-     * @param deptName
      * @return
      * @throws SQLException
      */
 
-    public ResponseData findAll(String deptName) throws SQLException {
+    public ResponseData findAll() throws SQLException {
         ResponseData responseData = null;
         Connection con = null;
 
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = userRepository.findAllByDeptName(con,deptName);
+            responseData = findAllBizLogic(con);
             con.commit();
         } catch (Exception e) {
             con.rollback();
@@ -183,6 +183,15 @@ public class UserService {
             release(con);
         }
         return responseData;
+    }
+
+    private ResponseData findAllBizLogic(Connection con) throws SQLException {
+        List<User> users = userRepository.findAll(con);
+        if (users.isEmpty()) {
+            return new ResponseData("회원 조회 실패(회원 없음)", null);
+        }
+
+        return new ResponseData("회원 전체 조회 성공", users);
     }
 
     private ResponseData findByUserIdBizLogic(String userId, Connection con, Role role) throws SQLException {

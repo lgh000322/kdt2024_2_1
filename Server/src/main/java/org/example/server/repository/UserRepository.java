@@ -2,7 +2,6 @@ package org.example.server.repository;
 
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
-import org.example.server.dto.ResponseData;
 import org.example.server.dto.user_dto.UserInfo;
 
 import java.sql.Connection;
@@ -222,43 +221,6 @@ public class UserRepository {
         }
     }
 
-    public ResponseData findAllByDeptName(Connection conn, String deptName) throws SQLException {
-        String sql = "select * from user inner join dept on user.dept_num = dept.dept_num where user.dept_name = ?";
-        List<User> list = new ArrayList<>();
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-
-        try {
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, deptName);
-            rs = pstmt.executeQuery();
-
-
-            while (rs.next()) {
-                User user = new User.Builder()
-                        .userNum(rs.getLong("user_num"))
-                        .userId(rs.getString("user_id"))
-                        .password(rs.getString("password"))
-                        .name(rs.getString("name"))
-                        .tel(rs.getString("tel"))
-                        .email(rs.getString("email"))
-                        .role(Role.fromString(rs.getString("role")))
-                        .remainedLeave(rs.getInt("remained_leave"))
-                        .positionNum(rs.getLong("position_num"))
-                        .deptNum(rs.getLong("dept_num"))
-                        .build();
-
-                list.add(user);
-            }
-
-            return new ResponseData("조회 성공", list);
-
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            close(pstmt, rs);
-        }
-    }
 
     public List<User> findAll(Connection conn) throws SQLException {
         String sql = "select * from user";

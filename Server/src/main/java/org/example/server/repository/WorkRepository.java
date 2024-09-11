@@ -3,9 +3,9 @@ package org.example.server.repository;
 import org.example.server.domain.user.User;
 import org.example.server.domain.work_log.Status;
 import org.example.server.domain.work_log.WorkLog;
-import org.example.server.dto.work_dto.AdminWorkData;
 import org.example.server.dto.ResponseData;
 import org.example.server.dto.user_dto.UserWorkData;
+import org.example.server.dto.work_dto.AdminWorkData;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -27,6 +27,72 @@ public class WorkRepository {
         System.out.println("WorkRepository 싱글톤 반환");
         return workRepository;
     }
+
+
+    /**
+     * 오전 8시 스케줄링에 사용되는 메소드. 회원의 근태로그를 미리 저장한다.
+     *
+     * @param con
+     * @param status
+     * @param time
+     * @param localDate
+     * @param userNum
+     * @throws SQLException
+     */
+    public void save(Connection con, Status status, LocalTime time, LocalDate localDate, Long userNum) throws SQLException {
+        String sql = "insert into work_log (start_time, end_time, status, work_date, user_num)" +
+                " values (?, ?, ?, ?, ?)";
+
+        PreparedStatement pstmt = null;
+
+        try {
+            pstmt = con.prepareStatement(sql);
+
+            pstmt.setTime(1, Time.valueOf(time));
+            pstmt.setTime(2, null);
+            pstmt.setString(3, status.name());
+            pstmt.setDate(4, Date.valueOf(localDate));
+            pstmt.setLong(5, userNum);
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, null);
+        }
+    }
+
+    public List<WorkLog> findWorkLogByDate(Connection conn, LocalDate today) throws SQLException {/*
+        String sql = "select * from work_log where work_date = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setDate(1,Date.valueOf(today));
+            rs = pstmt.executeQuery();
+
+            List<WorkLog> result = new ArrayList<>();
+
+            while (rs.next()) {
+              WorkLog workLog=new WorkLog.Builder()
+                      .logNum(rs.getLong(""))
+            }
+
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }*/
+        return null;
+    }
+
+
+
+
 
     ///유저의 근퇴목록 모두 조회
     public ResponseData UserworkSearchAllonDB(User user, Connection conn) throws SQLException {
@@ -52,11 +118,11 @@ public class WorkRepository {
                         .workNum(rs.getLong("log_num")) // 근퇴 기록 번호
                         .workDate(rs.getDate("work_date").toLocalDate()) // 출근 날짜
                         .status(Status.valueOf(rs.getString("status").toUpperCase())) // status 설정
-                        .startTime(rs.getTime("start_time").toLocalTime()) // 시작 시간, LocalTime 변환
-                        .endTime(rs.getTime("end_time").toLocalTime()) // 퇴근 시간, LocalTime 변환
+                        .startTime(rs.getTime("start_time") != null ? rs.getTime("start_time").toLocalTime() : null) // 시작 시간, null 체크 후 LocalTime 변환
+                        .endTime(rs.getTime("end_time") != null ? rs.getTime("end_time").toLocalTime() : null) // 퇴근 시간, null 체크 후 LocalTime 변환
                         .build();
 
-                workLogs.add(workLog); // 리스트에 SalaryLog 추가
+                workLogs.add(workLog); // 리스트에 workLog 추가
             }
 
             // 리스트가 비어 있지 않다면 조회 성공 메시지와 함께 리스트 반환
@@ -202,7 +268,7 @@ public class WorkRepository {
             close(pstmt, null);
         }
     }
-    
+
     //근퇴로그 업데이트
     public ResponseData updateWorkLog(WorkLog workLog, Connection con) throws SQLException {
         String updateSQL = "UPDATE work_log SET start_time = ?, end_time = ?, status = ?, leave_num = ? WHERE log_num = ?";
@@ -261,7 +327,7 @@ public class WorkRepository {
             close(pstmt, rs); // 자원 해제
         }
     }
-    
+
 
     private static void close(PreparedStatement pstmt, ResultSet rs) {
         if (rs != null) {
