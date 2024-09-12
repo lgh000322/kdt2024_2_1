@@ -23,6 +23,7 @@ public class FrontController {
         nextController.put("SalaryController", SalaryController.createOrGetSalaryController());
         nextController.put("WorkController", WorkController.createOrGetWorkController());
         nextController.put("AnswerController", AnswerController.createOrGetAnswerController());
+        nextController.put("LeaveController", LeaveController.createOrGetLeaveController());
     }
 
     /**
@@ -74,6 +75,11 @@ public class FrontController {
 
         if (requestData.getMessageType().contains("answer")) {
             controller = nextController.get("AnswerController");
+            result=controller.execute(requestData);
+        }
+
+        if (requestData.getMessageType().contains("leave")) {
+            controller = nextController.get("LeaveController");
             result=controller.execute(requestData);
         }
 

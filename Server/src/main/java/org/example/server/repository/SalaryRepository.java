@@ -92,7 +92,7 @@ public class SalaryRepository {
                 return new ResponseData("일반직원 월급조회 성공", salaryLogs);
             } else {
                 // 조회된 결과가 없을 때 적절한 메시지 반환
-                return new ResponseData("일바직원 월급조회 실패", null);
+                return new ResponseData("일반직원 월급조회 실패", null);
             }
 
         } catch (SQLException e) {
