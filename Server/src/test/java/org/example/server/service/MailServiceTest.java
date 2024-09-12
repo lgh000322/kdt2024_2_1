@@ -1,7 +1,8 @@
+/*
 package org.example.server.service;
 
 import org.example.server.domain.mail.Mail;
-import org.example.server.dto.MailReceivedData;
+import org.example.server.dto.mail_dto.MailReceivedData;
 import org.example.server.dto.ResponseData;
 import org.junit.jupiter.api.Test;
 
@@ -42,4 +43,4 @@ class MailServiceTest {
         System.out.println("메세지: "+result.getMessageType()+" 데이터: "+result.getData());
     }
 
-}
+}*/

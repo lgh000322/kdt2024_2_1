@@ -5,10 +5,10 @@ import org.example.server.domain.mail.Mail;
 import org.example.server.domain.mail.MailType;
 import org.example.server.domain.mail.ReceivedMail;
 import org.example.server.domain.user.User;
-import org.example.server.dto.MailReceivedData;
-import org.example.server.dto.MailSearchDto;
+import org.example.server.dto.mail_dto.MailReceivedData;
+import org.example.server.dto.mail_dto.MailSearchDto;
 import org.example.server.dto.ResponseData;
-import org.example.server.dto.UserAndMailStore;
+import org.example.server.dto.mail_dto.UserAndMailStore;
 import org.example.server.repository.MailRepository;
 import org.example.server.repository.UserRepository;
 

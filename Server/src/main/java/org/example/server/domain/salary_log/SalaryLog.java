@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public class SalaryLog {
     private Long salaryNum;
 
-    private LocalDate receivedData;
+    private LocalDate receivedDate;
 
     private int totalSalary;
 
@@ -13,7 +13,7 @@ public class SalaryLog {
 
     private SalaryLog(Builder builder) {
         this.salaryNum = builder.salaryNum;
-        this.receivedData = builder.receivedData;
+        this.receivedDate = builder.receivedData;
         this.totalSalary = builder.totalSalary;
         this.userNum = builder.userNum;
     }
@@ -57,7 +57,7 @@ public class SalaryLog {
     }
 
     public LocalDate getReceivedData() {
-        return receivedData;
+        return receivedDate;
     }
 
     public int getTotalSalary() {
@@ -66,5 +66,15 @@ public class SalaryLog {
 
     public Long getUserNum() {
         return userNum;
+    }
+
+    @Override
+    public String toString() {
+        return "SalaryLog{" +
+                "salaryNum=" + salaryNum +
+                ", receivedDate=" + receivedDate +
+                ", totalSalary=" + totalSalary +
+                ", userNum=" + userNum +
+                '}';
     }
 }

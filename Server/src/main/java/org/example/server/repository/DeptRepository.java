@@ -1,12 +1,9 @@
 package org.example.server.repository;
 
-import org.example.server.domain.mail.Mail;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Optional;
 
 public class DeptRepository {
 

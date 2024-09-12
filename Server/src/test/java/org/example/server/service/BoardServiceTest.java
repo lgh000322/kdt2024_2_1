@@ -1,20 +1,14 @@
 package org.example.server.service;
 
-import org.example.server.domain.board.Board;
-import org.example.server.domain.board.BoardAnswer;
-import org.example.server.dto.BoardAndAnswer;
 import org.example.server.dto.ResponseData;
-import org.example.server.repository.BoardRepository;
-import org.junit.jupiter.api.Assertions;
+import org.example.server.dto.board_dto.BoardFindAllDto;
+import org.example.server.dto.board_dto.BoardSaveDto;
+import org.example.server.dto.board_dto.BoardUpdateDto;
 import org.junit.jupiter.api.Test;
-
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
-
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class BoardServiceTest {
 
@@ -35,13 +29,12 @@ class BoardServiceTest {
 
 
 
-        Board board = new Board.Builder()
-                .title("rrr")
-                .contents("rrrr")
-                .userNum(16L)
-                .createdDate(localDateTime)
-                .build();
+        BoardSaveDto board = new BoardSaveDto();
 
+        board.setContents("고구구ㅜ가ㅜㄴ아룸;ㅣㅇ루");
+        board.setCreatedDate(localDateTime);
+        board.setTitle("ㅎㅇ?");
+        board.setUserNum(16L);
 
         ResponseData data = boardService.createBoard(board);
         System.out.println("메세지 타입: " + data.getMessageType() + ", 데이터: " + data.getData());
@@ -54,22 +47,28 @@ class BoardServiceTest {
 
     @Test
     void findAllBoards() throws SQLException {
-        ResponseData data = boardService.findAllBoards();
 
-        List<Board> list = (List<Board>) data.getData();
+        String title2 = "ㅎ";
+        String title3 = null;
+
+        ResponseData data = boardService.findAllBoards(title2);
+
+        List<BoardFindAllDto> list = (List<BoardFindAllDto>) data.getData();
 
         System.out.println("메세지 타입: " + data.getMessageType() + ", 데이터: " + data.getData());
 
-        for (Board board : list) {
+        for (BoardFindAllDto board : list) {
             System.out.println("게시글 번호 : " + board.getBoardNum());
             System.out.println("제목 : " + board.getTitle());
-            System.out.println("내용 : " + board.getContents());
-            System.out.println("사용자 : " + board.getUserNum());
+
+            System.out.println("사용자 : " + board.getUserId());
             System.out.println("작성일자 :  " + board.getCreatedDate());
+            System.out.println("-----------------------------------------------");
+
         }
     }
 
-    @Test
+    /*@Test
     void findOneBoard() throws SQLException {
         ResponseData data = boardService.findOneBoard(3L);
 
@@ -80,20 +79,19 @@ class BoardServiceTest {
         System.out.println("내용 : " + boardAndAnswer.getBoard().getContents());
         System.out.println("사용자 : " + boardAndAnswer.getBoard().getUserNum());
         System.out.println("작성일자 :  " + boardAndAnswer.getBoard().getCreatedDate());
-    }
+    }*/
 
     @Test
     void updateBoard() throws SQLException {
 
-        Board board = new Board.Builder()
-                .boardNum(4L)
-                .title("고구마감자먹자")
-                .contents("안먹어 ㅅㅂ")
-                .build();
+        BoardUpdateDto board = new BoardUpdateDto();
 
+        board.setBoardNum(5L);
+        board.setContents("ㅇㄻㄴㅇㄻㄴㅇㄻㅇㄴㄹ");
+        board.setTitle("sdfksdfklsjdflkajsdklflsd");
         ResponseData responseData = boardService.updateBoard(board);
 
-
-
+        ResponseData data = boardService.updateBoard(board);
+        System.out.println("메세지 타입: " + data.getMessageType() + ", 데이터: " + data.getData());
     }
 }

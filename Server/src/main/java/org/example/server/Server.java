@@ -1,9 +1,14 @@
 package org.example.server;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.example.server.adapter.LocalDateTypeAdapter;
+import org.example.server.adapter.LocalTimeTypeAdapter;
 import org.example.server.controller.front_controller.FrontController;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
+import org.example.server.scheduler.Scheduler;
+import org.example.server.service.SchedulerService;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -11,16 +16,21 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
 
     private final FrontController frontController;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(100);
+    private final ExecutorService executorService;
+    private final Scheduler scheduler;
 
     public Server(FrontController frontController) {
         this.frontController = frontController;
+        this.scheduler = new Scheduler(SchedulerService.createOrGetSchedulerService());
+        this.executorService = Executors.newFixedThreadPool(100);
     }
 
     /**
@@ -30,6 +40,7 @@ public class Server {
      */
 
     public void start() throws IOException {
+        scheduler.start();
         ServerSocket serverSocket = new ServerSocket(50001);
         System.out.println("Server 시작");
         while (true) {
@@ -47,9 +58,19 @@ public class Server {
      */
     private void handleClient(Socket socket) {
         try {
+<<<<<<< HEAD
             DataInputStream dis = new DataInputStream(socket.getInputStream());
             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
             Gson gson = new Gson();
+=======
+            dis = new DataInputStream(socket2.getInputStream());
+            dos = new DataOutputStream(socket2.getOutputStream());
+
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
+                    .registerTypeAdapter(LocalTime.class, new LocalTimeTypeAdapter())
+                    .create();
+>>>>>>> 633866c38578d2111eed6bb86c2b93a492dc204d
 
             boolean flag = true;
             while (flag) {
@@ -59,7 +80,14 @@ public class Server {
                 writeAtDataOutputStream(dos, gson, responseData);
             }
         } catch (IOException e) {
+<<<<<<< HEAD
             e.printStackTrace();
+=======
+            System.out.println("클라이언트와의 연결이 끊김");
+            if (dos != null) dos.close();
+            if (dis != null) dis.close();
+            if (socket2 != null) socket2.close();
+>>>>>>> 633866c38578d2111eed6bb86c2b93a492dc204d
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

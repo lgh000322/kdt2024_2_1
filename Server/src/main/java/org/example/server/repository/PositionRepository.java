@@ -1,6 +1,6 @@
 package org.example.server.repository;
 
-import org.example.server.dto.LeaveDay;
+import org.example.server.dto.leave_dto.LeaveDay;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
