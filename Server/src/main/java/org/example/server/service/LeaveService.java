@@ -4,7 +4,6 @@ import org.example.server.db_utils.DBUtils;
 import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
 import org.example.server.dto.leave_dto.*;
-import org.example.server.dto.user_dto.UserRoleDto;
 import org.example.server.repository.LeaveRepository;
 import org.example.server.repository.UserRepository;
 
