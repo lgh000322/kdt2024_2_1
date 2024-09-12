@@ -25,10 +25,11 @@ import main.domain.user.Role;
 import main.domain.user.User;
 import main.dto.RequestData;
 import main.dto.ResponseData;
-import main.dto.UserInfo;
-import main.dto.UserLoginDto;
-
+import main.dto.user_dto.UserInfo;
+import main.dto.user_dto.UserLoginDto;
+import main.util.CommunicationUtils;
 import main.util.ServerConnectUtils;
+import main.util.UserInfoSavedUtil;
 
 public class LoginController {
 
@@ -73,106 +74,113 @@ public class LoginController {
 			});
 		} else {
 			/**
-		     * 서버랑 연결
-		     */
-		    ServerConnectUtils serverConnectUtils = new ServerConnectUtils();
-		    serverConnectUtils.connect();
+			 * 서버랑 연결
+			 */
+			CommunicationUtils communicationUtils = new CommunicationUtils();
 
-		    /**
-		     * 데이터를 주고받기 위해 stream을 받아옴
-		     */
-		    DataOutputStream dos = serverConnectUtils.getDataOutputStream();
-		    DataInputStream dis = serverConnectUtils.getDataInputStream();
+			ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
 
-		    /**
-		     * json 변환, json에서 객체로 매핑하기 위한 gson 선언
-		     */
-		    Gson gson = new Gson();
+			/**
+			 * 데이터를 주고받기 위해 stream을 받아옴
+			 */
+			DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+			DataInputStream dis = serverConnectUtils.getDataInputStream();
 
-		    /**
-		     * requestData의 data에 넣어줄 객체를 생성
-		     */
-		    UserLoginDto userLoginDto = new UserLoginDto();
-		    userLoginDto.setUserId(userId.getText());
-		    userLoginDto.setPassword(userPwd.getText());
-		    if (userCheck.isSelected()) {
-		    	userLoginDto.setRole(Role.USER);
-		    } else {
-		    	userLoginDto.setRole(Role.ADMIN);
-		    }
-		    
-		    /**
-		     * requestData 생성
-		     */
-		    RequestData requestData = new RequestData();
-		    requestData.setData(userLoginDto);
-		    requestData.setMessageType(MessageTypeConst.MESSAGE_LOGIN);
-		    
-		    String jsonSendStr = gson.toJson(requestData);
-		    
-		    try {
-		        dos.writeUTF(jsonSendStr);
-		        dos.flush();
-		        String jsonReceivedStr = dis.readUTF();
-		        Type responseType=new TypeToken<ResponseData<UserInfo>>(){}.getType();
-		        ResponseData<UserInfo> responseData=gson.fromJson(jsonReceivedStr, responseType);
-		        String messageType=responseData.getMessageType();
-		        
-		        if (messageType.contains("성공")) {
-		        	UserInfo userInfo=responseData.getData();
-			        
-		        	if (userLoginDto.getRole() == Role.USER) {
-		        		
-		        		Platform.runLater(() -> {
-			                try {
-			                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/user_ui/UserUi.fxml"));
-			                    Parent loginRoot = fxmlLoader.load();
+			/**
+			 * json 변환, json에서 객체로 매핑하기 위한 gson 선언
+			 */
+//			Gson gson = new Gson();
 
-			                    UserUiController userUiController=fxmlLoader.getController();
-			                    userUiController.setUserData(userInfo);
-			                    Stage loginStage = new Stage();
-			                    loginStage.setTitle("인사 시스템 (사용자)");
-			                    loginStage.setScene(new Scene(loginRoot));
+			/**
+			 * requestData의 data에 넣어줄 객체를 생성
+			 */
+			UserLoginDto userLoginDto = new UserLoginDto();
+			userLoginDto.setUserId(userId.getText());
+			userLoginDto.setPassword(userPwd.getText());
+			if (userCheck.isSelected()) {
+				userLoginDto.setRole(Role.USER);
+			} else if (adminCheck.isSelected()) {
+				userLoginDto.setRole(Role.ADMIN);
+			} else {
+				userLoginDto.setRole(null);
+			}
 
-			                    Stage currentStage = (Stage) loginBtn.getScene().getWindow();
-			                    currentStage.hide();
-			                    
-			                    loginStage.show();
-			                    
-			                    
-			                } catch (IOException e) {
-			                    e.printStackTrace();
-			                }
-			            });
-		        	} else {
-		        		Platform.runLater(() -> {
-			                try {
-			                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/admin_ui/AdminUi.fxml"));
-			                    Parent loginRoot = fxmlLoader.load();
+			/**
+			 * requestData 생성
+//			 */
+//			RequestData requestData = new RequestData();
+//			requestData.setData(userLoginDto);
+//			requestData.setMessageType(MessageTypeConst.MESSAGE_LOGIN);
 
-			                    Stage loginStage = new Stage();
-			                    loginStage.setTitle("인사 시스템 (관리자)");
-			                    loginStage.setScene(new Scene(loginRoot));
+			String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_LOGIN, userLoginDto);
 
-			                    Stage currentStage = (Stage) loginBtn.getScene().getWindow();
-			                    currentStage.hide();
+			try {
+				communicationUtils.sendServer(jsonSendStr, dos);
+				String jsonReceivedStr = dis.readUTF();
+				
+				ResponseData<UserInfo> responseData=communicationUtils.jsonToResponseData(jsonReceivedStr, UserInfo.class);
+				String messageType = responseData.getMessageType();
 
-			                    loginStage.show();
-			                } catch (IOException e) {
-			                    e.printStackTrace();
-			                }
-			            });
-		        	}
-		        } else {
-		            Platform.runLater(() -> {
-		                LoginFailAlert("로그인 실패", "입력하신 정보가 맞지 않습니다. 다시 입력해주세요.");
-		            });
-		        }
-		    } catch (IOException e) {
-		        e.printStackTrace();
-		    } finally {
-		        serverConnectUtils.close();
-		    }
+				if (messageType.contains("성공")) {
+					UserInfo userInfo = responseData.getData();
+					
+					//클라이언트에 유저 정보를 저장해주는 로직 추가
+					UserInfoSavedUtil.setUserInfo(userInfo);
+					UserInfoSavedUtil.setUserId(userLoginDto.getUserId());
+					UserInfoSavedUtil.setRole(userLoginDto.getRole());
+
+					if (userLoginDto.getRole() == Role.USER) {
+
+						Platform.runLater(() -> {
+							try {
+ 								FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/user_ui/UserUi.fxml"));
+								Parent loginRoot = fxmlLoader.load();
+
+								UserUiController userUiController = fxmlLoader.getController();
+								userUiController.setUserData(userInfo);
+
+								Stage loginStage = new Stage();
+								loginStage.setTitle("인사 시스템 (사용자)");
+								loginStage.setScene(new Scene(loginRoot));
+
+								Stage currentStage = (Stage) loginBtn.getScene().getWindow();
+								currentStage.hide();
+
+								loginStage.show();
+
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						});
+					} else {
+						Platform.runLater(() -> {
+							try {
+								FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/admin_ui/AdminUi.fxml"));
+								Parent loginRoot = fxmlLoader.load();
+
+								Stage loginStage = new Stage();
+								loginStage.setTitle("인사 시스템 (관리자)");
+								loginStage.setScene(new Scene(loginRoot));
+
+								Stage currentStage = (Stage) loginBtn.getScene().getWindow();
+								currentStage.hide();
+
+								loginStage.show();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						});
+					}
+				} else {
+					Platform.runLater(() -> {
+						LoginFailAlert("로그인 실패", "입력하신 정보가 맞지 않습니다. 다시 입력해주세요.");
+					});
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				serverConnectUtils.close();
+			}
 		}
 	}
 

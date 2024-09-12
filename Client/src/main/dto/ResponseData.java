@@ -23,12 +23,8 @@ public class ResponseData<T> {
 		this.data = data;
 	}
 
-	
-
-    public ResponseData(String messageType, T data) {
+    public ResponseData() {
         this.messageType = messageType;
         this.data = data;
-    }
-
-   
+    }   
 }
