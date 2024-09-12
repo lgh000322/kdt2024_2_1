@@ -37,7 +37,7 @@ public class LeaveController implements Controller {
     }
 
     public LeaveController(LeaveService leaveService) {
-        this.leaveService = leaveController.leaveService;
+        this.leaveService = leaveService;
     }
 
 

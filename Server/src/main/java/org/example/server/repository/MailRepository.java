@@ -8,6 +8,7 @@ import org.example.server.dto.mail_dto.MailSearchDto;
 import org.example.server.dto.mail_dto.UserAndMailStore;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -123,9 +124,9 @@ public class MailRepository {
     }
 
     public Optional<List<Mail>> findSendMailAll(Connection con, MailSearchDto mailSearchDto) throws SQLException {
-        String sql = "select mail.mai_num, mail.title, mail_created_date" +
+        String sql = "select mail.mai_num, mail.title, mail.created_date" +
                 " from mail" +
-                " left join mail_store on mail_mail_store_num = mail_store.mail_store_num" +
+                " left join mail_store on mail.mail_store_num = mail_store.mail_store_num" +
                 " left join user on mail_store.user_num = user.user_num" +
                 " where user.email = ?" +
                 " order by mail.mai_num desc";
@@ -133,7 +134,7 @@ public class MailRepository {
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
-        List<Mail> result = null;
+        List<Mail> result = new ArrayList<>();
 
         try {
             pstmt = con.prepareStatement(sql);
@@ -150,7 +151,11 @@ public class MailRepository {
                 result.add(mail);
             }
 
-            return Optional.ofNullable(result);
+            if (result.isEmpty()) {
+                return Optional.empty();
+            }
+
+            return Optional.of(result);
         } catch (SQLException e) {
             throw e;
         } finally {
