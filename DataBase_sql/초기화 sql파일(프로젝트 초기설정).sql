@@ -124,6 +124,17 @@ CREATE TABLE IF NOT EXISTS `work_log` (
 ) ENGINE = InnoDB;
 
 -- -----------------------------------------------------
+-- Initial Setup
+-- -----------------------------------------------------
+SET @OLD_SQL_MODE = @@SQL_MODE;
+SET @OLD_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS;
+SET @OLD_UNIQUE_CHECKS = @@UNIQUE_CHECKS;
+
+SET SQL_MODE = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION';
+SET FOREIGN_KEY_CHECKS = 0;
+SET UNIQUE_CHECKS = 0;
+
+-- -----------------------------------------------------
 -- Insert Data into `position`
 -- -----------------------------------------------------
 INSERT INTO position (position_name, leave_day, basic_salary, leave_pay) VALUES 
@@ -147,15 +158,20 @@ INSERT INTO dept (dept_name) VALUES
 ('법무부');
 
 -- -----------------------------------------------------
+-- Insert Data into `user` admin
+-- -----------------------------------------------------
+INSERT INTO `user` (user_id, password, name, tel, email, role, remained_leave, position_num, dept_num)
+VALUES ('admin', 'admin', 'admin', '010-1111-1111', 'admin@knu.com', 'ADMIN', 21, 1, 1);
+
+-- -----------------------------------------------------
 -- Final Operations
 -- -----------------------------------------------------
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+SET SQL_MODE = IFNULL(@OLD_SQL_MODE, 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION');
+SET FOREIGN_KEY_CHECKS = IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1);
+SET UNIQUE_CHECKS = IFNULL(@OLD_UNIQUE_CHECKS, 1);
 
 -- Example Queries for Verification
 SELECT * FROM work_log;
 SELECT * FROM leave_log;
 SELECT * FROM position;
 SELECT * FROM dept;
-
