@@ -82,4 +82,15 @@ public class BoardAnswer {
     public Long getUserNum() {
         return userNum;
     }
+
+    @Override
+    public String toString() {
+        return "BoardAnswer{" +
+                "answerNum=" + answerNum +
+                ", contents='" + contents + '\'' +
+                ", createdDate=" + createdDate +
+                ", boardNum=" + boardNum +
+                ", userNum=" + userNum +
+                '}';
+    }
 }

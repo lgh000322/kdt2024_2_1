@@ -16,6 +16,9 @@ public abstract class MessageTypeConst {
     //모든 회원 조회
     public static final String MESSAGE_SEARCH_ALL = "/user/search/all";
 
+    // 회원 아이디 중복 검증
+    public static final String MESSAGE_USER_ID_VALIDATION = "/user/idValidation";
+
     //근태 조회
     public static final String MESSAGE_WORK_SEARCH = "/work/search";
 
@@ -27,9 +30,6 @@ public abstract class MessageTypeConst {
 
     //조퇴 업데이트
     public static final String MESSAGE_WORK_OUT_EARLY = "/work/out/early";
-
-    //서버랑 연결 종료
-    public static final String MESSAGE_SERVER_DISCONNECT = "/server/disconnect";
 
     //휴가 신청
     public static final String MESSAGE_LEAVE_REQUEST = "/leave/request";

@@ -163,7 +163,7 @@ public class UserUiController implements Initializable {
 
 	/* 근태기록탭 테이블뷰 컬럼 */
 	@FXML
-	private TableColumn<WorkRecord, Integer> noColumn;
+	private TableColumn<WorkRecord, Long> noColumn;
 	@FXML
 	private TableColumn<WorkRecord, String> dateColumn;
 	@FXML

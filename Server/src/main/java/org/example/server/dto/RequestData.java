@@ -1,7 +1,5 @@
 package org.example.server.dto;
 
-import org.example.server.domain.user.User;
-
 public class RequestData {
     /**
      * 클라이언트에서 받은 요청데이터

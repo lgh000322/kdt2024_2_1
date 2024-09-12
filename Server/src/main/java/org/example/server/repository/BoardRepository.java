@@ -1,15 +1,14 @@
 package org.example.server.repository;
 
-import org.example.server.domain.board.Board;
-import org.example.server.domain.board.BoardAnswer;
-import org.example.server.dto.ResponseData;
+import org.example.server.dto.board_dto.BoardFindAllDto;
+import org.example.server.dto.board_dto.BoardInfoDto;
+import org.example.server.dto.board_dto.BoardSaveDto;
+import org.example.server.dto.board_dto.BoardUpdateDto;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-
 
 
 public class BoardRepository {
@@ -38,30 +37,32 @@ public class BoardRepository {
     /**
      * 특정 게시물(게시물 번호로 매칭) 가져오는 함수
      */
-    public Board getOneBoard(Long boardNum,Connection conn) throws SQLException {
+    public BoardInfoDto getOneBoard(Long boardNum, Connection conn) throws SQLException {
 
-        Board board = null;
+        BoardInfoDto boardInfoDto = null;
 
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         // 특정 게시물 pk 값과 일치하는 게시물 데이터를 가져오는 쿼리문
-        String getBoardSql = "select * from board where board_num = ?";
+        String sql = "select b.title, b.contents, u.user_id" +
+                "from board b inner join user u " +
+                "on b.user_num = u.user_num" +
+                "where b.board_num = ?";
+
 
         try {
             // 특정 게시물 정보를 가져오는 쿼리 실행.
-            ps = conn.prepareStatement(getBoardSql);
+            ps = conn.prepareStatement(sql);
             ps.setLong(1, boardNum);
             rs = ps.executeQuery();
 
             // 해당 게시물이 있으면 실행
             if(rs.next()) {
-                board = new Board.Builder()
-                        .boardNum(rs.getLong("board_num"))
-                        .title(rs.getString("title"))
-                        .contents(rs.getString("contents"))
-                        .createdDate( rs.getDate("created_date").toLocalDate())
-                        .userNum(rs.getLong("user_num"))
+                boardInfoDto = new BoardInfoDto.Builder()
+                        .boardTitle(rs.getString("title"))
+                        .boardContents(rs.getString("contents"))
+                        .boardUserId( rs.getString("user_id"))
                         .build();
 
             } else {
@@ -75,7 +76,7 @@ public class BoardRepository {
             close(ps, rs);
         }
 
-        return board;
+        return boardInfoDto;
     }
 
 
@@ -85,14 +86,17 @@ public class BoardRepository {
      * 동적 쿼리를 통해서 조건과 일치하는 게시글을 가져와야한다. (수정 필요)
     * 검색 조건과 일치하는 모든 게시물을 가져오는 메서드
     * */
-    public List<Board> getBoardByTitle(String boardTitle,Connection conn) throws SQLException {
-        List<Board> boards = new ArrayList<>();
+    public List<BoardFindAllDto> getBoardByTitle(String boardTitle, Connection conn) throws SQLException {
+        List<BoardFindAllDto> boards = new ArrayList<>();
         PreparedStatement ps = null;
         ResultSet rs = null;
-        String Sql = "select * from board where title like ?";
+        String sql = "select b.board_num, b.title, u.user_id, b.created_date " +
+                "from board b " +
+                "inner join user u on b.user_num = u.user_num " +
+                "where b.title like ?";
 
         try{
-            ps = conn.prepareStatement(Sql);
+            ps = conn.prepareStatement(sql);
             ps.setString(1, "%" + boardTitle + "%");
             rs = ps.executeQuery();
 
@@ -102,19 +106,17 @@ public class BoardRepository {
                 // 게시물 제목
                 String title = rs.getString("title");
                 // 게시물 내용
-                String contents = rs.getString("contents");
+                String userId = rs.getString("user_id");
                 // 게시물 작성일
                 LocalDate createdDate = rs.getDate("created_date").toLocalDate();
-                // 게시자 번호
-                Long userNum = rs.getLong("user_num");
 
 
-                Board board = new Board.Builder()
+
+                BoardFindAllDto board = new BoardFindAllDto.Builder()
                         .boardNum(boardNum)
                         .title(title)
-                        .contents(contents)
+                        .userId(userId)
                         .createdDate(createdDate)
-                        .userNum(userNum)
                         .build();
 
                 boards.add(board);
@@ -123,6 +125,7 @@ public class BoardRepository {
             return boards;
 
         } catch (SQLException e) {
+            e.printStackTrace();
             throw e;
         } finally {
             close(ps, rs);
@@ -134,15 +137,16 @@ public class BoardRepository {
     /**
     *  모든 게시물을 가져오는함수
     * */
-    public List<Board> getAllBoards(Connection conn) throws SQLException {
+    public List<BoardFindAllDto> getAllBoards(Connection conn) throws SQLException {
 
-        List<Board> boards = new ArrayList<>();
+        List<BoardFindAllDto> boards = new ArrayList<>();
 
         //sql 실행을 위한 객체 생성
         PreparedStatement ps = null;
         ResultSet rs = null;
 
-        String sql = "select * from board order by board_num desc";
+        String sql = "select b.board_num, b.title, u.user_id, b.created_date " +
+                "from board b inner join user u on b.user_num = u.user_num";
 
 
         try {
@@ -158,19 +162,17 @@ public class BoardRepository {
                 // 게시물 제목
                 String title = rs.getString("title");
                 // 게시물 내용
-                String contents = rs.getString("contents");
+                String userId = rs.getString("user_id");
                 // 게시물 작성일
                 LocalDate createdDate = rs.getDate("created_date").toLocalDate();
-                // 게시자 번호
-                Long userNum = rs.getLong("user_num");
 
 
-                Board board = new Board.Builder()
+
+                BoardFindAllDto board = new BoardFindAllDto.Builder()
                         .boardNum(boardNum)
                         .title(title)
-                        .contents(contents)
+                        .userId(userId)
                         .createdDate(createdDate)
-                        .userNum(userNum)
                         .build();
 
                 boards.add(board);
@@ -190,18 +192,19 @@ public class BoardRepository {
     /**
     * 게시물을 저장하는 함수.
     * */
-    public Long saveBoard(Board board, Connection conn) throws SQLException {
+    public Long saveBoard(BoardSaveDto board, Connection conn) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         //value -> 제목, 내용, 유저번호, 작성일자 순으로 입력
-        String sql = "insert into board (title, contents, user_num, created_date) values(?, ?, ?, ?)";
+        String sql = "insert into board (title, contents, user_num, created_date)" +
+                " values(?, ?, ?, ?)";
 
 
         String title = board.getTitle();
         String contents = board.getContents();
         Long userNum = board.getUserNum();
-        java.sql.Date createdDate = java.sql.Date.valueOf(board.getCreatedDate());
+        Date createdDate = Date.valueOf(board.getCreatedDate());
 
         try{
 
@@ -263,7 +266,7 @@ public class BoardRepository {
     /**
     * 게시물을 수정하는 함수
     * */
-    public int updateBoard(Board board, Connection conn) throws SQLException {
+    public int updateBoard(BoardUpdateDto board, Connection conn) throws SQLException {
         PreparedStatement ps = null;
         String sql = "update board set title = ?, contents = ? where board_num = ?";
 
@@ -280,6 +283,7 @@ public class BoardRepository {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            throw e;
         }
         close(ps, null);
 

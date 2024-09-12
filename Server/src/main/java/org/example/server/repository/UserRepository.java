@@ -2,7 +2,7 @@ package org.example.server.repository;
 
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
-import org.example.server.dto.ResponseData;
+import org.example.server.dto.user_dto.UserInfo;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,6 +26,8 @@ public class UserRepository {
         return userRepository;
     }
 
+
+
     /**
      * 아래부턴 쿼리문을 작성한다.
      * 예시는 다음과 같다.
@@ -33,6 +35,34 @@ public class UserRepository {
      * System.out.println("memberRepository 실행");
      * }
      */
+
+
+    /**
+     * 휴가일수 수정 메서드 -> leaveService 에서 사용
+     * */
+    public int updateRemainedLeave(String userId, int remainedLeave, Connection conn) throws SQLException {
+        PreparedStatement pstmt = null;
+
+        String sql = "update user set remained_leave = ? where user_id = ?";
+        int row = 0;
+
+        try{
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, remainedLeave);
+            pstmt.setString(2, userId);
+            row = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, null);
+        }
+
+        return row; // 0 일경우 수정 실패 , 0이 아니면 수정 성공.
+    }
+
+
 
     public Optional<User> findUserByIDAndRole(Connection conn, String userId, Role role) throws SQLException {
         String sql = "select * from user where user_id = ? and role = ?";
@@ -64,6 +94,43 @@ public class UserRepository {
             }
 
             return Optional.ofNullable(user);
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public Optional<UserInfo> findUserInfoByIDAndRole(Connection conn, String userId, Role role) throws SQLException {
+        String sql = "select user.user_num, user.name, user.email, user.tel, dept.dept_name, position.position_name" +
+                " from user" +
+                " left join dept on user.dept_num = dept.dept_num" +
+                " left join position on user.position_num = position.position_num" +
+                " where user_id = ? and role = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userId);
+            pstmt.setString(2, role.name());
+            rs = pstmt.executeQuery();
+
+            UserInfo userInfo = null;
+
+            if (rs.next()) {
+                userInfo = new UserInfo();
+                userInfo.setUserNum(rs.getLong("user.user_num"));
+                userInfo.setTel(rs.getString("user.tel"));
+                userInfo.setName(rs.getString("user.name"));
+                userInfo.setEmail(rs.getString("user.email"));
+                userInfo.setDeptName(rs.getString("dept.dept_name"));
+                userInfo.setPositionName(rs.getString("position.position_name"));
+            }
+
+            return Optional.ofNullable(userInfo);
 
         } catch (SQLException e) {
             throw e;
@@ -184,15 +251,15 @@ public class UserRepository {
         }
     }
 
-    public ResponseData findAll(Connection conn, String deptName) throws SQLException {
-        String sql = "select * from user inner join dept on user.dept_num = dept.dept_num where user.dept_name = ?";
+
+    public List<User> findAll(Connection conn) throws SQLException {
+        String sql = "select * from user";
         List<User> list = new ArrayList<>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
         try {
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, deptName);
             rs = pstmt.executeQuery();
 
 
@@ -212,15 +279,14 @@ public class UserRepository {
 
                 list.add(user);
             }
-
-            return new ResponseData("조회 성공", list);
-
+            return list;
         } catch (SQLException e) {
             throw e;
         } finally {
             close(pstmt, rs);
         }
     }
+
 
 
     private static void close(PreparedStatement pstmt, ResultSet rs) {
