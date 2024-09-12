@@ -11,11 +11,10 @@ import org.example.server.dto.user_dto.UserRoleDto;
 * */
 public class ForFindLeaveDto {
 
-
-
     private UserRoleDto userRoleDto;
-    private String userName;
     private String userId;
+    private String userName;
+
 
     public UserRoleDto getUserRoleDto() {
         return userRoleDto;
@@ -33,11 +32,13 @@ public class ForFindLeaveDto {
         this.userName = userName;
     }
 
+
     public String getUserId() {
         return userId;
     }
 
     public void setUserId(String userId) {
         this.userId = userId;
+
     }
 }

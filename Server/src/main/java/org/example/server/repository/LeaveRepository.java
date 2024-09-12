@@ -255,8 +255,10 @@ public class LeaveRepository {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
-        String sql = "select request_date, start_date, end_date, acceptance_status " +
-                "from leave_log where user_id = ?";
+        String sql = "select request_date, start_date, end_date, acceptance_status" +
+                " from leave_log " +
+                " left join user on leave_log.user_num = user.user_num" +
+                " where user_id = ?";
 
         try{
 

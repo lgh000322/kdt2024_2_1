@@ -244,6 +244,9 @@ public class LeaveService {
         } else if (forFindLeaveDto.getUserRoleDto().getDescription().equals("일반 유저")) {
             // 일반 유저일경우 유저 아이디를 통해서 해당 유저의 휴가 로그를 찾음.
             leaveLogOfUserDtos = leaveRepository.getLeaveLogsOfUser(forFindLeaveDto.getUserId(), conn);
+            if (leaveLogOfUserDtos.isEmpty()) {
+                return new ResponseData("일반 유저 휴가로그 조회 실패(휴가없음)", null);
+            }
             responseData = new ResponseData("일반 유저 휴가로그 조회 성공", leaveLogOfUserDtos);
         }
 
