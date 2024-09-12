@@ -32,7 +32,7 @@ public class LeaveRepository {
                 "(request_date, start_date, end_date, user_num)" +
                 " values (?, ?, ?, ?)";
 
-        PreparedStatement ps = conn.prepareStatement(sql);
+        PreparedStatement ps = conn.prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS);
         ResultSet rs = null;
 
         java.sql.Date requestDate = java.sql.Date.valueOf(forRequestLeaveDto.getRequestDate());
@@ -255,7 +255,7 @@ public class LeaveRepository {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
-        String sql = "select request_date, start_date, end_date, acceptance_status" +
+        String sql = "select request_date, start_date, end_date, acceptance_status, check_status" +
                 " from leave_log " +
                 " left join user on leave_log.user_num = user.user_num" +
                 " where user_id = ?";
@@ -271,6 +271,7 @@ public class LeaveRepository {
                         .requestDate(rs.getDate("request_date").toLocalDate())
                         .startDate(rs.getDate("start_date").toLocalDate())
                         .endDate(rs.getDate("end_date").toLocalDate())
+                        .checkStatus(rs.getBoolean("check_status"))
                         .status(rs.getBoolean("acceptance_status"))
                         .build();
 

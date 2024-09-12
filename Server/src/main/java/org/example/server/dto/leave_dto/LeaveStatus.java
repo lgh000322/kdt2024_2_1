@@ -1,5 +1,5 @@
 package org.example.server.dto.leave_dto;
 
-public enum Status {
+public enum LeaveStatus {
     ACCEPT, REJECT
 }
