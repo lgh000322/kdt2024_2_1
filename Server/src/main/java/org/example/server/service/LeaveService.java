@@ -125,7 +125,7 @@ public class LeaveService {
         /**
         *  휴가  거절 클릭시 실행.
         * */
-        if(leaveLog.getStatus() == Status.REJECT) {
+        if(leaveLog.getStatus() == LeaveStatus.REJECT) {
             Long leaveNum = leaveLog.getLeaveNum();
             int row = leaveRepository.rejectLeave(leaveNum ,conn);
 
@@ -245,7 +245,7 @@ public class LeaveService {
             // 일반 유저일경우 유저 아이디를 통해서 해당 유저의 휴가 로그를 찾음.
             leaveLogOfUserDtos = leaveRepository.getLeaveLogsOfUser(forFindLeaveDto.getUserId(), conn);
             if (leaveLogOfUserDtos.isEmpty()) {
-                return new ResponseData("일반 유저 휴가로그 조회 실패(휴가없음)", null);
+                return new ResponseData("일반 유저 휴가로그 조회 실패(휴가 로그 없음)", null);
             }
             responseData = new ResponseData("일반 유저 휴가로그 조회 성공", leaveLogOfUserDtos);
         }

@@ -4,7 +4,6 @@ package org.example.server.dto.leave_dto;
 
 
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  *
@@ -15,7 +14,8 @@ public class LeaveLogOfUserDto {
     private LocalDate requestDate;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Boolean status;
+    private Boolean acceptanceStatus;
+    private Boolean checkStatus;
 
 
     public LocalDate getRequestDate() {
@@ -30,22 +30,33 @@ public class LeaveLogOfUserDto {
         return endDate;
     }
 
-    public Boolean getStatus() {
-        return status;
+    public Boolean getAcceptanceStatus() {
+        return acceptanceStatus;
+    }
+
+    public Boolean getCheckStatus() {
+        return checkStatus;
     }
 
     public LeaveLogOfUserDto(Builder builder) {
         this.requestDate = builder.requestDate;
         this.startDate = builder.startDate;
         this.endDate = builder.endDate;
-        this.status = builder.status;
+        this.acceptanceStatus = builder.acceptanceStatus;
+        this.checkStatus = builder.checkStatus;
     }
 
     public static class Builder {
         private LocalDate requestDate;
         private LocalDate startDate;
         private LocalDate endDate;
-        private Boolean status;
+        private Boolean acceptanceStatus;
+        private Boolean checkStatus;
+
+        public Builder checkStatus(Boolean checkStatus) {
+            this.checkStatus = checkStatus;
+            return this;
+        }
 
         public Builder requestDate(LocalDate requestDate) {
             this.requestDate = requestDate;
@@ -63,7 +74,7 @@ public class LeaveLogOfUserDto {
         }
 
         public Builder status(Boolean status) {
-            this.status = status;
+            this.acceptanceStatus = status;
             return this;
         }
 
