@@ -7,6 +7,11 @@ public class ResponseData {
     private String messageType;
     private Object data;
 
+    public ResponseData(String messageType, Object data) {
+        this.messageType = messageType;
+        this.data = data;
+    }
+
     public String getMessageType() {
         return messageType;
     }

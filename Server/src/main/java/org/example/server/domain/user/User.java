@@ -21,6 +21,14 @@ public class User {
 
     private Long deptNum;
 
+    public void changePositionNum(Long positionNum) {
+        this.positionNum = positionNum;
+    }
+
+    public void changeDeptNum(Long deptNum) {
+        this.deptNum = deptNum;
+    }
+
     public Long getUserNum() {
         return userNum;
     }
