@@ -10,7 +10,7 @@
    <children>
       <Label layoutX="31.0" layoutY="23.0" style="-fx-font-size: 15px;" text="제목 :" />
       <TextField layoutX="82.0" layoutY="21.0" prefHeight="25.0" prefWidth="444.0" />
-      <Button layoutX="490.0" layoutY="370.0" mnemonicParsing="false" text="글 작성" />
+      <Button fx:id="writePostBtn" layoutX="490.0" layoutY="370.0" mnemonicParsing="false" text="글 작성" onAction=""/>
       <HTMLEditor htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" layoutY="62.0" prefHeight="300.0" prefWidth="550.0" />
    </children>
 </AnchorPane>

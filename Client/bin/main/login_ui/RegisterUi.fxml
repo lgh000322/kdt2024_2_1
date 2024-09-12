@@ -21,5 +21,6 @@
       <Label layoutX="46.0" layoutY="228.0" style="-fx-font-size: 12px;" text="이메일" />
       <TextField fx:id="userEmail" layoutX="109.0" layoutY="225.0" prefHeight="22.0" prefWidth="190.0" promptText="qwert12345@naver.com" />
       <Button fx:id="registerBtn" layoutX="164.0" layoutY="276.0" mnemonicParsing="false" onAction="#handleRegisterBtn" text="회원가입" />
+      <Button fx:id="cancelBtn" layoutX="343.0" layoutY="276.0" mnemonicParsing="false" text="취소" onAction="#handleRegisterCancelBtn"/>
    </children>
 </AnchorPane>
