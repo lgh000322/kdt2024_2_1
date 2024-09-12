@@ -331,6 +331,19 @@ public class UserUiController implements Initializable {
 		leaveAcceptColumn.setCellValueFactory(new PropertyValueFactory<>("leaveAcceptStatus"));
 		
 		
+		// TableView의 onMouseClicked 이벤트 핸들러 설정
+		workRecordTableView.setOnMouseClicked(event -> {
+		    // 클릭된 셀의 인덱스와 해당 항목을 가져옴
+		    WorkRecord selectedItem = workRecordTableView.getSelectionModel().getSelectedItem();
+		    
+		    if (selectedItem != null) {
+		        // 선택된 항목에 대한 처리 로직
+		        System.out.println("Selected WorkRecord: " + selectedItem);
+		        // 예를 들어, 선택된 항목의 정보를 사용하여 추가적인 작업을 수행할 수 있음
+		    }
+		});
+		
+		
 		try {
 			workTabClickedMethod();
 		} catch (IOException e1) {
@@ -459,8 +472,7 @@ public class UserUiController implements Initializable {
 			communicationUtils.sendServer(jsonSendStr, dos);
 			String jsonReceivedStr = dis.readUTF();
 
-			Type listType = new TypeToken<List<UserWorkData>>() {
-			}.getType();
+			Type listType = new TypeToken<List<UserWorkData>>() {}.getType();
 			ResponseData<UserWorkData> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, listType);
 			String messageType = responseData.getMessageType();
 			if (messageType.contains("성공")) {
