@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="451.0" prefWidth="687.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.controller.AdminUiController">
+   <children>
+      <Pane layoutY="-2.0" prefHeight="451.0" prefWidth="126.0">
+         <children>
+            <ImageView fitHeight="133.0" fitWidth="108.0" layoutX="9.0" layoutY="29.0" pickOnBounds="true" preserveRatio="true" />
+            <Label layoutX="31.0" layoutY="180.0" text="사용자 이름" />
+            <Label layoutX="51.0" layoutY="212.0" text="직책" />
+         </children>
+      </Pane>
+      <TabPane layoutX="125.0" layoutY="31.0" prefHeight="411.0" prefWidth="548.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="사원관리">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="392.0" prefWidth="548.0">
+                     <children>
+                        <TableView fx:id="employeeTable" prefHeight="340.0" prefWidth="548.0">
+                         <columns>
+                          <TableColumn fx:id="usereditNum" prefWidth="66.0" text="Num" />
+                                <TableColumn fx:id="usereditName" prefWidth="90.0" text="이름" />
+                          <TableColumn fx:id="usereditPhone" prefWidth="100.0" text="전화번호" />
+                          <TableColumn fx:id="usereditDept" prefWidth="75.0" text="부서" />
+                          <TableColumn fx:id="usereditPosition" prefWidth="45.0" text="직급" />
+                          <TableColumn fx:id="usereditEmail" prefWidth="163.0" text="이메일" />
+                      </columns>
+                  </TableView>
+                        <Button fx:id="userEditSearchBtn" layoutX="185.0" layoutY="352.0" mnemonicParsing="false" text="회원 검색" />
+                        <TextField fx:id="userEditSearch" layoutX="14.0" layoutY="352.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="휴가관리">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TableView fx:id="leaveTable" prefHeight="340.0" prefWidth="548.0">
+                           <columns>
+                              <TableColumn fx:id="userleaveNum" prefWidth="66.0" text="Num" />
+                              <TableColumn fx:id="userleaveName" prefWidth="90.0" text="이름" />
+                              <TableColumn fx:id="userleavePhone" prefWidth="100.0" text="전화번호" />
+                              <TableColumn fx:id="userleaveDept" prefWidth="75.0" text="부서" />
+                              <TableColumn fx:id="userleavePosition" prefWidth="45.0" text="직급" />
+                              <TableColumn fx:id="userleaveCount" prefWidth="175.0" text="남은 휴가 일수" />
+                           </columns>
+                        </TableView>
+                        <Button fx:id="userLeaveSearchBtn" layoutX="185.0" layoutY="352.0" mnemonicParsing="false" text="회원 검색" />
+                        <TextField fx:id="userLeaveSearch" layoutX="14.0" layoutY="352.0" />
+                        <Button layoutX="464.0" layoutY="352.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="승인" />
+                        <Button layoutX="388.0" layoutY="352.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="거절" />
+                     </children></AnchorPane>
+            </content>
+          </Tab>
+            <Tab text="급여관리">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TableView fx:id="salaryTable" prefHeight="341.0" prefWidth="548.0">
+                           <columns>
+                              <TableColumn fx:id="usersalaryNum" prefWidth="66.0" text="Num" />
+                              <TableColumn fx:id="usersalaryName" prefWidth="90.0" text="이름" />
+                              <TableColumn fx:id="usersalaryPhone" prefWidth="100.0" text="전화번호" />
+                              <TableColumn fx:id="usersalaryDept" prefWidth="75.0" text="부서" />
+                              <TableColumn fx:id="usersalaryPosition" prefWidth="45.0" text="직급" />
+                              <TableColumn fx:id="usersalaryPayment" prefWidth="175.0" text="지급 급여" />
+                           </columns>
+                        </TableView>
+                        <Button fx:id="userSalarySearchBtn" layoutX="185.0" layoutY="353.0" mnemonicParsing="false" text="회원 검색" />
+                        <TextField fx:id="userSalarySearch" layoutX="14.0" layoutY="353.0" />
+                     </children></AnchorPane>
+              </content>
+            </Tab>
+            <Tab text="메일함">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TableView prefHeight="340.0" prefWidth="548.0">
+                           <columns>
+                              <TableColumn prefWidth="66.0" text="Num" />
+                              <TableColumn prefWidth="90.0" text="보낸사람" />
+                              <TableColumn prefWidth="142.0" text="제목" />
+                              <TableColumn prefWidth="74.0" text="수신 일자" />
+                              <TableColumn prefWidth="175.0" text="이메일" />
+                           </columns>
+                        </TableView>
+                        <Button layoutX="184.0" layoutY="352.0" mnemonicParsing="false" text="검색" />
+                        <TextField layoutX="14.0" layoutY="352.0" />
+                        <Button layoutX="440.0" layoutY="352.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="87.0" text="메일 쓰기" />
+                        <Button layoutX="367.0" layoutY="352.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="삭제" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab text="Q&amp;A">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TableView prefHeight="340.0" prefWidth="548.0">
+                           <columns>
+                              <TableColumn fx:id="userboardNum" prefWidth="66.0" text="Num" />
+                              <TableColumn fx:id="userboardwriterNum" prefWidth="90.0" text="작성자" />
+                              <TableColumn fx:id="userboardtitleNum" prefWidth="299.0" text="제목" />
+                              <TableColumn fx:id="userboarddateNum" prefWidth="92.0" text="작성 일자" />
+                           </columns>
+                        </TableView>
+                        <Button fx:id="userBoardSearchBtn" layoutX="184.0" layoutY="352.0" mnemonicParsing="false" text="검색" />
+                        <TextField fx:id="userBoardSearch" layoutX="14.0" layoutY="352.0" />
+                        <Button fx:id="userBoardDeleteBtn" layoutX="464.0" layoutY="352.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="삭제" />
+                     </children></AnchorPane>
+              </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+      <Button layoutX="586.0" layoutY="3.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="87.0" text="로그아웃" />
+   </children>
+</AnchorPane>
