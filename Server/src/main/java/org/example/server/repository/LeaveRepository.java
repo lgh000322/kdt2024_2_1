@@ -125,9 +125,9 @@ public class LeaveRepository {
         ResultSet rs = null;
 
         //모든 leave_log를 가져오기위한 쿼리
-        String sql = "select l.leave_num, u.name, l.request_date, l.start_date, l.end_date, p.position_name, l.acceptance_status" +
+        String sql = "select l.leave_num, u.name, l.request_date, l.start_date, l.end_date, d.dept_name, l.acceptance_status" +
                 " from leave_log l inner join user u on l.user_num = u.user_num" +
-                "inner join position p on u.position_num = p.position_num";
+                "inner join dept d on u.dept_num = d.dept_num";
 
         try{
             ps = conn.prepareStatement(sql);
@@ -168,9 +168,9 @@ public class LeaveRepository {
         ResultSet rs = null;
 
         //모든 leave_log를 가져오기위한 쿼리
-        String sql = "select l.leave_num, u.name, l.request_date, l.start_date, l.end_date, p.position_name, l.acceptance_status" +
+        String sql = "select l.leave_num, u.name, l.request_date, l.start_date, l.end_date, d.dept_name, l.acceptance_status" +
                 " from leave_log l inner join user u on l.user_num = u.user_num" +
-                "inner join position p on u.position_num = p.position_num";
+                "inner join dept d on u.dept_num = d.dept_num";
 
         try{
             ps = conn.prepareStatement(sql);
