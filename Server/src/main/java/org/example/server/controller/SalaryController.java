@@ -1,7 +1,10 @@
 package org.example.server.controller;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
+import org.example.server.adapter.LocalDateTypeAdapter;
+import org.example.server.adapter.LocalTimeTypeAdapter;
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
@@ -10,6 +13,8 @@ import org.example.server.dto.ResponseData;
 import org.example.server.service.SalaryService;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class SalaryController implements Controller {
     private static SalaryController salaryController = null;
@@ -35,7 +40,10 @@ public class SalaryController implements Controller {
     public ResponseData execute(RequestData requestData) throws SQLException {
         String requestURL = requestData.getMessageType();
         ResponseData result = null;
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
+                .registerTypeAdapter(LocalTime.class, new LocalTimeTypeAdapter())
+                .create();
 
         switch (requestURL) {
             case MessageTypeConst.MESSAGE_SALARY_SEARCH -> {

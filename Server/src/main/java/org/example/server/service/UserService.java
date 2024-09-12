@@ -8,6 +8,7 @@ import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.*;
 import org.example.server.dto.leave_dto.LeaveDay;
+import org.example.server.dto.user_dto.UserIdAndRole;
 import org.example.server.dto.user_dto.UserInfo;
 import org.example.server.dto.user_dto.UserJoinDto;
 import org.example.server.dto.user_dto.UserLoginDto;
@@ -19,6 +20,7 @@ import org.example.server.repository.UserRepository;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 public class UserService {
@@ -114,11 +116,11 @@ public class UserService {
     /**
      * 특정 회원을 찾는 메소드
      *
-     * @param user
+     * @param userIdAndRole
      * @return
      * @throws SQLException
      */
-    public ResponseData findByUserId(User user) throws SQLException {
+    public ResponseData findByUserId(UserIdAndRole userIdAndRole) throws SQLException {
 
 
         ResponseData responseData = null;
@@ -127,7 +129,30 @@ public class UserService {
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = findByUserIdBizLogic(user.getUserId(), con, user.getRole());
+            responseData = findByUserIdBizLogic(userIdAndRole.getUserId(), con, userIdAndRole.getRole());
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+        return responseData;
+    }
+
+    /**
+     *
+     * 아이디 중복 검사
+     */
+    public ResponseData idValidation(String userId) throws SQLException {
+
+
+        ResponseData responseData = null;
+        Connection con = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = findByUserIdBizLogic(userId, con, Role.USER);
             con.commit();
         } catch (Exception e) {
             con.rollback();
@@ -139,19 +164,18 @@ public class UserService {
 
     /**
      * 모든 회원을 조회하는 메소드
-     * @param deptName
      * @return
      * @throws SQLException
      */
 
-    public ResponseData findAll(String deptName) throws SQLException {
+    public ResponseData findAll() throws SQLException {
         ResponseData responseData = null;
         Connection con = null;
 
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = userRepository.findAll(con,deptName);
+            responseData = findAllBizLogic(con);
             con.commit();
         } catch (Exception e) {
             con.rollback();
@@ -161,12 +185,21 @@ public class UserService {
         return responseData;
     }
 
+    private ResponseData findAllBizLogic(Connection con) throws SQLException {
+        List<User> users = userRepository.findAll(con);
+        if (users.isEmpty()) {
+            return new ResponseData("회원 조회 실패(회원 없음)", null);
+        }
+
+        return new ResponseData("회원 전체 조회 성공", users);
+    }
+
     private ResponseData findByUserIdBizLogic(String userId, Connection con, Role role) throws SQLException {
 
-        Optional<User> findUser = userRepository.findUserByIDAndRole(con, userId, role);
+        Optional<UserInfo> findUserInfo = userRepository.findUserInfoByIDAndRole(con, userId, role);
 
-        if (findUser.isPresent()) {
-            return new ResponseData("회원 조회 성공", findUser.get());
+        if (findUserInfo.isPresent()) {
+            return new ResponseData("회원 조회 성공", findUserInfo.get());
         }
 
         return new ResponseData("회원 조회 실패", null);

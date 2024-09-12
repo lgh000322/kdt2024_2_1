@@ -1,6 +1,9 @@
 package org.example.server;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.example.server.adapter.LocalDateTypeAdapter;
+import org.example.server.adapter.LocalTimeTypeAdapter;
 import org.example.server.controller.front_controller.FrontController;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
@@ -13,6 +16,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -65,7 +70,11 @@ public class Server {
         try {
             dis = new DataInputStream(socket2.getInputStream());
             dos = new DataOutputStream(socket2.getOutputStream());
-            Gson gson = new Gson();
+
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
+                    .registerTypeAdapter(LocalTime.class, new LocalTimeTypeAdapter())
+                    .create();
 
             String receivedJsonStr = dis.readUTF();
             RequestData requestData = gson.fromJson(receivedJsonStr, RequestData.class);
@@ -77,9 +86,9 @@ public class Server {
             socket2.close();
         } catch (IOException e) {
             System.out.println("클라이언트와의 연결이 끊김");
-            dos.close();
-            dis.close();
-            socket2.close();
+            if (dos != null) dos.close();
+            if (dis != null) dis.close();
+            if (socket2 != null) socket2.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

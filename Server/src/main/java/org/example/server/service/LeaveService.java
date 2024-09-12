@@ -1,22 +1,22 @@
 package org.example.server.service;
 
 import org.example.server.db_utils.DBUtils;
-import org.example.server.domain.leave_log.LeaveLog;
 import org.example.server.domain.user.User;
-import org.example.server.dto.*;
+import org.example.server.dto.ResponseData;
 import org.example.server.dto.leave_dto.*;
-import org.example.server.dto.user_dto.UserInfo;
+import org.example.server.dto.user_dto.UserRoleDto;
 import org.example.server.repository.LeaveRepository;
 import org.example.server.repository.UserRepository;
-import java.time.LocalDate;
-import java.time.Period;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+
 
 public class LeaveService {
 
@@ -44,22 +44,18 @@ public class LeaveService {
 
 
     /**
-    * 휴가 조회 메서드
-    * */
+     * 휴가 조회 메서드
+     */
     public ResponseData findLeaveLog(ForFindLeaveDto forFindLeaveDto) throws SQLException {
 
         Connection conn = null;
         ResponseData responseData = null;
-
 
         try{
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
 
             responseData = findAllLeaveLogBizLogic(forFindLeaveDto, conn);
-
-
-
             conn.commit();
 
         } catch (SQLException e) {
@@ -75,17 +71,16 @@ public class LeaveService {
 
 
     /**
-    * 휴가 수정 메서드
-    * */
+     * 휴가 수정 메서드
+     */
     public ResponseData updateLeaveLog(ForUpdateLeaveDto forUpdateLeaveDto) throws SQLException {
         ResponseData responseData = null;
         Connection conn = null;
-        int remained_leave = 0;
-        UserInfo userInfo;
 
-        try{
+        try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
+
             responseData = updateLeaveBizLogic(forUpdateLeaveDto, conn);
             conn.commit();
         } catch (SQLException e) {
@@ -97,13 +92,13 @@ public class LeaveService {
     }
 
     /**
-    * 휴가 신청 메서드
-    * */
-    public ResponseData requestLeave(ForRequestLeaveDto forRequestLeaveDto) throws SQLException{
+     * 휴가 신청 메서드
+     */
+    public ResponseData requestLeave(ForRequestLeaveDto forRequestLeaveDto) throws SQLException {
         ResponseData responseData = null;
         Connection conn = null;
 
-        try{
+        try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
 
@@ -118,11 +113,9 @@ public class LeaveService {
     }
 
 
-
-
     /**
-    * 휴가 수정 비즈니스 로직
-    * */
+     * 휴가 수정 비즈니스 로직
+     */
     public ResponseData updateLeaveBizLogic(ForUpdateLeaveDto leaveLog, Connection conn) throws SQLException {
 
         //남은 후가일수
@@ -181,7 +174,6 @@ public class LeaveService {
         if(checkUpdate == 0) {
             return new ResponseData("휴가 수락 실패", null);
         }
-
 
         return new ResponseData("휴가 수락 성공", null);
     }

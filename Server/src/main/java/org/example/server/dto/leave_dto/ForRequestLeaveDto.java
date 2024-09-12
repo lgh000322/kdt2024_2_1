@@ -7,11 +7,11 @@ public class ForRequestLeaveDto {
 
 
 
-    private Date requestDate;
+    private LocalDate requestDate;
 
-    private Date startDate;
+    private LocalDate startDate;
 
-    private Date endDate;
+    private LocalDate endDate;
 
     private String userId;
 
@@ -27,29 +27,29 @@ public class ForRequestLeaveDto {
     public static class Builder{
 
 
-        private Date requestDate;
+        private LocalDate requestDate;
 
-        private Date startDate;
+        private LocalDate startDate;
 
-        private Date endDate;
+        private LocalDate endDate;
 
 
 
         private String userId;
 
 
-        public Builder requestDate(Date requestDate) {
+        public Builder requestDate(LocalDate requestDate) {
             this.requestDate = requestDate;
             return this;
         }
 
-        public Builder startDate(Date startDate) {
+        public Builder startDate(LocalDate startDate) {
             this.startDate = startDate;
             return this;
         }
 
 
-        public Builder endDate(Date endDate) {
+        public Builder endDate(LocalDate endDate) {
             this.endDate = endDate;
             return this;
         }
@@ -66,15 +66,15 @@ public class ForRequestLeaveDto {
     }
 
 
-    public Date getRequestDate() {
+    public LocalDate getRequestDate() {
         return requestDate;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 

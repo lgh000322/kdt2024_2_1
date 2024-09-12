@@ -1,6 +1,7 @@
 package org.example.server.dto.leave_dto;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 /**
 *
@@ -12,9 +13,9 @@ public class LeaveLogOfAdminDto
 
     private Long leaveNum;
     private String userName;
-    private Date requestDate;
-    private Date startDate;
-    private Date endDate;
+    private LocalDate requestDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String deptName;
     private Boolean status;
 
@@ -31,15 +32,15 @@ public class LeaveLogOfAdminDto
     }
 
 
-    public Date getRequestDate() {
+    public LocalDate getRequestDate() {
         return requestDate;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
@@ -59,26 +60,26 @@ public class LeaveLogOfAdminDto
     }
 
     public static class Builder {
-        private Date requestDate;
-        private Date startDate;
-        private Date endDate;
+        private LocalDate requestDate;
+        private LocalDate startDate;
+        private LocalDate endDate;
         private Boolean status;
         private String deptName;
 
         private Long leaveNum;
         private String userName;
 
-        public LeaveLogOfAdminDto.Builder requestDate(Date requestDate) {
+        public LeaveLogOfAdminDto.Builder requestDate(LocalDate requestDate) {
             this.requestDate = requestDate;
             return this;
         }
 
-        public LeaveLogOfAdminDto.Builder startDate(Date startDate) {
+        public LeaveLogOfAdminDto.Builder startDate(LocalDate startDate) {
             this.startDate = startDate;
             return this;
         }
 
-        public LeaveLogOfAdminDto.Builder endDate(Date endDate) {
+        public LeaveLogOfAdminDto.Builder endDate(LocalDate endDate) {
             this.endDate = endDate;
             return this;
         }

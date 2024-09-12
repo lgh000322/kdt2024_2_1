@@ -2,7 +2,6 @@ package org.example.server.repository;
 
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
-import org.example.server.dto.ResponseData;
 import org.example.server.dto.user_dto.UserInfo;
 
 import java.sql.Connection;
@@ -104,10 +103,10 @@ public class UserRepository {
     }
 
     public Optional<UserInfo> findUserInfoByIDAndRole(Connection conn, String userId, Role role) throws SQLException {
-        String sql = "select user.user_num, user.name, user.email, dept.dept_name, position.position_name" +
+        String sql = "select user.user_num, user.name, user.email, user.tel, dept.dept_name, position.position_name" +
                 " from user" +
                 " left join dept on user.dept_num = dept.dept_num" +
-                " left join position on user.position_num = dept.position_num" +
+                " left join position on user.position_num = position.position_num" +
                 " where user_id = ? and role = ?";
 
         PreparedStatement pstmt = null;
@@ -124,6 +123,7 @@ public class UserRepository {
             if (rs.next()) {
                 userInfo = new UserInfo();
                 userInfo.setUserNum(rs.getLong("user.user_num"));
+                userInfo.setTel(rs.getString("user.tel"));
                 userInfo.setName(rs.getString("user.name"));
                 userInfo.setEmail(rs.getString("user.email"));
                 userInfo.setDeptName(rs.getString("dept.dept_name"));
@@ -251,15 +251,15 @@ public class UserRepository {
         }
     }
 
-    public ResponseData findAll(Connection conn, String deptName) throws SQLException {
-        String sql = "select * from user inner join dept on user.dept_num = dept.dept_num where user.dept_name = ?";
+
+    public List<User> findAll(Connection conn) throws SQLException {
+        String sql = "select * from user";
         List<User> list = new ArrayList<>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
         try {
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, deptName);
             rs = pstmt.executeQuery();
 
 
@@ -279,9 +279,7 @@ public class UserRepository {
 
                 list.add(user);
             }
-
-            return new ResponseData("조회 성공", list);
-
+            return list;
         } catch (SQLException e) {
             throw e;
         } finally {

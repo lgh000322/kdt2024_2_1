@@ -1,15 +1,16 @@
 package org.example.server.dto.leave_dto;
 
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class ForUpdateLeaveDto {
 
     private Long leaveNum;
 
-    private Date startDate;
+    private LocalDate startDate;
 
-    private Date endDate;
+    private LocalDate endDate;
 
     private String userId;
 
@@ -30,9 +31,9 @@ public class ForUpdateLeaveDto {
 
         private Status status;
 
-        private Date startDate;
+        private LocalDate startDate;
 
-        private Date endDate;
+        private LocalDate endDate;
 
         private String userId;
 
@@ -46,12 +47,12 @@ public class ForUpdateLeaveDto {
             return this;
         }
 
-        public Builder startDate(Date startDate) {
+        public Builder startDate(LocalDate startDate) {
             this.startDate = startDate;
             return this;
         }
 
-        public Builder endDate(Date endDate) {
+        public Builder endDate(LocalDate endDate) {
             this.endDate = endDate;
             return this;
         }
@@ -78,11 +79,11 @@ public class ForUpdateLeaveDto {
         return status;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
