@@ -44,16 +44,16 @@
                         <Line endX="115.0999755859375" endY="30.999996185302734" layoutX="140.0" opacity="0.2" startX="115.0999755859375" startY="0.7999984622001648" />
                         <ComboBox fx:id="workComboList" layoutX="270.0" layoutY="4.0" prefHeight="22.0" prefWidth="91.0" promptText="근태분류" onAction="#handleworkComboList"/>
                         <Line endX="115.0999755859375" endY="30.999996185302734" layoutX="260.0" opacity="0.2" startX="115.0999755859375" startY="0.7999984622001648" />
-                        <TableView fx:id="tableView" layoutY="31.0" prefHeight="384.0" prefWidth="550.0">
-                      <columns>
-                          <TableColumn fx:id="noColumn" prefWidth="40.0" text="No." />
-                          <TableColumn fx:id="dateColumn" prefWidth="150.0" text="날짜" />
-                          <TableColumn fx:id="workStatusColumn" editable="false" minWidth="0.0" prefWidth="65.0" text="근태상태" />
-                          <TableColumn fx:id="startTimeColumn" minWidth="0.0" prefWidth="115.0" text="출근시간" />
-                          <TableColumn fx:id="endTimeColumn" minWidth="0.0" prefWidth="115.0" text="퇴근시간" />
-                          <TableColumn fx:id="noteColumn" minWidth="0.0" prefWidth="63.2" text="비고" />
-                      </columns>
-                  </TableView>
+                        <TableView fx:id="workRecordTableView" layoutY="31.0" prefHeight="384.0" prefWidth="550.0">
+	                      <columns>
+	                          <TableColumn fx:id="noColumn" prefWidth="40.0" text="No." />
+	                          <TableColumn fx:id="dateColumn" prefWidth="150.0" text="날짜" />
+	                          <TableColumn fx:id="workStatusColumn" editable="false" minWidth="0.0" prefWidth="65.0" text="근태상태" />
+	                          <TableColumn fx:id="startTimeColumn" minWidth="0.0" prefWidth="115.0" text="출근시간" />
+	                          <TableColumn fx:id="endTimeColumn" minWidth="0.0" prefWidth="115.0" text="퇴근시간" />
+	                          <TableColumn fx:id="noteColumn" minWidth="0.0" prefWidth="63.2" text="비고" />
+	                      </columns>
+                	  </TableView>
                         <Button fx:id="startWorkBtn" layoutX="400.0" layoutY="5.0" mnemonicParsing="false" text="출근" />
                         <Button fx:id="endWorkBtn" layoutX="451.0" layoutY="5.0" mnemonicParsing="false" text="퇴근" />
                         <Button fx:id="leaveEarlyBtn" layoutX="500.0" layoutY="4.0" mnemonicParsing="false" text="조퇴" />
@@ -65,7 +65,7 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TableView layoutX="-1.0" prefHeight="384.0" prefWidth="550.0">
+                        <TableView fx:id="leaveRecordTableView" layoutX="-1.0" prefHeight="384.0" prefWidth="550.0">
                            <columns>
                               <TableColumn fx:id="leaveNoColumn" prefWidth="40.0" text="No." />
                               <TableColumn fx:id="leaveRequestColumn" prefWidth="140.0" text="휴가신청 날짜" />
