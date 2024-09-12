@@ -1,8 +1,10 @@
 package org.example.server.dto.leave_dto;
 
 //db 날짜와 호환되는 date 라이브러리 임포트.
-import java.sql.Date;
 
+
+import java.time.LocalDate;
+import java.util.Date;
 
 /**
  *
@@ -10,21 +12,21 @@ import java.sql.Date;
  * */
 public class LeaveLogOfUserDto {
 
-    private Date requestDate;
-    private Date startDate;
-    private Date endDate;
+    private LocalDate requestDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Boolean status;
 
 
-    public Date getRequestDate() {
+    public LocalDate getRequestDate() {
         return requestDate;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
@@ -40,22 +42,22 @@ public class LeaveLogOfUserDto {
     }
 
     public static class Builder {
-        private Date requestDate;
-        private Date startDate;
-        private Date endDate;
+        private LocalDate requestDate;
+        private LocalDate startDate;
+        private LocalDate endDate;
         private Boolean status;
 
-        public Builder requestDate(Date requestDate) {
+        public Builder requestDate(LocalDate requestDate) {
             this.requestDate = requestDate;
             return this;
         }
 
-        public Builder startDate(Date startDate) {
+        public Builder startDate(LocalDate startDate) {
             this.startDate = startDate;
             return this;
         }
 
-        public Builder endDate(Date endDate) {
+        public Builder endDate(LocalDate endDate) {
             this.endDate = endDate;
             return this;
         }

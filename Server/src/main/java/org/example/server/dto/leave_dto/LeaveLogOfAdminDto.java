@@ -1,6 +1,7 @@
 package org.example.server.dto.leave_dto;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 /**
 *
@@ -8,21 +9,38 @@ import java.sql.Date;
 * */
 public class LeaveLogOfAdminDto
 {
-    private Date requestDate;
-    private Date startDate;
-    private Date endDate;
+
+
+    private Long leaveNum;
+    private String userName;
+    private LocalDate requestDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private String deptName;
     private Boolean status;
 
+    public String getUserName() {
+        return userName;
+    }
 
-    public Date getRequestDate() {
+    public Long getLeaveNum() {
+        return leaveNum;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+
+    public LocalDate getRequestDate() {
         return requestDate;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
@@ -35,25 +53,33 @@ public class LeaveLogOfAdminDto
         this.startDate = builder.startDate;
         this.endDate = builder.endDate;
         this.status = builder.status;
+        this.deptName = builder.deptName;
+        this.leaveNum = builder.leaveNum;
+        this.userName = builder.userName;
+
     }
 
     public static class Builder {
-        private Date requestDate;
-        private Date startDate;
-        private Date endDate;
+        private LocalDate requestDate;
+        private LocalDate startDate;
+        private LocalDate endDate;
         private Boolean status;
+        private String deptName;
 
-        public LeaveLogOfAdminDto.Builder requestDate(Date requestDate) {
+        private Long leaveNum;
+        private String userName;
+
+        public LeaveLogOfAdminDto.Builder requestDate(LocalDate requestDate) {
             this.requestDate = requestDate;
             return this;
         }
 
-        public LeaveLogOfAdminDto.Builder startDate(Date startDate) {
+        public LeaveLogOfAdminDto.Builder startDate(LocalDate startDate) {
             this.startDate = startDate;
             return this;
         }
 
-        public LeaveLogOfAdminDto.Builder endDate(Date endDate) {
+        public LeaveLogOfAdminDto.Builder endDate(LocalDate endDate) {
             this.endDate = endDate;
             return this;
         }
@@ -62,6 +88,24 @@ public class LeaveLogOfAdminDto
             this.status = status;
             return this;
         }
+
+        public LeaveLogOfAdminDto.Builder deptName(String deptName) {
+            this.deptName = deptName;
+            return this;
+        }
+
+
+        public LeaveLogOfAdminDto.Builder leaveNum(Long leaveNum) {
+            this.leaveNum = leaveNum;
+            return this;
+        }
+
+        public LeaveLogOfAdminDto.Builder userName(String userName) {
+            this.userName = userName;
+            return this;
+        }
+
+
 
         public LeaveLogOfAdminDto build() {
             return new LeaveLogOfAdminDto(this);
