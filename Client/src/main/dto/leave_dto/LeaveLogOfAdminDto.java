@@ -1,6 +1,7 @@
 package main.dto.leave_dto;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 /**
 *
@@ -8,64 +9,111 @@ import java.sql.Date;
 * */
 public class LeaveLogOfAdminDto
 {
-    private Date requestDate;
-    private Date startDate;
-    private Date endDate;
-    private Boolean status;
+	private Long leaveNum;
+	private String userName;
+	private LocalDate requestDate;
+	private LocalDate startDate;
+	private LocalDate endDate;
+	private String deptName;
+	private Boolean status;
+	private Integer remainedLeave;
 
+	public String getUserName() {
+		return userName;
+	}
 
-    public Date getRequestDate() {
-        return requestDate;
-    }
+	public Long getLeaveNum() {
+		return leaveNum;
+	}
 
-    public Date getStartDate() {
-        return startDate;
-    }
+	public String getDeptName() {
+		return deptName;
+	}
 
-    public Date getEndDate() {
-        return endDate;
-    }
+	public Integer getRemainedLeave() {
+		return remainedLeave;
+	}
 
-    public Boolean getStatus() {
-        return status;
-    }
+	public LocalDate getRequestDate() {
+		return requestDate;
+	}
 
-    public LeaveLogOfAdminDto(LeaveLogOfAdminDto.Builder builder) {
-        this.requestDate = builder.requestDate;
-        this.startDate = builder.startDate;
-        this.endDate = builder.endDate;
-        this.status = builder.status;
-    }
+	public LocalDate getStartDate() {
+		return startDate;
+	}
 
-    public static class Builder {
-        private Date requestDate;
-        private Date startDate;
-        private Date endDate;
-        private Boolean status;
+	public LocalDate getEndDate() {
+		return endDate;
+	}
 
-        public LeaveLogOfAdminDto.Builder requestDate(Date requestDate) {
-            this.requestDate = requestDate;
-            return this;
-        }
+	public Boolean getStatus() {
+		return status;
+	}
 
-        public LeaveLogOfAdminDto.Builder startDate(Date startDate) {
-            this.startDate = startDate;
-            return this;
-        }
+	public LeaveLogOfAdminDto(LeaveLogOfAdminDto.Builder builder) {
+		this.requestDate = builder.requestDate;
+		this.startDate = builder.startDate;
+		this.endDate = builder.endDate;
+		this.status = builder.status;
+		this.deptName = builder.deptName;
+		this.leaveNum = builder.leaveNum;
+		this.userName = builder.userName;
+		this.remainedLeave = builder.remainedLeave;
+	}
 
-        public LeaveLogOfAdminDto.Builder endDate(Date endDate) {
-            this.endDate = endDate;
-            return this;
-        }
+	public static class Builder {
+		private LocalDate requestDate;
+		private LocalDate startDate;
+		private LocalDate endDate;
+		private Boolean status;
+		private String deptName;
+		private Integer remainedLeave;
+		private Long leaveNum;
+		private String userName;
 
-        public LeaveLogOfAdminDto.Builder status(Boolean status) {
-            this.status = status;
-            return this;
-        }
+		public LeaveLogOfAdminDto.Builder requestDate(LocalDate requestDate) {
+			this.requestDate = requestDate;
+			return this;
+		}
 
-        public LeaveLogOfAdminDto build() {
-            return new LeaveLogOfAdminDto(this);
-        }
+		public LeaveLogOfAdminDto.Builder startDate(LocalDate startDate) {
+			this.startDate = startDate;
+			return this;
+		}
 
-    }
+		public LeaveLogOfAdminDto.Builder remainedLeave(Integer remainedLeave) {
+			this.remainedLeave = remainedLeave;
+			return this;
+		}
+
+		public LeaveLogOfAdminDto.Builder endDate(LocalDate endDate) {
+			this.endDate = endDate;
+			return this;
+		}
+
+		public LeaveLogOfAdminDto.Builder status(Boolean status) {
+			this.status = status;
+			return this;
+		}
+
+		public LeaveLogOfAdminDto.Builder deptName(String deptName) {
+			this.deptName = deptName;
+			return this;
+		}
+
+		public LeaveLogOfAdminDto.Builder leaveNum(Long leaveNum) {
+			this.leaveNum = leaveNum;
+			return this;
+		}
+
+		public LeaveLogOfAdminDto.Builder userName(String userName) {
+			this.userName = userName;
+			return this;
+		}
+
+		public LeaveLogOfAdminDto build() {
+			return new LeaveLogOfAdminDto(this);
+		}
+
+	}
 }
