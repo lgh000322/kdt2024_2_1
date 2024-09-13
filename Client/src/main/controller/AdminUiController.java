@@ -22,16 +22,17 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import main.consts.MessageTypeConst;
+import main.domain.user.Role;
+import main.domain.user.User;
 import main.dto.ResponseData;
 import main.dto.leave_dto.ForFindLeaveDto;
 import main.dto.leave_dto.LeaveLogOfAdminDto;
 import main.dto.leave_dto.LeaveRecordOfAdmin;
+import main.dto.salary_dto.AdminSalaryData;
+import main.dto.salary_dto.AdminSalaryRecord;
 import main.dto.user_dto.UserInfo;
 import main.dto.user_dto.UserRecord;
 import main.dto.user_dto.UserRoleDto;
-import main.dto.user_dto.UserSalaryData;
-import main.dto.user_dto.UserWorkData;
-import main.dto.work_dto.WorkRecord;
 import main.util.CommunicationUtils;
 import main.util.ServerConnectUtils;
 import main.util.UserInfoSavedUtil;
@@ -71,6 +72,9 @@ public class AdminUiController {
 	@FXML
 	private TableColumn<UserRecord, String> usereditEmail;
 
+	/*
+	 * 휴가관리 테이블 뷰
+	 */
 	@FXML
 	private TableView<LeaveRecordOfAdmin> leaveTable;
 	@FXML
@@ -90,10 +94,29 @@ public class AdminUiController {
 	@FXML
 	private TableColumn<LeaveRecordOfAdmin, Integer> userleaveCount;
 
-
+	/*
+	 * 급여관리 테이블 뷰
+	 */
+	@FXML
+	private TableView<AdminSalaryRecord> salaryTable;
 
 	@FXML
-	private TableView<?> salaryTable;
+	private TableColumn<AdminSalaryRecord, Long> usersalaryNum;
+
+	@FXML
+	private TableColumn<AdminSalaryRecord, String> usersalaryName;
+
+	@FXML
+	private TableColumn<AdminSalaryRecord, String> usersalaryPhone;
+
+	@FXML
+	private TableColumn<AdminSalaryRecord, String> usersalaryDept;
+
+	@FXML
+	private TableColumn<AdminSalaryRecord, String> usersalaryPosition;
+
+	@FXML
+	private TableColumn<AdminSalaryRecord, Integer> usersalaryPayment;
 
 	@FXML
 	private Button userBoardDeleteBtn;
@@ -111,59 +134,14 @@ public class AdminUiController {
 	private Button userSalarySearchBtn;
 
 	@FXML
-	private TableColumn<?, ?> userboardNum;
-
-	@FXML
-	private TableColumn<?, ?> userboarddateNum;
-
-	@FXML
-	private TableColumn<?, ?> userboardtitleNum;
-
-	@FXML
-	private TableColumn<?, ?> userboardwriterNum;
-
-
-
-	@FXML
-	private TableColumn<?, ?> userleaveName;
-
-	@FXML
-	private TableColumn<?, ?> userleaveNum;
-
-	@FXML
-	private TableColumn<?, ?> userleavePhone;
-
-	@FXML
-	private TableColumn<?, ?> userleaveDept;
-
-	@FXML
-	private TableColumn<?, ?> userleavePosition;
-
-	@FXML
-	private TableColumn<?, ?> usersalaryName;
-
-	@FXML
-	private TableColumn<?, ?> usersalaryNum;
-
-	@FXML
-	private TableColumn<?, ?> usersalaryPayment;
-
-	@FXML
-	private TableColumn<?, ?> usersalaryPhone;
-
-	@FXML
-	private TableColumn<?, ?> usersalaryDept;
-
-	@FXML
-	private TableColumn<?, ?> usersalaryPosition;
-
-	@FXML
 	private ObservableList<UserRecord> userRecordList = FXCollections.observableArrayList();
 
 	@FXML
 	private ObservableList<LeaveRecordOfAdmin> leaveRecordList = FXCollections.observableArrayList();
 
-	
+	@FXML
+	private ObservableList<AdminSalaryRecord> salaryRecordList = FXCollections.observableArrayList();
+
 	@FXML
 	public void initialize() {
 		/*
@@ -172,14 +150,6 @@ public class AdminUiController {
 		 * employeeTable.setOnMouseClicked(event -> { if (event.getClickCount() == 2) {
 		 * // 더블 클릭 감지 openAdminUserManagement(); } });
 		 */
-
-		// 컬럼과 Employee 속성 바인딩
-		usereditNum.setCellValueFactory(new PropertyValueFactory<>("num"));
-		usereditName.setCellValueFactory(new PropertyValueFactory<>("name"));
-		usereditPhone.setCellValueFactory(new PropertyValueFactory<>("tel"));
-		usereditDept.setCellValueFactory(new PropertyValueFactory<>("dept"));
-		usereditPosition.setCellValueFactory(new PropertyValueFactory<>("position"));
-		usereditEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
 
 		// 사원관리 탭이 선택되었을 때 이벤트 추가
 		employeeTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -192,17 +162,10 @@ public class AdminUiController {
 					e.printStackTrace();
 				}
 
+				leaveRecordList.clear();
+
 			}
 		});
-
-		leaveNumColumn.setCellValueFactory(new PropertyValueFactory<>("no"));
-		userNameColumn.setCellValueFactory(new PropertyValueFactory<>("userName"));
-		requestDateColumn.setCellValueFactory(new PropertyValueFactory<>("leaveRequestDate"));
-		startDateColumn.setCellValueFactory(new PropertyValueFactory<>("leaveStartDate"));
-		endDateColumn.setCellValueFactory(new PropertyValueFactory<>("leaveEndDate"));
-		deptNameColumn.setCellValueFactory(new PropertyValueFactory<>("deptName"));
-		statusColumn.setCellValueFactory(new PropertyValueFactory<>("leaveAcceptStatus"));
-		userleaveCount.setCellValueFactory(new PropertyValueFactory<>("remainedLeave"));
 
 		// 휴가신청 탭이 선택되었을 때 이벤트 추가
 		leaveTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -215,8 +178,84 @@ public class AdminUiController {
 					e.printStackTrace();
 				}
 
+				userRecordList.clear();
+
 			}
 		});
+
+		salaryTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue) { // Tab 2가 선택되었을 때
+				System.out.println("급여관리 탭이 선택됨");
+				try {
+					salaryTabClickedMethod();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				userRecordList.clear();
+				leaveRecordList.clear();
+
+			}
+		});
+
+		mailTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue) { // Tab 2가 선택되었을 때
+				System.out.println("메일 탭이 선택됨");
+				try {
+					leaveTabClickedMethod();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				leaveRecordList.clear();
+				userRecordList.clear();
+
+			}
+		});
+
+		userboardTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue) { // Tab 2가 선택되었을 때
+				System.out.println("q&a 탭이 선택됨");
+				try {
+					leaveTabClickedMethod();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				leaveRecordList.clear();
+				userRecordList.clear();
+
+			}
+		});
+
+		// 컬럼과 Employee 속성 바인딩
+		usereditNum.setCellValueFactory(new PropertyValueFactory<>("num"));
+		usereditName.setCellValueFactory(new PropertyValueFactory<>("name"));
+		usereditPhone.setCellValueFactory(new PropertyValueFactory<>("tel"));
+		usereditDept.setCellValueFactory(new PropertyValueFactory<>("dept"));
+		usereditPosition.setCellValueFactory(new PropertyValueFactory<>("position"));
+		usereditEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+
+		// 컬럼과 휴가관리
+		leaveNumColumn.setCellValueFactory(new PropertyValueFactory<>("no"));
+		userNameColumn.setCellValueFactory(new PropertyValueFactory<>("userName"));
+		requestDateColumn.setCellValueFactory(new PropertyValueFactory<>("leaveRequestDate"));
+		startDateColumn.setCellValueFactory(new PropertyValueFactory<>("leaveStartDate"));
+		endDateColumn.setCellValueFactory(new PropertyValueFactory<>("leaveEndDate"));
+		deptNameColumn.setCellValueFactory(new PropertyValueFactory<>("deptName"));
+		statusColumn.setCellValueFactory(new PropertyValueFactory<>("leaveAcceptStatus"));
+		userleaveCount.setCellValueFactory(new PropertyValueFactory<>("remainedLeave"));
+
+		// 컬럼과 급여관리
+		usersalaryNum.setCellValueFactory(new PropertyValueFactory<>("salaryNum"));
+		usersalaryName.setCellValueFactory(new PropertyValueFactory<>("salaryName"));
+		usersalaryPhone.setCellValueFactory(new PropertyValueFactory<>("salaryPhone"));
+		usersalaryDept.setCellValueFactory(new PropertyValueFactory<>("salaryDept"));
+		usersalaryPosition.setCellValueFactory(new PropertyValueFactory<>("salaryPosition"));
+		usersalaryPayment.setCellValueFactory(new PropertyValueFactory<>("salaryPayment"));
 
 		try {
 			employeeTabClickedMethod();
@@ -233,15 +272,9 @@ public class AdminUiController {
 		CommunicationUtils communicationUtils = new CommunicationUtils();
 		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
 
-		/**
-		 * 데이터를 주고받기 위해 stream을 받아옴
-		 */
 		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
 		DataInputStream dis = serverConnectUtils.getDataInputStream();
 
-		/**
-		 * requestData 생성
-		 */
 		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_SEARCH_ALL_BYADMIN, null);
 
 		try {
@@ -264,7 +297,11 @@ public class AdminUiController {
 				}
 
 				Platform.runLater(() -> {
-					employeeTable.setItems(userRecordList);
+					try {
+						employeeTable.setItems(userRecordList);
+					} catch (Exception e) {
+						e.printStackTrace(); // UI 업데이트 중 예외 발생 시 처리
+					}
 				});
 
 			}
@@ -325,6 +362,61 @@ public class AdminUiController {
 
 					leaveRecordList.add(leaveRecordOfAdmin);
 
+				}
+
+				Platform.runLater(() -> {
+					leaveTable.setItems(leaveRecordList);
+				});
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
+
+	}
+
+	private void salaryTabClickedMethod() throws IOException {
+		System.out.println("급여탭 클릭 이벤트 발생");
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		User user = new User.Builder().userId(UserInfoSavedUtil.getUserId()).role(Role.ADMIN).build();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_SALARY_SEARCH, user);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			Type listType = new TypeToken<List<AdminSalaryData>>() {
+			}.getType();
+			ResponseData<AdminSalaryData> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					listType);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				List<AdminSalaryData> list = (List<AdminSalaryData>) responseData.getData();
+				for (int i = 0; i < list.size(); i++) {
+					Long no = Long.valueOf(i + 1);
+					AdminSalaryData adminSalaryData = list.get(i);
+
+					
 				}
 
 				Platform.runLater(() -> {

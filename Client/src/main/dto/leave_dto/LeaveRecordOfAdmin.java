@@ -6,62 +6,131 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.StringProperty;
 
 public class LeaveRecordOfAdmin {
 
-	   	private final SimpleLongProperty no;
-	    private final SimpleStringProperty userName;
-	    private final SimpleStringProperty leaveRequestDate;
-	    private final SimpleStringProperty leaveStartDate;
-	    private final SimpleStringProperty leaveEndDate;
-	    private final SimpleStringProperty deptName;
-	    private final SimpleBooleanProperty leaveAcceptStatus;
-	    private final SimpleIntegerProperty remainedLeave;
+    private final SimpleLongProperty no;
+    private final SimpleStringProperty userName;
+    private final SimpleStringProperty leaveRequestDate;
+    private final SimpleStringProperty leaveStartDate;
+    private final SimpleStringProperty leaveEndDate;
+    private final SimpleStringProperty deptName;
+    private final SimpleBooleanProperty leaveAcceptStatus;
+    private final SimpleIntegerProperty remainedLeave;
 
-	    // 생성자
-	    public LeaveRecordOfAdmin(Long no, String userName, LocalDate leaveRequestDate, LocalDate leaveStartDate
-	    		, LocalDate leaveEndDate, String deptName, Boolean leaveAcceptStatus, Integer remainedLeave) {
-	        this.no = new SimpleLongProperty(no);
-	        this.userName = new SimpleStringProperty(userName);
-	        // LocalDate를 String으로 변환
-	        this.leaveRequestDate = new SimpleStringProperty(leaveRequestDate.toString());
-	        this.leaveStartDate = new SimpleStringProperty(leaveStartDate.toString());
-	        this.leaveEndDate = new SimpleStringProperty(leaveEndDate.toString());
-	        this.deptName = new SimpleStringProperty(deptName);
-	        this.leaveAcceptStatus = new SimpleBooleanProperty(leaveAcceptStatus);
-	        this.remainedLeave = new SimpleIntegerProperty(remainedLeave);
-	    }
+    // 생성자
+    public LeaveRecordOfAdmin(Long no, String userName, LocalDate leaveRequestDate, LocalDate leaveStartDate,
+            LocalDate leaveEndDate, String deptName, Boolean leaveAcceptStatus, Integer remainedLeave) {
+        this.no = new SimpleLongProperty(no);
+        this.userName = new SimpleStringProperty(userName);
+        // LocalDate를 String으로 변환
+        this.leaveRequestDate = new SimpleStringProperty(leaveRequestDate.toString());
+        this.leaveStartDate = new SimpleStringProperty(leaveStartDate.toString());
+        this.leaveEndDate = new SimpleStringProperty(leaveEndDate.toString());
+        this.deptName = new SimpleStringProperty(deptName);
+        this.leaveAcceptStatus = new SimpleBooleanProperty(leaveAcceptStatus);
+        this.remainedLeave = new SimpleIntegerProperty(remainedLeave);
+    }
 
-		public SimpleLongProperty getNo() {
-			return no;
-		}
+    // Property 반환 메서드
+    public LongProperty noProperty() {
+        return no;
+    }
 
-		public SimpleStringProperty getUserName() {
-			return userName;
-		}
+    public StringProperty userNameProperty() {
+        return userName;
+    }
 
-		public SimpleStringProperty getLeaveRequestDate() {
-			return leaveRequestDate;
-		}
+    public StringProperty leaveRequestDateProperty() {
+        return leaveRequestDate;
+    }
 
-		public SimpleStringProperty getLeaveStartDate() {
-			return leaveStartDate;
-		}
+    public StringProperty leaveStartDateProperty() {
+        return leaveStartDate;
+    }
 
-		public SimpleStringProperty getLeaveEndDate() {
-			return leaveEndDate;
-		}
+    public StringProperty leaveEndDateProperty() {
+        return leaveEndDate;
+    }
 
-		public SimpleStringProperty getDeptName() {
-			return deptName;
-		}
+    public StringProperty deptNameProperty() {
+        return deptName;
+    }
 
-		public SimpleBooleanProperty getLeaveAcceptStatus() {
-			return leaveAcceptStatus;
-		}
+    public BooleanProperty leaveAcceptStatusProperty() {
+        return leaveAcceptStatus;
+    }
 
-		public SimpleIntegerProperty getRemainedLeave() {
-			return remainedLeave;
-		}
-	   
+    public IntegerProperty remainedLeaveProperty() {
+        return remainedLeave;
+    }
+
+    // Getter methods
+    public long getNo() {
+        return no.get();
+    }
+
+    public void setNo(long no) {
+        this.no.set(no);
+    }
+
+    public String getUserName() {
+        return userName.get();
+    }
+
+    public void setUserName(String userName) {
+        this.userName.set(userName);
+    }
+
+    public String getLeaveRequestDate() {
+        return leaveRequestDate.get();
+    }
+
+    public void setLeaveRequestDate(String leaveRequestDate) {
+        this.leaveRequestDate.set(leaveRequestDate);
+    }
+
+    public String getLeaveStartDate() {
+        return leaveStartDate.get();
+    }
+
+    public void setLeaveStartDate(String leaveStartDate) {
+        this.leaveStartDate.set(leaveStartDate);
+    }
+
+    public String getLeaveEndDate() {
+        return leaveEndDate.get();
+    }
+
+    public void setLeaveEndDate(String leaveEndDate) {
+        this.leaveEndDate.set(leaveEndDate);
+    }
+
+    public String getDeptName() {
+        return deptName.get();
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName.set(deptName);
+    }
+
+    public boolean getLeaveAcceptStatus() {
+        return leaveAcceptStatus.get();
+    }
+
+    public void setLeaveAcceptStatus(boolean leaveAcceptStatus) {
+        this.leaveAcceptStatus.set(leaveAcceptStatus);
+    }
+
+    public int getRemainedLeave() {
+        return remainedLeave.get();
+    }
+
+    public void setRemainedLeave(int remainedLeave) {
+        this.remainedLeave.set(remainedLeave);
+    }
 }
