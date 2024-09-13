@@ -8,10 +8,7 @@ import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.*;
 import org.example.server.dto.leave_dto.LeaveDay;
-import org.example.server.dto.user_dto.UserIdAndRole;
-import org.example.server.dto.user_dto.UserInfo;
-import org.example.server.dto.user_dto.UserJoinDto;
-import org.example.server.dto.user_dto.UserLoginDto;
+import org.example.server.dto.user_dto.*;
 import org.example.server.repository.DeptRepository;
 import org.example.server.repository.MailRepository;
 import org.example.server.repository.PositionRepository;
@@ -185,6 +182,33 @@ public class UserService {
         return responseData;
     }
 
+    public ResponseData findUsernameAndEmailAll() throws SQLException {
+        ResponseData responseData = null;
+        Connection con = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = findUsernameAndEmailAllBizLogic(con);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+        return responseData;
+    }
+
+    private ResponseData findUsernameAndEmailAllBizLogic(Connection con) throws SQLException {
+        List<UserNameAndEmailDto> usernameAndEmailAll = userRepository.findUsernameAndEmailAll(con);
+
+        if (usernameAndEmailAll.isEmpty()) {
+            return new ResponseData("회원이 존재하지 않음(실패)", null);
+        }
+
+        return new ResponseData("회원 조회 성공", usernameAndEmailAll);
+
+    }
     private ResponseData findAllBizLogic(Connection con) throws SQLException {
         List<User> users = userRepository.findAll(con,Role.USER);
         if (users.isEmpty()) {
