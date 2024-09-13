@@ -4,6 +4,7 @@ import org.example.server.domain.mail.Mail;
 import org.example.server.domain.mail.MailStore;
 import org.example.server.domain.mail.MailType;
 import org.example.server.domain.mail.ReceivedMail;
+import org.example.server.dto.mail_dto.MailAllDto;
 import org.example.server.dto.mail_dto.MailSearchDto;
 import org.example.server.dto.mail_dto.UserAndMailStore;
 
@@ -163,10 +164,10 @@ public class MailRepository {
         }
     }
 
-    public Optional<List<Mail>> findReceivedMailAll(Connection con, MailSearchDto mailSearchDto) throws SQLException {
-        String sql = "select mail.mai_num, mail.title, mail.created_date" +
+    public Optional<List<MailAllDto>> findReceivedMailAll(Connection con, MailSearchDto mailSearchDto) throws SQLException {
+        String sql = "select mail.mai_num, mail.title, mail.created_date, user.email" +
                 " from mail" +
-                " left join received_mail on mail.mai_num = received_mail.mai_num" +
+                " left join received_mail on mail.mai_num = received_mail.mail_num" +
                 " left join user on received_mail.user_num = user.user_num" +
                 " where user.email = ?" +
                 " order by mail.mai_num desc";
@@ -174,7 +175,7 @@ public class MailRepository {
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
-        List<Mail> result = null;
+        List<MailAllDto> result = new ArrayList<>();
 
         try {
             pstmt = con.prepareStatement(sql);
@@ -182,16 +183,22 @@ public class MailRepository {
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                Mail mail = new Mail.Builder()
-                        .mailNum(rs.getLong("mai_num"))
-                        .title(rs.getString("title"))
-                        .createdDate(rs.getDate("created_date").toLocalDate())
+                MailAllDto mailAllDto=new MailAllDto.Builder()
+                        .mailNum(rs.getLong("mail.mai_num"))
+                        .title(rs.getString("mail.title"))
+                        .createdDate(rs.getDate("mail.created_date").toLocalDate())
+                        .userEmail(rs.getString("user.email"))
                         .build();
 
-                result.add(mail);
+
+                result.add(mailAllDto);
             }
 
-            return Optional.ofNullable(result);
+            if (result.isEmpty()) {
+                return Optional.empty();
+            }
+
+            return Optional.of(result);
         } catch (SQLException e) {
             throw e;
         } finally {

@@ -5,6 +5,7 @@ import org.example.server.domain.mail.Mail;
 import org.example.server.domain.mail.MailType;
 import org.example.server.domain.mail.ReceivedMail;
 import org.example.server.domain.user.User;
+import org.example.server.dto.mail_dto.MailAllDto;
 import org.example.server.dto.mail_dto.MailReceivedData;
 import org.example.server.dto.mail_dto.MailSearchDto;
 import org.example.server.dto.ResponseData;
@@ -105,7 +106,7 @@ public class MailService {
     }
 
     private ResponseData mailSearchBizLogic(Connection con, MailSearchDto mailSearchDto) throws SQLException {
-        if (mailSearchDto.getMailType() == MailType.RECEIVED) {
+        if (mailSearchDto.getMailType() == MailType.SEND) {
             Optional<List<Mail>> sendMailAll = mailRepository.findSendMailAll(con, mailSearchDto);
             if (sendMailAll.isEmpty()) {
                 return new ResponseData("해당 유저의 송신메일함이 비어있습니다.", null);
@@ -113,7 +114,7 @@ public class MailService {
 
             return new ResponseData("유저의 송신메일함의 모든 메일 조회 성공", sendMailAll.get());
         } else {
-            Optional<List<Mail>> receivedMailAll = mailRepository.findReceivedMailAll(con, mailSearchDto);
+            Optional<List<MailAllDto>> receivedMailAll = mailRepository.findReceivedMailAll(con, mailSearchDto);
             if (receivedMailAll.isEmpty()) {
                 return new ResponseData("해당 유저의 수신메일함이 비어있습니다.", null);
             }
