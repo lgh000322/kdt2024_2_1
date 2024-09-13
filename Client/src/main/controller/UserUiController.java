@@ -35,8 +35,6 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.consts.MessageTypeConst;
-import main.domain.board.Board;
-import main.domain.mail.Mail;
 import main.domain.mail.MailType;
 import main.domain.user.Role;
 import main.domain.user.User;
@@ -49,6 +47,7 @@ import main.dto.leave_dto.LeaveRecord;
 import main.dto.mail_dto.MailAllDto;
 import main.dto.mail_dto.MailRecord;
 import main.dto.mail_dto.MailSearchDto;
+import main.dto.mail_dto.UserAndEmailDto;
 import main.dto.salary_dto.SalaryRecord;
 import main.dto.user_dto.UserInfo;
 import main.dto.user_dto.UserRoleDto;
@@ -217,8 +216,6 @@ public class UserUiController implements Initializable {
 	@FXML
 	private TableColumn<QnARecord, String> qnaDateColumn;
 
-
-
 	@FXML
 	private TableView<MailRecord> mailRecordTableView;
 	@FXML
@@ -230,7 +227,6 @@ public class UserUiController implements Initializable {
 	@FXML
 	private TableColumn<MailRecord, String> mailReceivedDateColumn;
 
-
 	@FXML
 	private ObservableList<WorkRecord> workRecordList = FXCollections.observableArrayList();
 
@@ -240,7 +236,7 @@ public class UserUiController implements Initializable {
 	@FXML
 	private ObservableList<QnARecord> qnaRecordList = FXCollections.observableArrayList();
 
-  @FXML
+	@FXML
 	private ObservableList<SalaryRecord> salaryRecordList = FXCollections.observableArrayList();
 
 	@FXML
@@ -283,7 +279,7 @@ public class UserUiController implements Initializable {
 					e.printStackTrace();
 				}
 				workRecordList.clear();
-				qnaRecordList.clear();					
+				qnaRecordList.clear();
 				salaryRecordList.clear();
 				mailRecordList.clear();
 
@@ -370,6 +366,15 @@ public class UserUiController implements Initializable {
 		qnaPostUserColumn.setCellValueFactory(new PropertyValueFactory<>("qnaPostUser"));
 		qnaDateColumn.setCellValueFactory(new PropertyValueFactory<>("qnaDate"));
 
+		salaryNoColumn.setCellValueFactory(new PropertyValueFactory<>("salaryNo"));
+		salaryReceivedColumn.setCellValueFactory(new PropertyValueFactory<>("salaryReceived"));
+		salaryTotalColumn.setCellValueFactory(new PropertyValueFactory<>("salaryTotal"));
+
+		mailNoColumn.setCellValueFactory(new PropertyValueFactory<>("mailNo"));
+		mailReceivedColumn.setCellValueFactory(new PropertyValueFactory<>("mailReceived"));
+		mailTitleColumn.setCellValueFactory(new PropertyValueFactory<>("mailTitle"));
+		mailReceivedDateColumn.setCellValueFactory(new PropertyValueFactory<>("mailReceivedDate"));
+
 		// TableView의 onMouseClicked 이벤트 핸들러 설정
 		workRecordTableView.setOnMouseClicked(event -> {
 			// 클릭된 셀의 인덱스와 해당 항목을 가져옴
@@ -381,16 +386,6 @@ public class UserUiController implements Initializable {
 				// 예를 들어, 선택된 항목의 정보를 사용하여 추가적인 작업을 수행할 수 있음
 			}
 		});
-		
-		salaryNoColumn.setCellValueFactory(new PropertyValueFactory<>("salaryNo"));
-		salaryReceivedColumn.setCellValueFactory(new PropertyValueFactory<>("salaryReceived"));
-		salaryTotalColumn.setCellValueFactory(new PropertyValueFactory<>("salaryTotal"));
-
-		mailNoColumn.setCellValueFactory(new PropertyValueFactory<>("mailNo"));
-		mailReceivedColumn.setCellValueFactory(new PropertyValueFactory<>("mailReceived"));
-		mailTitleColumn.setCellValueFactory(new PropertyValueFactory<>("mailTitle"));
-		mailReceivedDateColumn.setCellValueFactory(new PropertyValueFactory<>("mailReceivedDate"));
-
 
 		try {
 			workTabClickedMethod();
@@ -444,10 +439,58 @@ public class UserUiController implements Initializable {
 	 * 메일함 탭
 	 */
 	/* 메일쓰기 버튼 클릭 시, 메일작성 창 띄우기 */
-	public void handlesendMailBtn() {
+	public void handlesendMailBtn() throws IOException {
+		ObservableList<String> emailList = FXCollections.observableArrayList();
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_SEARCH_ALL_USERNAME_AND_EMAIL,
+				null);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			Type listType = new TypeToken<List<UserAndEmailDto>>() {
+			}.getType();
+			ResponseData<UserAndEmailDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					listType);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				List<UserAndEmailDto> list = (List<UserAndEmailDto>) responseData.getData();
+				for (int i = 0; i < list.size(); i++) {
+					UserAndEmailDto userAndEmailDto = list.get(i);
+					String str = userAndEmailDto.getUserEmail();
+					emailList.add(str);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
+
 		try {
 			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/mail_ui/SendMail.fxml"));
 			Parent sendMailRoot = fxmlLoader.load();
+			MailController mailController = fxmlLoader.getController();
+			mailController.setReceiveUserEmailData(emailList);
 
 			Stage sendMailStage = new Stage();
 			sendMailStage.setTitle("메일작성");
@@ -491,7 +534,63 @@ public class UserUiController implements Initializable {
 	}
 
 	/* Q&A 탭에서 검색 버튼 버튼 클릭 시, 입력한 제목명으로 검색 처리 로칙 */
-	public void handletitleSearchBtn() {
+	public void handletitleSearchBtn() throws IOException {
+		qnaRecordList.clear();
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		String title = qnaTitle.getText();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_LIST_SEARCH, title);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			Type listType = new TypeToken<List<BoardFindAllDto>>() {
+			}.getType();
+			ResponseData<BoardFindAllDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					listType);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				List<BoardFindAllDto> list = (List<BoardFindAllDto>) responseData.getData();
+				for (int i = 0; i < list.size(); i++) {
+					System.out.println("QnA게시판 로그 출력 실행");
+					BoardFindAllDto boardFindAllDto = list.get(i);
+					Long no = Long.valueOf(i + 1);
+					QnARecord qnaRecord = new QnARecord(no, boardFindAllDto.getTitle(), boardFindAllDto.getUserId(),
+							boardFindAllDto.getCreatedDate());
+					qnaRecordList.add(qnaRecord);
+				}
+
+				Platform.runLater(() -> {
+					qnaRecordTableView.setItems(qnaRecordList);
+				});
+
+			}
+		} catch (
+
+		IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
 	}
 
 	public void handleLogoutBtn() {
@@ -681,6 +780,7 @@ public class UserUiController implements Initializable {
 
 					SalaryRecord salaryRecord = new SalaryRecord(no, userSalaryData.getReceivedDate().toString(),
 							userSalaryData.getTotalSalary());
+
 					salaryRecordList.add(salaryRecord);
 				}
 
