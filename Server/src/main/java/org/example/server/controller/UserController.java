@@ -77,6 +77,11 @@ public class UserController implements Controller {
                 System.out.println("모든 회원 조회");
                 result=userService.findAll();
             }
+
+            case MessageTypeConst.MESSAGE_SEARCH_ALL_BYADMIN -> {
+                System.out.println("모든 회원 조회 (관리자)");
+                result = userService.findAllByAdmin();
+            }
             case MessageTypeConst.MESSAGE_USER_ID_VALIDATION -> {
                 if (requestData.getData() instanceof String) {
                     System.out.println("아이디 중복 검사");

@@ -16,6 +16,9 @@ public abstract class MessageTypeConst {
     //모든 회원 조회
     public static final String MESSAGE_SEARCH_ALL = "/user/search/all";
 
+    // 모든 회원 조회 (관리자)
+    public static final String MESSAGE_SEARCH_ALL_BYADMIN = "/user/search/all/byadmin";
+
     // 회원 아이디 중복 검증
     public static final String MESSAGE_USER_ID_VALIDATION = "/user/idValidation";
 

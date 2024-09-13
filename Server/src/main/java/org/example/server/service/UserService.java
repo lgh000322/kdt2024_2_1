@@ -185,6 +185,34 @@ public class UserService {
         return responseData;
     }
 
+
+    public ResponseData findAllByAdmin() throws SQLException {
+        ResponseData responseData = null;
+        Connection con = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = findAllByAdminBizLogic(con);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+        return responseData;
+    }
+
+    private ResponseData findAllByAdminBizLogic(Connection con) throws SQLException {
+        List<UserInfo> userInfos = userRepository.findAllForAdmin(con);
+        if (userInfos.isEmpty()) {
+            return new ResponseData("관리자 회원 조회 실패(회원 없음)", null);
+        }
+
+        return new ResponseData("회원 전체 조회 성공(관리자 페이지)", userInfos);
+    }
+
+
     private ResponseData findAllBizLogic(Connection con) throws SQLException {
         List<User> users = userRepository.findAll(con,Role.USER);
         if (users.isEmpty()) {
@@ -273,6 +301,7 @@ public class UserService {
         return new ResponseData("성공", null);
     }
 
+
     private void release(Connection con) {
         if (con != null) {
             try {
@@ -283,6 +312,7 @@ public class UserService {
             }
         }
     }
+
 
 
 }
