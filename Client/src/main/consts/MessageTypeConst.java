@@ -14,6 +14,7 @@ public abstract class MessageTypeConst {
 	public static final String MESSAGE_SEARCH = "/user/search";
 
 
+
     //관리자 모든 회원 조회
     public static final String MESSAGE_SEARCH_ALL_BYADMIN = "/user/search/all/byadmin";
     

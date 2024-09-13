@@ -1,1 +1,0 @@
-INDEX VERSION 1.134+C:\Users\dltjd\kdt2024_2_1_front\kdt2024_2_1\Client\.metadata\.plugins\org.eclipse.jdt.core
