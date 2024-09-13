@@ -252,14 +252,15 @@ public class UserRepository {
     }
 
 
-    public List<User> findAll(Connection conn) throws SQLException {
-        String sql = "select * from user";
+    public List<User> findAll(Connection conn,Role role) throws SQLException {
+        String sql = "select * from user where role = ?";
         List<User> list = new ArrayList<>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
         try {
             pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, String.valueOf(role));
             rs = pstmt.executeQuery();
 
 

@@ -63,7 +63,7 @@ public class WorkRepository {
         }
     }
 
-    public List<WorkLog> findWorkLogByDate(Connection conn, LocalDate today) throws SQLException {/*
+    public List<WorkLog> findWorkLogByDate(Connection conn, LocalDate today) throws SQLException {
         String sql = "select * from work_log where work_date = ?";
 
         PreparedStatement pstmt = null;
@@ -71,27 +71,31 @@ public class WorkRepository {
 
         try {
             pstmt = conn.prepareStatement(sql);
-            pstmt.setDate(1,Date.valueOf(today));
+            pstmt.setDate(1, Date.valueOf(today));
             rs = pstmt.executeQuery();
 
             List<WorkLog> result = new ArrayList<>();
 
             while (rs.next()) {
-              WorkLog workLog=new WorkLog.Builder()
-                      .logNum(rs.getLong(""))
+                WorkLog workLog = new WorkLog.Builder()
+                        .logNum(rs.getLong("log_num"))
+                        .startTime(rs.getTime("start_time").toLocalTime())
+                        .endTime(rs.getTime("end_time") != null ? rs.getTime("end_time").toLocalTime() : null)
+                        .status(Status.valueOf(rs.getString("status").toUpperCase()))  // Enum 처리
+                        .workDate(rs.getDate("work_date").toLocalDate())
+                        .userNum(rs.getLong("user_num"))
+                        .build();
+
+                result.add(workLog);
             }
 
-
+            return result;
         } catch (SQLException e) {
             throw e;
         } finally {
             close(pstmt, rs);
-        }*/
-        return null;
+        }
     }
-
-
-
 
 
     ///유저의 근퇴목록 모두 조회
@@ -290,6 +294,24 @@ public class WorkRepository {
         } catch (SQLException e) {
             e.printStackTrace();
             return new ResponseData("WorkLog 업데이트 중 오류 발생", null);
+        } finally {
+            close(pstmt, null);
+        }
+    }
+
+    // 스케줄러가 쓰는 업데이트
+    public void updateStatus(WorkLog workLog, Connection con) throws SQLException {
+        String updateSQL = "UPDATE work_log SET status = ? WHERE user_num = ? AND work_date = ?";
+        PreparedStatement pstmt = null;
+
+        try {
+            pstmt = con.prepareStatement(updateSQL);
+            pstmt.setString(1, Status.ABSENCE.name());
+            pstmt.setLong(2, workLog.getUserNum());
+            pstmt.setDate(3, Date.valueOf(workLog.getWorkDate()));
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         } finally {
             close(pstmt, null);
         }

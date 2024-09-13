@@ -186,7 +186,7 @@ public class UserService {
     }
 
     private ResponseData findAllBizLogic(Connection con) throws SQLException {
-        List<User> users = userRepository.findAll(con);
+        List<User> users = userRepository.findAll(con,Role.USER);
         if (users.isEmpty()) {
             return new ResponseData("회원 조회 실패(회원 없음)", null);
         }

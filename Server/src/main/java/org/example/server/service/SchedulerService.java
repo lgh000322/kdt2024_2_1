@@ -2,8 +2,10 @@ package org.example.server.service;
 
 import org.example.server.db_utils.DBUtils;
 import org.example.server.domain.leave_log.LeaveLog;
+import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.domain.work_log.Status;
+import org.example.server.domain.work_log.WorkLog;
 import org.example.server.repository.LeaveRepository;
 import org.example.server.repository.UserRepository;
 import org.example.server.repository.WorkRepository;
@@ -73,15 +75,20 @@ public class SchedulerService {
     private void eveningActBizLogic(Connection con) throws SQLException {
         // 오늘 날짜의 모든 근태로그를 가져온다.
         LocalDate today = LocalDate.now();
-        workRepository.findWorkLogByDate(con,today);
-        // 해당 근태로그의 상태가 출근 또는 지각일 경우 근태로그를 결근으로 변경한다.
+        List<WorkLog> findWorkLogs = workRepository.findWorkLogByDate(con, today);
 
+        // 해당 근태로그의 상태가 출근 또는 지각이고 퇴근시간이 null이면 근태로그를 결근으로 변경한다.
+        for (WorkLog findWorkLog : findWorkLogs) {
+            if ((findWorkLog.getStatus() == Status.ATTENDANCE || findWorkLog.getStatus() == Status.TARDINESS) && findWorkLog.getEndTime() == null) {
+                workRepository.updateStatus(findWorkLog, con);
+            }
+        }
     }
 
     private void morningActBizLogic(Connection con) throws SQLException {
         LocalTime localTime = LocalTime.of(8, 0);
         //모든 회원을 찾는다.
-        List<User> findUsers = userRepository.findAll(con);
+        List<User> findUsers = userRepository.findAll(con, Role.USER);
         for (User findUser : findUsers) {
             Long userNum = findUser.getUserNum();
 
