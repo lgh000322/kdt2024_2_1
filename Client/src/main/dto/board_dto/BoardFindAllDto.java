@@ -10,7 +10,7 @@ public class BoardFindAllDto {
     private String userId;
 
     private LocalDate createdDate;
-
+    
     private BoardFindAllDto(Builder builder) {
         this.boardNum = builder.boardNum;
         this.title = builder.title;
@@ -22,8 +22,6 @@ public class BoardFindAllDto {
         return createdDate;
     }
 
-
-
     public String getUserId() {
         return userId;
     }
@@ -32,8 +30,6 @@ public class BoardFindAllDto {
     public String getTitle() {
         return title;
     }
-
-
 
     public Long getBoardNum() {
         return boardNum;

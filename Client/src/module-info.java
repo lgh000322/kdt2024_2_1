@@ -5,6 +5,7 @@ module Client {
 	requires javafx.graphics; // JavaFX 그래픽 관련 모듈
 	requires java.sql; // SQL 관련 모듈
 	requires javafx.base;
+	requires javafx.web;
 
 	opens main.controller to javafx.fxml; // FXML에서 사용할 컨트롤러 모듈 열기
 	opens main.dto to com.google.gson, javafx.base; // Gson에서 사용할 DTO 모듈 열기

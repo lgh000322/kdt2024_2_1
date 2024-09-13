@@ -35,16 +35,22 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.consts.MessageTypeConst;
-import main.domain.mail.Mail;
 import main.domain.mail.MailType;
 import main.domain.user.Role;
 import main.domain.user.User;
 import main.dto.ResponseData;
+import main.dto.board_dto.BoardFindAllDto;
+import main.dto.board_dto.QnARecord;
 import main.dto.leave_dto.ForFindLeaveDto;
 import main.dto.leave_dto.LeaveLogOfUserDto;
 import main.dto.leave_dto.LeaveRecord;
+import main.dto.mail_dto.MailAllDto;
+import main.dto.mail_dto.MailRecord;
 import main.dto.mail_dto.MailSearchDto;
+import main.dto.mail_dto.UserAndEmailDto;
+import main.dto.salary_dto.SalaryRecord;
 import main.dto.user_dto.UserInfo;
+import main.dto.user_dto.UserLoginDto;
 import main.dto.user_dto.UserRoleDto;
 import main.dto.user_dto.UserSalaryData;
 import main.dto.user_dto.UserWorkData;
@@ -158,10 +164,9 @@ public class UserUiController implements Initializable {
 	@FXML
 	private Button deletePostQnABtn;
 
+	/* 근태기록탭 테이블뷰 컬럼 */
 	@FXML
 	private TableView<WorkRecord> workRecordTableView;
-
-	/* 근태기록탭 테이블뷰 컬럼 */
 	@FXML
 	private TableColumn<WorkRecord, Long> noColumn;
 	@FXML
@@ -176,7 +181,6 @@ public class UserUiController implements Initializable {
 	private TableColumn<WorkRecord, String> noteColumn;
 
 	/* 휴가신청탭 테이블뷰 컬럼 */
-
 	@FXML
 	private TableView<LeaveRecord> leaveRecordTableView;
 	@FXML
@@ -191,38 +195,55 @@ public class UserUiController implements Initializable {
 	private TableColumn<LeaveRecord, Boolean> leaveAcceptColumn;
 
 	/* 급여내역탭 테이블뷰 컬럼 */
-//   @FXML
-//   private TableColumn<SalaryRecord, Integer> salaryNoColumn;
-//   @FXML
-//   private TableColumn<SalaryRecord, String> salaryReceivedColumn;
-//   @FXML
-//   private TableColumn<SalaryRecord, String> salaryTotalColumn;
-//   
-//   /* 메일함탭 테이블뷰 컬럼 */
-//   @FXML
-//   private TableColumn<MailRecord, Integer> mailNoColumn;
-//   @FXML
-//   private TableColumn<MailRecord, String> mailReceivedColumn;
-//   @FXML
-//   private TableColumn<MailRecord, String> mailTitleColumn;
-//   @FXML
-//   private TableColumn<MailRecord, String> mailReceivedDateColumn;
-//   
-//   /* Q&A탭 테이블뷰 컬럼 */
-//   @FXML
-//   private TableColumn<QnARecord, Integer> qnaNoColumn;
-//   @FXML
-//   private TableColumn<QnARecord, String> qnaTitleColumn;
-//   @FXML
-//   private TableColumn<QnARecord, String> qnaPostUserColumn;
-//   @FXML
-//   private TableColumn<QnARecord, String> qnaDateColumn;
+	@FXML
+	private TableView<SalaryRecord> salaryRecordTableView;
+
+	@FXML
+	private TableColumn<SalaryRecord, Long> salaryNoColumn;
+	@FXML
+	private TableColumn<SalaryRecord, String> salaryReceivedColumn;
+	@FXML
+	private TableColumn<SalaryRecord, Integer> salaryTotalColumn;
+
+	/* Q&A탭 테이블뷰 컬럼 */
+	@FXML
+	private TableView<QnARecord> qnaRecordTableView;
+	@FXML
+	private TableColumn<QnARecord, Long> qnaNoColumn;
+	@FXML
+	private TableColumn<QnARecord, String> qnaTitleColumn;
+	@FXML
+	private TableColumn<QnARecord, String> qnaPostUserColumn;
+	@FXML
+	private TableColumn<QnARecord, String> qnaDateColumn;
+	@FXML
+	private TableColumn<QnARecord, Long> boardNo;
+
+	@FXML
+	private TableView<MailRecord> mailRecordTableView;
+	@FXML
+	private TableColumn<MailRecord, Long> mailNoColumn;
+	@FXML
+	private TableColumn<MailRecord, String> mailReceivedColumn;
+	@FXML
+	private TableColumn<MailRecord, String> mailTitleColumn;
+	@FXML
+	private TableColumn<MailRecord, String> mailReceivedDateColumn;
 
 	@FXML
 	private ObservableList<WorkRecord> workRecordList = FXCollections.observableArrayList();
 
 	@FXML
 	private ObservableList<LeaveRecord> leaveRecordList = FXCollections.observableArrayList();
+
+	@FXML
+	private ObservableList<QnARecord> qnaRecordList = FXCollections.observableArrayList();
+
+	@FXML
+	private ObservableList<SalaryRecord> salaryRecordList = FXCollections.observableArrayList();
+
+	@FXML
+	private ObservableList<MailRecord> mailRecordList = FXCollections.observableArrayList();
 
 	@FXML
 	private ObservableList<String> list = FXCollections.observableArrayList("출근", "결근", "조퇴");
@@ -244,6 +265,9 @@ public class UserUiController implements Initializable {
 				}
 				// 원하는 동작을 여기에 추가
 				leaveRecordList.clear();
+				qnaRecordList.clear();
+				salaryRecordList.clear();
+				mailRecordList.clear();
 			}
 		});
 
@@ -257,9 +281,11 @@ public class UserUiController implements Initializable {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
 				workRecordList.clear();
-				
+				qnaRecordList.clear();
+				salaryRecordList.clear();
+				mailRecordList.clear();
+
 			}
 		});
 
@@ -275,7 +301,8 @@ public class UserUiController implements Initializable {
 				}
 				workRecordList.clear();
 				leaveRecordList.clear();
-				// 원하는 동작을 여기에 추가
+				qnaRecordList.clear();
+				mailRecordList.clear();
 			}
 		});
 
@@ -289,9 +316,11 @@ public class UserUiController implements Initializable {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+
 				workRecordList.clear();
 				leaveRecordList.clear();
-				// 원하는 동작을 여기에 추가
+				qnaRecordList.clear();
+				salaryRecordList.clear();
 			}
 		});
 
@@ -299,11 +328,17 @@ public class UserUiController implements Initializable {
 		qnaTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue) { // Tab 2가 선택되었을 때
 				System.out.println("Q&A 탭이 선택됨");
-				
-				// 원하는 동작을 여기에 추가
+				try {
+					qnaTabClickedMethod();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			leaveRecordList.clear();
 			workRecordList.clear();
+			salaryRecordList.clear();
+			mailRecordList.clear();
 		});
 
 		Timeline clock = new Timeline(new KeyFrame(Duration.ZERO, e -> {
@@ -323,27 +358,38 @@ public class UserUiController implements Initializable {
 		endTimeColumn.setCellValueFactory(new PropertyValueFactory<>("endTime"));
 		noteColumn.setCellValueFactory(new PropertyValueFactory<>("note"));
 
-		
 		leaveNoColumn.setCellValueFactory(new PropertyValueFactory<>("no"));
 		leaveRequestColumn.setCellValueFactory(new PropertyValueFactory<>("leaveRequestDate"));
 		leaveStartColumn.setCellValueFactory(new PropertyValueFactory<>("leaveStartDate"));
 		leaveEndColumn.setCellValueFactory(new PropertyValueFactory<>("leaveEndDate"));
 		leaveAcceptColumn.setCellValueFactory(new PropertyValueFactory<>("leaveAcceptStatus"));
-		
-		
+
+		qnaNoColumn.setCellValueFactory(new PropertyValueFactory<>("qnaNo"));
+		qnaTitleColumn.setCellValueFactory(new PropertyValueFactory<>("qnaTitle"));
+		qnaPostUserColumn.setCellValueFactory(new PropertyValueFactory<>("qnaPostUser"));
+		qnaDateColumn.setCellValueFactory(new PropertyValueFactory<>("qnaDate"));
+
+		salaryNoColumn.setCellValueFactory(new PropertyValueFactory<>("salaryNo"));
+		salaryReceivedColumn.setCellValueFactory(new PropertyValueFactory<>("salaryReceived"));
+		salaryTotalColumn.setCellValueFactory(new PropertyValueFactory<>("salaryTotal"));
+
+		mailNoColumn.setCellValueFactory(new PropertyValueFactory<>("mailNo"));
+		mailReceivedColumn.setCellValueFactory(new PropertyValueFactory<>("mailReceived"));
+		mailTitleColumn.setCellValueFactory(new PropertyValueFactory<>("mailTitle"));
+		mailReceivedDateColumn.setCellValueFactory(new PropertyValueFactory<>("mailReceivedDate"));
+
 		// TableView의 onMouseClicked 이벤트 핸들러 설정
 		workRecordTableView.setOnMouseClicked(event -> {
-		    // 클릭된 셀의 인덱스와 해당 항목을 가져옴
-		    WorkRecord selectedItem = workRecordTableView.getSelectionModel().getSelectedItem();
-		    
-		    if (selectedItem != null) {
-		        // 선택된 항목에 대한 처리 로직
-		        System.out.println("Selected WorkRecord: " + selectedItem);
-		        // 예를 들어, 선택된 항목의 정보를 사용하여 추가적인 작업을 수행할 수 있음
-		    }
+			// 클릭된 셀의 인덱스와 해당 항목을 가져옴
+			WorkRecord selectedItem = workRecordTableView.getSelectionModel().getSelectedItem();
+
+			if (selectedItem != null) {
+				// 선택된 항목에 대한 처리 로직
+				System.out.println("Selected WorkRecord: " + selectedItem);
+				// 예를 들어, 선택된 항목의 정보를 사용하여 추가적인 작업을 수행할 수 있음
+			}
 		});
-		
-		
+
 		try {
 			workTabClickedMethod();
 		} catch (IOException e1) {
@@ -359,6 +405,34 @@ public class UserUiController implements Initializable {
 		userEmail.setText(userInfo.getEmail());
 		userDept.setText(userInfo.getDeptName());
 		userPosition.setText(userInfo.getPositionName());
+	}
+	
+	/* 로그아웃 버튼 처리 로직 */
+	public void handleLogoutBtn() {
+		UserInfoSavedUtil.logout();
+
+		Platform.runLater(() -> {
+			try {
+				FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/login_ui/LoginUi.fxml"));
+				Parent loginRoot = fxmlLoader.load();
+
+				// 새 Stage를 생성하고 Scene을 설정합니다.
+				Stage loginStage = new Stage();
+				loginStage.setTitle("로그인");
+				loginStage.setScene(new Scene(loginRoot));
+
+				// 현재 Stage를 가져와서 숨깁니다.
+				Stage currentStage = (Stage) startWorkBtn.getScene().getWindow();
+				currentStage.hide();
+
+				// 새 Stage를 표시합니다.
+				loginStage.show();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+
 	}
 
 	/*
@@ -396,10 +470,58 @@ public class UserUiController implements Initializable {
 	 * 메일함 탭
 	 */
 	/* 메일쓰기 버튼 클릭 시, 메일작성 창 띄우기 */
-	public void handlesendMailBtn() {
+	public void handlesendMailBtn() throws IOException {
+		ObservableList<String> emailList = FXCollections.observableArrayList();
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_SEARCH_ALL_USERNAME_AND_EMAIL,
+				null);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			Type listType = new TypeToken<List<UserAndEmailDto>>() {
+			}.getType();
+			ResponseData<UserAndEmailDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					listType);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				List<UserAndEmailDto> list = (List<UserAndEmailDto>) responseData.getData();
+				for (int i = 0; i < list.size(); i++) {
+					UserAndEmailDto userAndEmailDto = list.get(i);
+					String str = userAndEmailDto.getUserEmail();
+					emailList.add(str);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
+
 		try {
 			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/mail_ui/SendMail.fxml"));
 			Parent sendMailRoot = fxmlLoader.load();
+			MailController mailController = fxmlLoader.getController();
+			mailController.setReceiveUserEmailData(emailList);
 
 			Stage sendMailStage = new Stage();
 			sendMailStage.setTitle("메일작성");
@@ -443,9 +565,170 @@ public class UserUiController implements Initializable {
 	}
 
 	/* Q&A 탭에서 검색 버튼 버튼 클릭 시, 입력한 제목명으로 검색 처리 로칙 */
-	public void handletitleSearchBtn() {
+	public void handletitleSearchBtn() throws IOException {
+		qnaRecordList.clear();
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		String title = qnaTitle.getText();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_LIST_SEARCH, title);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			Type listType = new TypeToken<List<BoardFindAllDto>>() {
+			}.getType();
+			ResponseData<BoardFindAllDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					listType);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				List<BoardFindAllDto> list = (List<BoardFindAllDto>) responseData.getData();
+				for (int i = 0; i < list.size(); i++) {
+					System.out.println("QnA게시판 로그 출력 실행");
+					BoardFindAllDto boardFindAllDto = list.get(i);
+					Long no = Long.valueOf(i + 1);
+					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
+					        boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
+					qnaRecordList.add(qnaRecord);
+				}
+
+				Platform.runLater(() -> {
+					qnaRecordTableView.setItems(qnaRecordList);
+				});
+
+			}
+		} catch (
+
+		IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
 	}
 
+	/* Q&A 리스트 아이템 선택 시, 선택된 아이템 창 연결 */
+	public void qnaItemClickMethod() {
+//		CommunicationUtils communicationUtils = new CommunicationUtils();
+//
+//		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+//
+//		/**
+//		 * 데이터를 주고받기 위해 stream을 받아옴
+//		 */
+//		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+//		DataInputStream dis = serverConnectUtils.getDataInputStream();
+//
+//		/**
+//		 * requestData의 data에 넣어줄 객체를 생성
+//		 */
+//		UserLoginDto userLoginDto = new UserLoginDto();
+//		userLoginDto.setUserId(userId.getText());
+//		userLoginDto.setPassword(userPwd.getText());
+//		if (userCheck.isSelected()) {
+//			userLoginDto.setRole(Role.USER);
+//		} else if (adminCheck.isSelected()) {
+//			userLoginDto.setRole(Role.ADMIN);
+//		} else {
+//			userLoginDto.setRole(null);
+//		}
+//
+//		/**
+//		 * requestData 생성
+////		 */
+////		RequestData requestData = new RequestData();
+////		requestData.setData(userLoginDto);
+////		requestData.setMessageType(MessageTypeConst.MESSAGE_LOGIN);
+//
+//		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_LOGIN, userLoginDto);
+//
+//		try {
+//			communicationUtils.sendServer(jsonSendStr, dos);
+//			String jsonReceivedStr = dis.readUTF();
+//			
+//			ResponseData<UserInfo> responseData=communicationUtils.jsonToResponseData(jsonReceivedStr, UserInfo.class);
+//			String messageType = responseData.getMessageType();
+//
+//			if (messageType.contains("성공")) {
+//				UserInfo userInfo = responseData.getData();
+//				
+//				//클라이언트에 유저 정보를 저장해주는 로직 추가
+//				UserInfoSavedUtil.setUserInfo(userInfo);
+//				UserInfoSavedUtil.setUserId(userLoginDto.getUserId());
+//				UserInfoSavedUtil.setRole(userLoginDto.getRole());
+//
+//				if (userLoginDto.getRole() == Role.USER) {
+//
+//					Platform.runLater(() -> {
+//						try {
+//								FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/user_ui/UserUi.fxml"));
+//							Parent loginRoot = fxmlLoader.load();
+//
+//							UserUiController userUiController = fxmlLoader.getController();
+//							userUiController.setUserData(userInfo);
+//							
+//							Stage loginStage = new Stage();
+//							loginStage.setTitle("인사 시스템 (사용자)");
+//							loginStage.setScene(new Scene(loginRoot));
+//
+//							Stage currentStage = (Stage) loginBtn.getScene().getWindow();
+//							currentStage.hide();
+//
+//							loginStage.show();
+//
+//						} catch (IOException e) {
+//							e.printStackTrace();
+//						}
+//					});
+//				} else {
+//					Platform.runLater(() -> {
+//						try {
+//							FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/admin_ui/AdminUi.fxml"));
+//							Parent loginRoot = fxmlLoader.load();
+//
+//							Stage loginStage = new Stage();
+//							loginStage.setTitle("인사 시스템 (관리자)");
+//							loginStage.setScene(new Scene(loginRoot));
+//
+//							Stage currentStage = (Stage) loginBtn.getScene().getWindow();
+//							currentStage.hide();
+//
+//							loginStage.show();
+//						} catch (IOException e) {
+//							e.printStackTrace();
+//						}
+//					});
+//				}
+//			} else {
+//				Platform.runLater(() -> {
+//					LoginFailAlert("로그인 실패", "입력하신 정보가 맞지 않습니다. 다시 입력해주세요.");
+//				});
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} finally {
+//			serverConnectUtils.close();
+//		}
+	}
+
+	// 근태기록 선택되었을 때
 	public void workTabClickedMethod() throws IOException {
 		System.out.println("근태기록 클릭이벤트 발생");
 		CommunicationUtils communicationUtils = new CommunicationUtils();
@@ -472,7 +755,8 @@ public class UserUiController implements Initializable {
 			communicationUtils.sendServer(jsonSendStr, dos);
 			String jsonReceivedStr = dis.readUTF();
 
-			Type listType = new TypeToken<List<UserWorkData>>() {}.getType();
+			Type listType = new TypeToken<List<UserWorkData>>() {
+			}.getType();
 			ResponseData<UserWorkData> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, listType);
 			String messageType = responseData.getMessageType();
 			if (messageType.contains("성공")) {
@@ -488,7 +772,7 @@ public class UserUiController implements Initializable {
 				Platform.runLater(() -> {
 					workRecordTableView.setItems(workRecordList);
 				});
-				
+
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -499,6 +783,7 @@ public class UserUiController implements Initializable {
 		}
 	}
 
+	// 휴가탭이 선택되었을 때
 	public void leaveTablClickedMethod() throws IOException {
 		System.out.println("휴가탭 클릭 이벤트 발생");
 		CommunicationUtils communicationUtils = new CommunicationUtils();
@@ -541,15 +826,14 @@ public class UserUiController implements Initializable {
 					LeaveRecord leaveRecord = new LeaveRecord(no, leaveLogOfUserDto.getRequestDate(),
 							leaveLogOfUserDto.getStartDate(), leaveLogOfUserDto.getEndDate(),
 							leaveLogOfUserDto.getAcceptanceStatus());
-					
+
 					leaveRecordList.add(leaveRecord);
 
 				}
-				
+
 				Platform.runLater(() -> {
 					leaveRecordTableView.setItems(leaveRecordList);
 				});
-				
 
 			}
 		} catch (IOException e) {
@@ -562,6 +846,7 @@ public class UserUiController implements Initializable {
 
 	}
 
+	// 급여내역이 선택되었을때
 	public void moneyTabClickedMethod() throws IOException {
 		System.out.println("급여내역 클릭 이벤트 발생");
 		CommunicationUtils communicationUtils = new CommunicationUtils();
@@ -599,9 +884,17 @@ public class UserUiController implements Initializable {
 				for (int i = 0; i < list.size(); i++) {
 					System.out.println("휴가로그 출력 실행");
 					UserSalaryData userSalaryData = list.get(i);
-					// 탭에 추가할 내용 추가해야됨
+					Long no = (long) (i + 1);
 
+					SalaryRecord salaryRecord = new SalaryRecord(no, userSalaryData.getReceivedDate().toString(),
+							userSalaryData.getTotalSalary());
+
+					salaryRecordList.add(salaryRecord);
 				}
+
+				Platform.runLater(() -> {
+					salaryRecordTableView.setItems(salaryRecordList);
+				});
 
 			}
 		} catch (IOException e) {
@@ -614,6 +907,7 @@ public class UserUiController implements Initializable {
 
 	}
 
+	// 메일탭이 선택되었을때
 	public void mailTabClickedMethod() throws IOException {
 		System.out.println("메일탭 클릭 이벤트 발생");
 		CommunicationUtils communicationUtils = new CommunicationUtils();
@@ -642,19 +936,26 @@ public class UserUiController implements Initializable {
 			communicationUtils.sendServer(jsonSendStr, dos);
 			String jsonReceivedStr = dis.readUTF();
 
-			Type listType = new TypeToken<List<Mail>>() {
+			Type listType = new TypeToken<List<MailAllDto>>() {
 			}.getType();
-			ResponseData<Mail> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, listType);
+			ResponseData<MailAllDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, listType);
 			String messageType = responseData.getMessageType();
 
 			if (messageType.contains("성공")) {
-				List<Mail> list = (List<Mail>) responseData.getData();
+				List<MailAllDto> list = (List<MailAllDto>) responseData.getData();
 				for (int i = 0; i < list.size(); i++) {
 					System.out.println("휴가로그 출력 실행");
-					Mail Mail = list.get(i);
-					// 탭에 추가할 내용 추가해야됨
+					MailAllDto mailAllDto = list.get(i);
+					Long no = (long) (i + 1);
+					MailRecord mailRecord = new MailRecord(no, mailAllDto.getUserEmail(), mailAllDto.getTitle(),
+							mailAllDto.getCreatedDate().toString());
 
+					mailRecordList.add(mailRecord);
 				}
+
+				Platform.runLater(() -> {
+					mailRecordTableView.setItems(mailRecordList);
+				});
 
 			}
 		} catch (IOException e) {
@@ -667,4 +968,63 @@ public class UserUiController implements Initializable {
 
 	}
 
+	public void qnaTabClickedMethod() throws IOException {
+		System.out.println("Q&A탭 클릭 이벤트 발생");
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		String title = qnaTitle.getText();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_LIST_SEARCH, title);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			Type listType = new TypeToken<List<BoardFindAllDto>>() {
+			}.getType();
+			ResponseData<BoardFindAllDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					listType);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				List<BoardFindAllDto> list = (List<BoardFindAllDto>) responseData.getData();
+				for (int i = 0; i < list.size(); i++) {
+					System.out.println("QnA게시판 로그 출력 실행");
+					BoardFindAllDto boardFindAllDto = list.get(i);
+					Long no = Long.valueOf(i + 1);
+					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
+					        boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
+					qnaRecordList.add(qnaRecord);
+				}
+
+				Platform.runLater(() -> {
+					qnaRecordTableView.setItems(qnaRecordList);
+				});
+
+			}
+		} catch (
+
+		IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
+
+	}
 }

@@ -138,7 +138,7 @@ public class LoginController {
 
 								UserUiController userUiController = fxmlLoader.getController();
 								userUiController.setUserData(userInfo);
-
+								
 								Stage loginStage = new Stage();
 								loginStage.setTitle("인사 시스템 (사용자)");
 								loginStage.setScene(new Scene(loginRoot));
