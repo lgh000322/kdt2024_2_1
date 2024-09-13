@@ -406,7 +406,7 @@ public class UserUiController implements Initializable {
 		userDept.setText(userInfo.getDeptName());
 		userPosition.setText(userInfo.getPositionName());
 	}
-	
+
 	/* 로그아웃 버튼 처리 로직 */
 	public void handleLogoutBtn() {
 		UserInfoSavedUtil.logout();
@@ -603,8 +603,8 @@ public class UserUiController implements Initializable {
 					System.out.println("QnA게시판 로그 출력 실행");
 					BoardFindAllDto boardFindAllDto = list.get(i);
 					Long no = Long.valueOf(i + 1);
-					QnARecord qnaRecord = new QnARecord(no, boardFindAllDto.getTitle(), boardFindAllDto.getUserId(),
-							boardFindAllDto.getCreatedDate());
+					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
+					        boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
 					qnaRecordList.add(qnaRecord);
 				}
 
@@ -1007,7 +1007,7 @@ public class UserUiController implements Initializable {
 					BoardFindAllDto boardFindAllDto = list.get(i);
 					Long no = Long.valueOf(i + 1);
 					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
-					        boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
+							boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
 					qnaRecordList.add(qnaRecord);
 				}
 

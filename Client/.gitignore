@@ -1,1 +1,26 @@
+# Eclipse 관련 파일
+.classpath
+.project
+.settings/
+.metadata/
+
+# Java 컴파일된 파일
 /bin/
+.out/
+
+# Gradle 또는 Maven 빌드 파일
+.gradle/
+build/
+target/
+
+# IDE 특정 파일
+*.swp
+*.iml
+.idea/
+
+# JavaFX 관련 (종속성 라이브러리 등)
+lib/
+
+# OS-specific 파일 (예: macOS, Windows)
+.DS_Store
+Thumbs.db
