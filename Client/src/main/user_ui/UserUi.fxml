@@ -120,7 +120,7 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TableView layoutX="-2.0" layoutY="3.0" prefHeight="384.0" prefWidth="550.0">
+                        <TableView fx:id="qnaRecordTableView" layoutX="-2.0" layoutY="3.0" prefHeight="384.0" prefWidth="550.0">
                           <columns>
                             <TableColumn fx:id="qnaNoColumn" prefWidth="38.4000244140625" text="No." />
                             <TableColumn fx:id="qnaTitleColumn" prefWidth="260.79998779296875" text="제목" />
