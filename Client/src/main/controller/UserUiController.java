@@ -50,7 +50,6 @@ import main.dto.mail_dto.MailSearchDto;
 import main.dto.mail_dto.UserAndEmailDto;
 import main.dto.salary_dto.SalaryRecord;
 import main.dto.user_dto.UserInfo;
-import main.dto.user_dto.UserLoginDto;
 import main.dto.user_dto.UserRoleDto;
 import main.dto.user_dto.UserSalaryData;
 import main.dto.user_dto.UserWorkData;
@@ -406,7 +405,7 @@ public class UserUiController implements Initializable {
 		userDept.setText(userInfo.getDeptName());
 		userPosition.setText(userInfo.getPositionName());
 	}
-	
+
 	/* 로그아웃 버튼 처리 로직 */
 	public void handleLogoutBtn() {
 		UserInfoSavedUtil.logout();
@@ -606,6 +605,7 @@ public class UserUiController implements Initializable {
 
 					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
 					        boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
+
 
 					qnaRecordList.add(qnaRecord);
 				}
@@ -1009,7 +1009,7 @@ public class UserUiController implements Initializable {
 					BoardFindAllDto boardFindAllDto = list.get(i);
 					Long no = Long.valueOf(i + 1);
 					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
-					        boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
+							boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
 					qnaRecordList.add(qnaRecord);
 				}
 
