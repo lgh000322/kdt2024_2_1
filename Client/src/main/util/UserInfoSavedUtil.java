@@ -35,6 +35,12 @@ public class UserInfoSavedUtil {
 	}
 
 	
+	public static void logout() {
+		userInfo=null;
+		userId=null;
+		role=null;
+	}
+	
 	
 
 	
