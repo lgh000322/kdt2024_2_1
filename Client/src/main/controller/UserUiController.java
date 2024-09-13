@@ -603,8 +603,10 @@ public class UserUiController implements Initializable {
 					System.out.println("QnA게시판 로그 출력 실행");
 					BoardFindAllDto boardFindAllDto = list.get(i);
 					Long no = Long.valueOf(i + 1);
-					QnARecord qnaRecord = new QnARecord(no, boardFindAllDto.getTitle(), boardFindAllDto.getUserId(),
-							boardFindAllDto.getCreatedDate());
+
+					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
+					        boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
+
 					qnaRecordList.add(qnaRecord);
 				}
 
