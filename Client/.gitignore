@@ -1,7 +1,4 @@
 # Eclipse 관련 파일
-.classpath
-.project
-.settings/
 .metadata/
 
 # Java 컴파일된 파일
