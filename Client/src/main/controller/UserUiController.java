@@ -205,17 +205,6 @@ public class UserUiController implements Initializable {
 	@FXML
 	private TableColumn<SalaryRecord, Integer> salaryTotalColumn;
 
-//   /* 메일함탭 테이블뷰 컬럼 */
-
-//   @FXML
-//   private TableColumn<MailRecord, Integer> mailNoColumn;
-//   @FXML
-//   private TableColumn<MailRecord, String> mailReceivedColumn;
-//   @FXML
-//   private TableColumn<MailRecord, String> mailTitleColumn;
-//   @FXML
-//   private TableColumn<MailRecord, String> mailReceivedDateColumn;
-
 	/* Q&A탭 테이블뷰 컬럼 */
 	@FXML
 	private TableView<QnARecord> qnaRecordTableView;
@@ -228,6 +217,8 @@ public class UserUiController implements Initializable {
 	@FXML
 	private TableColumn<QnARecord, String> qnaDateColumn;
 
+
+
 	@FXML
 	private TableView<MailRecord> mailRecordTableView;
 	@FXML
@@ -239,6 +230,7 @@ public class UserUiController implements Initializable {
 	@FXML
 	private TableColumn<MailRecord, String> mailReceivedDateColumn;
 
+
 	@FXML
 	private ObservableList<WorkRecord> workRecordList = FXCollections.observableArrayList();
 
@@ -248,6 +240,7 @@ public class UserUiController implements Initializable {
 	@FXML
 	private ObservableList<QnARecord> qnaRecordList = FXCollections.observableArrayList();
 
+  @FXML
 	private ObservableList<SalaryRecord> salaryRecordList = FXCollections.observableArrayList();
 
 	@FXML
@@ -276,7 +269,6 @@ public class UserUiController implements Initializable {
 				qnaRecordList.clear();
 				salaryRecordList.clear();
 				mailRecordList.clear();
-
 			}
 		});
 
@@ -291,7 +283,7 @@ public class UserUiController implements Initializable {
 					e.printStackTrace();
 				}
 				workRecordList.clear();
-				qnaRecordList.clear();		
+				qnaRecordList.clear();					
 				salaryRecordList.clear();
 				mailRecordList.clear();
 
@@ -343,8 +335,6 @@ public class UserUiController implements Initializable {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
-				// 원하는 동작을 여기에 추가
 			}
 			leaveRecordList.clear();
 			workRecordList.clear();
