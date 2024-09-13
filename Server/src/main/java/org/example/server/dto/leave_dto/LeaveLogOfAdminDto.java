@@ -18,6 +18,7 @@ public class LeaveLogOfAdminDto
     private LocalDate endDate;
     private String deptName;
     private Boolean status;
+    private Integer remainedLeave;
 
     public String getUserName() {
         return userName;
@@ -31,6 +32,7 @@ public class LeaveLogOfAdminDto
         return deptName;
     }
 
+    public Integer getRemainedLeave() {return remainedLeave;}
 
     public LocalDate getRequestDate() {
         return requestDate;
@@ -56,7 +58,7 @@ public class LeaveLogOfAdminDto
         this.deptName = builder.deptName;
         this.leaveNum = builder.leaveNum;
         this.userName = builder.userName;
-
+        this.remainedLeave = builder.remainedLeave;
     }
 
     public static class Builder {
@@ -65,7 +67,7 @@ public class LeaveLogOfAdminDto
         private LocalDate endDate;
         private Boolean status;
         private String deptName;
-
+        private Integer remainedLeave;
         private Long leaveNum;
         private String userName;
 
@@ -76,6 +78,11 @@ public class LeaveLogOfAdminDto
 
         public LeaveLogOfAdminDto.Builder startDate(LocalDate startDate) {
             this.startDate = startDate;
+            return this;
+        }
+
+        public LeaveLogOfAdminDto.Builder remainedLeave(Integer remainedLeave) {
+            this.remainedLeave = remainedLeave;
             return this;
         }
 
