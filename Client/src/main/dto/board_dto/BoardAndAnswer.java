@@ -6,13 +6,11 @@ import main.dto.answer_dto.AnswerInBoardDto;
 
 public class BoardAndAnswer {
 
-
-
-    private BoardInfoDto boardInfoDto;
+    private BoardInfoDto2 boardInfoDto;
     private List<AnswerInBoardDto> answerInBoard;
 
 
-    public BoardInfoDto getBoardInfoDto() {
+    public BoardInfoDto2 getBoardInfoDto() {
         return boardInfoDto;
     }
 
@@ -20,18 +18,8 @@ public class BoardAndAnswer {
         return answerInBoard;
     }
 
-
-
-    public BoardAndAnswer(BoardInfoDto boardInfoDto, List<AnswerInBoardDto> answerInBoard) {
+    public BoardAndAnswer(BoardInfoDto2 boardInfoDto, List<AnswerInBoardDto> answerInBoard) {
         this.boardInfoDto = boardInfoDto;
         this.answerInBoard = answerInBoard;
     }
-
-
-
-
-
-
-
-
 }

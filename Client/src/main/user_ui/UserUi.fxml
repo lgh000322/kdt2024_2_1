@@ -126,6 +126,7 @@
                             <TableColumn fx:id="qnaTitleColumn" prefWidth="260.79998779296875" text="제목" />
                               <TableColumn fx:id="qnaPostUserColumn" minWidth="0.0" text="작성자" />
                               <TableColumn fx:id="qnaDateColumn" minWidth="0.0" prefWidth="170.39996337890625" text="작성날짜" />
+                              <TableColumn fx:id="boardNo" prefWidth="38.4000244140625" text="boardNo" visible="false" />
                           </columns>
                         </TableView>
                         <Button fx:id="writePostQnABtn" layoutX="367.0" layoutY="389.0" mnemonicParsing="false" onAction="#handlewritePostQnABtn" text="글 작성" />
@@ -138,6 +139,6 @@
             </Tab>
          </tabs>
       </TabPane>
-      <Button fx:id="logoutBtn" layoutX="616.0" layoutY="9.0" mnemonicParsing="false" text="로그아웃" onAction="#handleLogoutBtn" />
+      <Button fx:id="logoutBtn" layoutX="616.0" layoutY="9.0" mnemonicParsing="false" onAction="#handleLogoutBtn" text="로그아웃" />
    </children>
 </AnchorPane>

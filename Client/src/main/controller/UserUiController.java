@@ -51,6 +51,7 @@ import main.dto.mail_dto.MailRecord;
 import main.dto.mail_dto.MailSearchDto;
 import main.dto.salary_dto.SalaryRecord;
 import main.dto.user_dto.UserInfo;
+import main.dto.user_dto.UserLoginDto;
 import main.dto.user_dto.UserRoleDto;
 import main.dto.user_dto.UserSalaryData;
 import main.dto.user_dto.UserWorkData;
@@ -216,6 +217,8 @@ public class UserUiController implements Initializable {
 	private TableColumn<QnARecord, String> qnaPostUserColumn;
 	@FXML
 	private TableColumn<QnARecord, String> qnaDateColumn;
+	@FXML
+	private TableColumn<QnARecord, Long> boardNo;
 
 
 
@@ -408,6 +411,34 @@ public class UserUiController implements Initializable {
 		userDept.setText(userInfo.getDeptName());
 		userPosition.setText(userInfo.getPositionName());
 	}
+	
+	/* 로그아웃 버튼 처리 로직 */
+	public void handleLogoutBtn() {
+		UserInfoSavedUtil.logout();
+
+		Platform.runLater(() -> {
+			try {
+				FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/login_ui/LoginUi.fxml"));
+				Parent loginRoot = fxmlLoader.load();
+
+				// 새 Stage를 생성하고 Scene을 설정합니다.
+				Stage loginStage = new Stage();
+				loginStage.setTitle("로그인");
+				loginStage.setScene(new Scene(loginRoot));
+
+				// 현재 Stage를 가져와서 숨깁니다.
+				Stage currentStage = (Stage) startWorkBtn.getScene().getWindow();
+				currentStage.hide();
+
+				// 새 Stage를 표시합니다.
+				loginStage.show();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+
+	}
 
 	/*
 	 * 근태기록 탭
@@ -494,31 +525,108 @@ public class UserUiController implements Initializable {
 	public void handletitleSearchBtn() {
 	}
 
-	public void handleLogoutBtn() {
-		UserInfoSavedUtil.logout();
-
-		Platform.runLater(() -> {
-			try {
-				FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/login_ui/LoginUi.fxml"));
-				Parent loginRoot = fxmlLoader.load();
-
-				// 새 Stage를 생성하고 Scene을 설정합니다.
-				Stage loginStage = new Stage();
-				loginStage.setTitle("로그인");
-				loginStage.setScene(new Scene(loginRoot));
-
-				// 현재 Stage를 가져와서 숨깁니다.
-				Stage currentStage = (Stage) startWorkBtn.getScene().getWindow();
-				currentStage.hide();
-
-				// 새 Stage를 표시합니다.
-				loginStage.show();
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
-
+	/* Q&A 리스트 아이템 선택 시, 선택된 아이템 창 연결 */
+	public void qnaItemClickMethod() {
+//		CommunicationUtils communicationUtils = new CommunicationUtils();
+//
+//		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+//
+//		/**
+//		 * 데이터를 주고받기 위해 stream을 받아옴
+//		 */
+//		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+//		DataInputStream dis = serverConnectUtils.getDataInputStream();
+//
+//		/**
+//		 * requestData의 data에 넣어줄 객체를 생성
+//		 */
+//		UserLoginDto userLoginDto = new UserLoginDto();
+//		userLoginDto.setUserId(userId.getText());
+//		userLoginDto.setPassword(userPwd.getText());
+//		if (userCheck.isSelected()) {
+//			userLoginDto.setRole(Role.USER);
+//		} else if (adminCheck.isSelected()) {
+//			userLoginDto.setRole(Role.ADMIN);
+//		} else {
+//			userLoginDto.setRole(null);
+//		}
+//
+//		/**
+//		 * requestData 생성
+////		 */
+////		RequestData requestData = new RequestData();
+////		requestData.setData(userLoginDto);
+////		requestData.setMessageType(MessageTypeConst.MESSAGE_LOGIN);
+//
+//		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_LOGIN, userLoginDto);
+//
+//		try {
+//			communicationUtils.sendServer(jsonSendStr, dos);
+//			String jsonReceivedStr = dis.readUTF();
+//			
+//			ResponseData<UserInfo> responseData=communicationUtils.jsonToResponseData(jsonReceivedStr, UserInfo.class);
+//			String messageType = responseData.getMessageType();
+//
+//			if (messageType.contains("성공")) {
+//				UserInfo userInfo = responseData.getData();
+//				
+//				//클라이언트에 유저 정보를 저장해주는 로직 추가
+//				UserInfoSavedUtil.setUserInfo(userInfo);
+//				UserInfoSavedUtil.setUserId(userLoginDto.getUserId());
+//				UserInfoSavedUtil.setRole(userLoginDto.getRole());
+//
+//				if (userLoginDto.getRole() == Role.USER) {
+//
+//					Platform.runLater(() -> {
+//						try {
+//								FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/user_ui/UserUi.fxml"));
+//							Parent loginRoot = fxmlLoader.load();
+//
+//							UserUiController userUiController = fxmlLoader.getController();
+//							userUiController.setUserData(userInfo);
+//							
+//							Stage loginStage = new Stage();
+//							loginStage.setTitle("인사 시스템 (사용자)");
+//							loginStage.setScene(new Scene(loginRoot));
+//
+//							Stage currentStage = (Stage) loginBtn.getScene().getWindow();
+//							currentStage.hide();
+//
+//							loginStage.show();
+//
+//						} catch (IOException e) {
+//							e.printStackTrace();
+//						}
+//					});
+//				} else {
+//					Platform.runLater(() -> {
+//						try {
+//							FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/admin_ui/AdminUi.fxml"));
+//							Parent loginRoot = fxmlLoader.load();
+//
+//							Stage loginStage = new Stage();
+//							loginStage.setTitle("인사 시스템 (관리자)");
+//							loginStage.setScene(new Scene(loginRoot));
+//
+//							Stage currentStage = (Stage) loginBtn.getScene().getWindow();
+//							currentStage.hide();
+//
+//							loginStage.show();
+//						} catch (IOException e) {
+//							e.printStackTrace();
+//						}
+//					});
+//				}
+//			} else {
+//				Platform.runLater(() -> {
+//					LoginFailAlert("로그인 실패", "입력하신 정보가 맞지 않습니다. 다시 입력해주세요.");
+//				});
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} finally {
+//			serverConnectUtils.close();
+//		}
 	}
 
 	// 근태기록 선택되었을 때
@@ -798,8 +906,8 @@ public class UserUiController implements Initializable {
 					System.out.println("QnA게시판 로그 출력 실행");
 					BoardFindAllDto boardFindAllDto = list.get(i);
 					Long no = Long.valueOf(i + 1);
-					QnARecord qnaRecord = new QnARecord(no, boardFindAllDto.getTitle(), boardFindAllDto.getUserId(),
-							boardFindAllDto.getCreatedDate());
+					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
+					        boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
 					qnaRecordList.add(qnaRecord);
 				}
 

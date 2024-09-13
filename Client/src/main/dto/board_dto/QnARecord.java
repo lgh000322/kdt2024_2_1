@@ -8,13 +8,15 @@ import javafx.beans.property.SimpleStringProperty;
 import main.domain.work_log.Status;
 
 public class QnARecord {
+	private final SimpleLongProperty keyNo;
     private final SimpleLongProperty qnaNo;
     private final SimpleStringProperty qnaTitle;
     private final SimpleStringProperty qnaPostUser;
     private final SimpleStringProperty qnaDate;
 
     // 생성자
-    public QnARecord(Long qnaNo, String qnaTitle, String qnaPostUser, LocalDate qnaDate) {
+    public QnARecord(Long keyNo, Long qnaNo, String qnaTitle, String qnaPostUser, LocalDate qnaDate) {
+    	this.keyNo = new SimpleLongProperty(keyNo);
         this.qnaNo = new SimpleLongProperty(qnaNo);
         this.qnaTitle = new SimpleStringProperty(qnaTitle);
         this.qnaPostUser = new SimpleStringProperty(qnaPostUser);
@@ -22,6 +24,10 @@ public class QnARecord {
     }
 
     // Getter for the properties
+    public SimpleLongProperty keyNoProperty() {
+    	return keyNo;
+    }
+    
     public SimpleLongProperty qnaNoProperty() {
         return qnaNo;
     }
@@ -39,6 +45,10 @@ public class QnARecord {
     }
 
     // 기존 Getter 메서드 (필요시 유지)
+    public long getKeyNo() {
+    	return keyNo.get();
+    }
+    
     public long getQnANo() {
         return qnaNo.get();
     }
