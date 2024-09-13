@@ -50,7 +50,6 @@ import main.dto.mail_dto.MailSearchDto;
 import main.dto.mail_dto.UserAndEmailDto;
 import main.dto.salary_dto.SalaryRecord;
 import main.dto.user_dto.UserInfo;
-import main.dto.user_dto.UserLoginDto;
 import main.dto.user_dto.UserRoleDto;
 import main.dto.user_dto.UserSalaryData;
 import main.dto.user_dto.UserWorkData;
@@ -603,8 +602,11 @@ public class UserUiController implements Initializable {
 					System.out.println("QnA게시판 로그 출력 실행");
 					BoardFindAllDto boardFindAllDto = list.get(i);
 					Long no = Long.valueOf(i + 1);
+
 					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
 					        boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
+
+
 					qnaRecordList.add(qnaRecord);
 				}
 

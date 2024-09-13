@@ -48,13 +48,13 @@
                      <children>
                         <TableView fx:id="leaveTable" prefHeight="374.0" prefWidth="548.0">
                            <columns>
-                              <TableColumn fx:id="userleaveNum" prefWidth="31.0" text="Num" />
-                              <TableColumn fx:id="userleaveName" prefWidth="74.0" text="이름" />
-                              <TableColumn fx:id="userleaveDate" prefWidth="95.0" text="신청일" />
-                              <TableColumn fx:id="userleavestartDate" prefWidth="95.0" text="출발일" />
-                              <TableColumn fx:id="userleaveendDate" prefWidth="95.0" text="도착일" />
-                              <TableColumn fx:id="userleaveDept" prefWidth="46.0" text="부서" />
-                              <TableColumn fx:id="userleaveState" prefWidth="53.0" text="승인여부" />
+                              <TableColumn fx:id="leaveNumColumn" prefWidth="31.0" text="Num" />
+                              <TableColumn fx:id="userNameColumn" prefWidth="74.0" text="이름" />
+                              <TableColumn fx:id="requestDateColumn" prefWidth="95.0" text="신청일" />
+                              <TableColumn fx:id="startDateColumn" prefWidth="95.0" text="출발일" />
+                              <TableColumn fx:id="endDateColumn" prefWidth="95.0" text="도착일" />
+                              <TableColumn fx:id="deptNameColumn" prefWidth="46.0" text="부서" />
+                              <TableColumn fx:id="statusColumn" prefWidth="53.0" text="승인여부" />
                               <TableColumn fx:id="userleaveCount" prefWidth="57.0" text="남은 휴가" />
                            </columns>
                         </TableView>
