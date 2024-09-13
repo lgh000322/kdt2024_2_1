@@ -35,11 +35,14 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.consts.MessageTypeConst;
+import main.domain.board.Board;
 import main.domain.mail.Mail;
 import main.domain.mail.MailType;
 import main.domain.user.Role;
 import main.domain.user.User;
 import main.dto.ResponseData;
+import main.dto.board_dto.BoardFindAllDto;
+import main.dto.board_dto.QnARecord;
 import main.dto.leave_dto.ForFindLeaveDto;
 import main.dto.leave_dto.LeaveLogOfUserDto;
 import main.dto.leave_dto.LeaveRecord;
@@ -158,10 +161,9 @@ public class UserUiController implements Initializable {
 	@FXML
 	private Button deletePostQnABtn;
 
+	/* 근태기록탭 테이블뷰 컬럼 */
 	@FXML
 	private TableView<WorkRecord> workRecordTableView;
-
-	/* 근태기록탭 테이블뷰 컬럼 */
 	@FXML
 	private TableColumn<WorkRecord, Long> noColumn;
 	@FXML
@@ -176,7 +178,6 @@ public class UserUiController implements Initializable {
 	private TableColumn<WorkRecord, String> noteColumn;
 
 	/* 휴가신청탭 테이블뷰 컬럼 */
-
 	@FXML
 	private TableView<LeaveRecord> leaveRecordTableView;
 	@FXML
@@ -207,22 +208,27 @@ public class UserUiController implements Initializable {
 //   private TableColumn<MailRecord, String> mailTitleColumn;
 //   @FXML
 //   private TableColumn<MailRecord, String> mailReceivedDateColumn;
-//   
-//   /* Q&A탭 테이블뷰 컬럼 */
-//   @FXML
-//   private TableColumn<QnARecord, Integer> qnaNoColumn;
-//   @FXML
-//   private TableColumn<QnARecord, String> qnaTitleColumn;
-//   @FXML
-//   private TableColumn<QnARecord, String> qnaPostUserColumn;
-//   @FXML
-//   private TableColumn<QnARecord, String> qnaDateColumn;
+
+	/* Q&A탭 테이블뷰 컬럼 */
+	@FXML
+	private TableView<QnARecord> qnaRecordTableView;
+	@FXML
+	private TableColumn<QnARecord, Long> qnaNoColumn;
+	@FXML
+	private TableColumn<QnARecord, String> qnaTitleColumn;
+	@FXML
+	private TableColumn<QnARecord, String> qnaPostUserColumn;
+	@FXML
+	private TableColumn<QnARecord, String> qnaDateColumn;
 
 	@FXML
 	private ObservableList<WorkRecord> workRecordList = FXCollections.observableArrayList();
 
 	@FXML
 	private ObservableList<LeaveRecord> leaveRecordList = FXCollections.observableArrayList();
+
+	@FXML
+	private ObservableList<QnARecord> qnaRecordList = FXCollections.observableArrayList();
 
 	@FXML
 	private ObservableList<String> list = FXCollections.observableArrayList("출근", "결근", "조퇴");
@@ -244,6 +250,7 @@ public class UserUiController implements Initializable {
 				}
 				// 원하는 동작을 여기에 추가
 				leaveRecordList.clear();
+				qnaRecordList.clear();
 			}
 		});
 
@@ -257,9 +264,8 @@ public class UserUiController implements Initializable {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
 				workRecordList.clear();
-				
+				qnaRecordList.clear();
 			}
 		});
 
@@ -275,6 +281,7 @@ public class UserUiController implements Initializable {
 				}
 				workRecordList.clear();
 				leaveRecordList.clear();
+				qnaRecordList.clear();
 				// 원하는 동작을 여기에 추가
 			}
 		});
@@ -291,6 +298,7 @@ public class UserUiController implements Initializable {
 				}
 				workRecordList.clear();
 				leaveRecordList.clear();
+				qnaRecordList.clear();
 				// 원하는 동작을 여기에 추가
 			}
 		});
@@ -299,7 +307,12 @@ public class UserUiController implements Initializable {
 		qnaTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue) { // Tab 2가 선택되었을 때
 				System.out.println("Q&A 탭이 선택됨");
-				
+				try {
+					qnaTabClickedMethod();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				// 원하는 동작을 여기에 추가
 			}
 			leaveRecordList.clear();
@@ -323,27 +336,29 @@ public class UserUiController implements Initializable {
 		endTimeColumn.setCellValueFactory(new PropertyValueFactory<>("endTime"));
 		noteColumn.setCellValueFactory(new PropertyValueFactory<>("note"));
 
-		
 		leaveNoColumn.setCellValueFactory(new PropertyValueFactory<>("no"));
 		leaveRequestColumn.setCellValueFactory(new PropertyValueFactory<>("leaveRequestDate"));
 		leaveStartColumn.setCellValueFactory(new PropertyValueFactory<>("leaveStartDate"));
 		leaveEndColumn.setCellValueFactory(new PropertyValueFactory<>("leaveEndDate"));
 		leaveAcceptColumn.setCellValueFactory(new PropertyValueFactory<>("leaveAcceptStatus"));
-		
-		
+
+		qnaNoColumn.setCellValueFactory(new PropertyValueFactory<>("qnaNo"));
+		qnaTitleColumn.setCellValueFactory(new PropertyValueFactory<>("qnaTitle"));
+		qnaPostUserColumn.setCellValueFactory(new PropertyValueFactory<>("qnaPostUser"));
+		qnaDateColumn.setCellValueFactory(new PropertyValueFactory<>("qnaDate"));
+
 		// TableView의 onMouseClicked 이벤트 핸들러 설정
 		workRecordTableView.setOnMouseClicked(event -> {
-		    // 클릭된 셀의 인덱스와 해당 항목을 가져옴
-		    WorkRecord selectedItem = workRecordTableView.getSelectionModel().getSelectedItem();
-		    
-		    if (selectedItem != null) {
-		        // 선택된 항목에 대한 처리 로직
-		        System.out.println("Selected WorkRecord: " + selectedItem);
-		        // 예를 들어, 선택된 항목의 정보를 사용하여 추가적인 작업을 수행할 수 있음
-		    }
+			// 클릭된 셀의 인덱스와 해당 항목을 가져옴
+			WorkRecord selectedItem = workRecordTableView.getSelectionModel().getSelectedItem();
+
+			if (selectedItem != null) {
+				// 선택된 항목에 대한 처리 로직
+				System.out.println("Selected WorkRecord: " + selectedItem);
+				// 예를 들어, 선택된 항목의 정보를 사용하여 추가적인 작업을 수행할 수 있음
+			}
 		});
-		
-		
+
 		try {
 			workTabClickedMethod();
 		} catch (IOException e1) {
@@ -472,7 +487,8 @@ public class UserUiController implements Initializable {
 			communicationUtils.sendServer(jsonSendStr, dos);
 			String jsonReceivedStr = dis.readUTF();
 
-			Type listType = new TypeToken<List<UserWorkData>>() {}.getType();
+			Type listType = new TypeToken<List<UserWorkData>>() {
+			}.getType();
 			ResponseData<UserWorkData> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, listType);
 			String messageType = responseData.getMessageType();
 			if (messageType.contains("성공")) {
@@ -488,7 +504,7 @@ public class UserUiController implements Initializable {
 				Platform.runLater(() -> {
 					workRecordTableView.setItems(workRecordList);
 				});
-				
+
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -541,15 +557,14 @@ public class UserUiController implements Initializable {
 					LeaveRecord leaveRecord = new LeaveRecord(no, leaveLogOfUserDto.getRequestDate(),
 							leaveLogOfUserDto.getStartDate(), leaveLogOfUserDto.getEndDate(),
 							leaveLogOfUserDto.getAcceptanceStatus());
-					
+
 					leaveRecordList.add(leaveRecord);
 
 				}
-				
+
 				Platform.runLater(() -> {
 					leaveRecordTableView.setItems(leaveRecordList);
 				});
-				
 
 			}
 		} catch (IOException e) {
@@ -667,4 +682,63 @@ public class UserUiController implements Initializable {
 
 	}
 
+	public void qnaTabClickedMethod() throws IOException {
+		System.out.println("Q&A탭 클릭 이벤트 발생");
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		String title = qnaTitle.getText();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_LIST_SEARCH, title);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			Type listType = new TypeToken<List<BoardFindAllDto>>() {
+			}.getType();
+			ResponseData<BoardFindAllDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					listType);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				List<BoardFindAllDto> list = (List<BoardFindAllDto>) responseData.getData();
+				for (int i = 0; i < list.size(); i++) {
+					System.out.println("QnA게시판 로그 출력 실행");
+					BoardFindAllDto boardFindAllDto = list.get(i);
+					Long no = Long.valueOf(i + 1);
+					QnARecord qnaRecord = new QnARecord(no, boardFindAllDto.getTitle(), boardFindAllDto.getUserId(),
+							boardFindAllDto.getCreatedDate());
+					qnaRecordList.add(qnaRecord);
+				}
+
+				Platform.runLater(() -> {
+					qnaRecordTableView.setItems(qnaRecordList);
+				});
+
+			}
+		} catch (
+
+		IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
+
+	}
 }

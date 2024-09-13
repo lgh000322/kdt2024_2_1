@@ -40,9 +40,9 @@
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <DatePicker fx:id="selectWorkDate" layoutX="1.0" layoutY="3.0" prefHeight="25.0" prefWidth="170.0" promptText="날짜 조회" />
-                        <Button fx:id="searchWorkDateBtn" layoutX="175.0" layoutY="4.0" mnemonicParsing="false" text="날짜 검색" onAction="#handlesearchWorkDateBtn"/>
+                        <Button fx:id="searchWorkDateBtn" layoutX="190.0" layoutY="4.0" mnemonicParsing="false" onAction="#handlesearchWorkDateBtn" text="검색" />
                         <Line endX="115.0999755859375" endY="30.999996185302734" layoutX="140.0" opacity="0.2" startX="115.0999755859375" startY="0.7999984622001648" />
-                        <ComboBox fx:id="workComboList" layoutX="270.0" layoutY="4.0" prefHeight="22.0" prefWidth="91.0" promptText="근태분류" onAction="#handleworkComboList"/>
+                        <ComboBox fx:id="workComboList" layoutX="270.0" layoutY="4.0" onAction="#handleworkComboList" prefHeight="22.0" prefWidth="91.0" promptText="근태분류" />
                         <Line endX="115.0999755859375" endY="30.999996185302734" layoutX="260.0" opacity="0.2" startX="115.0999755859375" startY="0.7999984622001648" />
                         <TableView fx:id="workRecordTableView" layoutY="31.0" prefHeight="384.0" prefWidth="550.0">
 	                      <columns>
@@ -103,8 +103,8 @@
                         <Line endX="115.0999755859375" endY="30.999996185302734" layoutX="-1.0" opacity="0.2" startX="115.0999755859375" startY="0.7999984622001648" />
                         <TextField fx:id="mailTitle" layoutX="121.0" layoutY="4.0" promptText="제목명" />
                         <Button fx:id="searchMailTitleBtn" layoutX="286.0" layoutY="4.0" mnemonicParsing="false" text="검색" />
-                        <Button fx:id="sendMailBtn" layoutX="410.0" layoutY="4.0" mnemonicParsing="false" text="메일쓰기" onAction="#handlesendMailBtn" />
-                        <Button fx:id="deleteMailBtn" layoutX="482.0" layoutY="4.0" mnemonicParsing="false" text="메일삭제" onAction="#handledeleteMailBtn" />
+                        <Button fx:id="sendMailBtn" layoutX="410.0" layoutY="4.0" mnemonicParsing="false" onAction="#handlesendMailBtn" text="메일쓰기" />
+                        <Button fx:id="deleteMailBtn" layoutX="482.0" layoutY="4.0" mnemonicParsing="false" onAction="#handledeleteMailBtn" text="메일삭제" />
                         <TableView layoutY="31.0" prefHeight="384.0" prefWidth="550.0">
                           <columns>
                             <TableColumn fx:id="mailNoColumn" minWidth="0.0" prefWidth="39.20001220703125" text="No." />
@@ -120,7 +120,7 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TableView layoutX="-2.0" layoutY="3.0" prefHeight="384.0" prefWidth="550.0">
+                        <TableView fx:id="qnaRecordTableView" layoutX="-2.0" layoutY="3.0" prefHeight="384.0" prefWidth="550.0">
                           <columns>
                             <TableColumn fx:id="qnaNoColumn" prefWidth="38.4000244140625" text="No." />
                             <TableColumn fx:id="qnaTitleColumn" prefWidth="260.79998779296875" text="제목" />
@@ -128,11 +128,11 @@
                               <TableColumn fx:id="qnaDateColumn" minWidth="0.0" prefWidth="170.39996337890625" text="작성날짜" />
                           </columns>
                         </TableView>
-                        <Button fx:id="writePostQnABtn" layoutX="367.0" layoutY="389.0" mnemonicParsing="false" text="글 작성" onAction="#handlewritePostQnABtn"/>
-                        <Button fx:id="updatePostQnABtn" layoutX="428.0" layoutY="389.0" mnemonicParsing="false" text="글 수정" onAction="#handleupdatePostQnABtn"/>
-                        <Button fx:id="deletePostQnABtn" layoutX="489.0" layoutY="389.0" mnemonicParsing="false" text="글 삭제" onAction="#handledeletePostQnABtn"/>
+                        <Button fx:id="writePostQnABtn" layoutX="367.0" layoutY="389.0" mnemonicParsing="false" onAction="#handlewritePostQnABtn" text="글 작성" />
+                        <Button fx:id="updatePostQnABtn" layoutX="428.0" layoutY="389.0" mnemonicParsing="false" onAction="#handleupdatePostQnABtn" text="글 수정" />
+                        <Button fx:id="deletePostQnABtn" layoutX="489.0" layoutY="389.0" mnemonicParsing="false" onAction="#handledeletePostQnABtn" text="글 삭제" />
                         <TextField fx:id="qnaTitle" layoutX="1.0" layoutY="389.0" promptText="제목명" />
-                        <Button fx:id="titleSearchQnABtn" layoutX="164.0" layoutY="389.0" mnemonicParsing="false" text="검색" onAction="#handletitleSearchBtn"/>
+                        <Button fx:id="titleSearchQnABtn" layoutX="164.0" layoutY="389.0" mnemonicParsing="false" onAction="#handletitleSearchBtn" text="검색" />
                      </children></AnchorPane>
                </content>
             </Tab>
