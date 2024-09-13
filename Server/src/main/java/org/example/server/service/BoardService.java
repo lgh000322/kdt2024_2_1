@@ -228,7 +228,7 @@ public class BoardService {
      * 선택된 게시물 + 댓글을 보여주는 비즈니스 로직
     * */
     private ResponseData findOneBoardBizLogic(Long boardNum, Connection conn) throws SQLException {
-        BoardInfoDto boardInfoDto = null;
+        BoardInfoDto2 boardInfoDto2 = null;
 
         List<AnswerInBoardDto> answerInBoardDtos = null;
 
@@ -238,13 +238,13 @@ public class BoardService {
 
 
         // 게시물 번호로 게시물 정보를 가져옴.
-        boardInfoDto = boardRepository.getOneBoard(boardNum, conn);
+        boardInfoDto2 = boardRepository.getOneBoard(boardNum, conn);
 
         // 게시물 번호로 게시물 댓글을 가져옴.
         answerInBoardDtos = answerRepository.searchBoardAndTakeAnswerOnDB(conn, boardNum);
 
         //위의 가져온 게시물과 댓글로 dto 생성
-        boardAndAnswer = new BoardAndAnswer(boardInfoDto, answerInBoardDtos);
+        boardAndAnswer = new BoardAndAnswer(boardInfoDto2, answerInBoardDtos);
 
         //만들어진 게시물 + 댓글 dto를 responseData로 만듦.
         responseData = new ResponseData("특정 게시물 조회 성공", boardAndAnswer);

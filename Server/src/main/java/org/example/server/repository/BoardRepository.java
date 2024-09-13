@@ -1,9 +1,6 @@
 package org.example.server.repository;
 
-import org.example.server.dto.board_dto.BoardFindAllDto;
-import org.example.server.dto.board_dto.BoardInfoDto;
-import org.example.server.dto.board_dto.BoardSaveDto;
-import org.example.server.dto.board_dto.BoardUpdateDto;
+import org.example.server.dto.board_dto.*;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -37,15 +34,15 @@ public class BoardRepository {
     /**
      * 특정 게시물(게시물 번호로 매칭) 가져오는 함수
      */
-    public BoardInfoDto getOneBoard(Long boardNum, Connection conn) throws SQLException {
+    public BoardInfoDto2 getOneBoard(Long boardNum, Connection conn) throws SQLException {
 
-        BoardInfoDto boardInfoDto = null;
+        BoardInfoDto2 boardInfoDto2 = null;
 
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         // 특정 게시물 pk 값과 일치하는 게시물 데이터를 가져오는 쿼리문
-        String sql = "select b.title, b.contents, u.user_id" +
+        String sql = "select b.title, b.contents, u.user_id, u.name " +
                 "from board b inner join user u " +
                 "on b.user_num = u.user_num" +
                 "where b.board_num = ?";
@@ -59,10 +56,11 @@ public class BoardRepository {
 
             // 해당 게시물이 있으면 실행
             if(rs.next()) {
-                boardInfoDto = new BoardInfoDto.Builder()
+                boardInfoDto2 = new BoardInfoDto2.Builder()
                         .boardTitle(rs.getString("title"))
                         .boardContents(rs.getString("contents"))
                         .boardUserId( rs.getString("user_id"))
+                        .boardUserName(rs.getString("u.name"))
                         .build();
 
             } else {
@@ -76,7 +74,7 @@ public class BoardRepository {
             close(ps, rs);
         }
 
-        return boardInfoDto;
+        return boardInfoDto2;
     }
 
 
