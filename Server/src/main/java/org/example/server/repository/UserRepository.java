@@ -3,6 +3,7 @@ package org.example.server.repository;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.user_dto.UserInfo;
+import org.example.server.dto.user_dto.UserNameAndEmailDto;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -310,6 +311,32 @@ public class UserRepository {
                         .build();
 
                 list.add(user);
+            }
+            return list;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public List<UserNameAndEmailDto> findUsernameAndEmailAll(Connection conn) throws SQLException {
+        String sql = "select * from user";
+        List<UserNameAndEmailDto> list = new ArrayList<>();
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+
+            while (rs.next()) {
+                UserNameAndEmailDto userNameAndEmailDto = new UserNameAndEmailDto();
+                userNameAndEmailDto.setUserEmail(rs.getString("email"));
+                userNameAndEmailDto.setUsername(rs.getString("name"));
+
+                list.add(userNameAndEmailDto);
             }
             return list;
         } catch (SQLException e) {
