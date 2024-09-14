@@ -108,9 +108,11 @@ public class SalaryRepository {
         2024-09-07수정
          */
         // salary_log와 user 테이블을 JOIN해서 필요한 데이터를 가져옵니다.
-        String sql = "SELECT s.salary_num, s.total_salary, s.received_date, u.name, u.tel, u.position_num, u.role " +
+        String sql = "SELECT s.salary_num, s.total_salary, s.received_date, u.name, u.tel, u.position_num, u.role, d.dept_name, p.position_name " +
                 "FROM salary_log s " +
-                "JOIN user u ON s.user_num = u.user_num";  // user 테이블과 salary_log를 user_num을 기준으로 조인
+                "JOIN user u ON s.user_num = u.user_num" +
+                " join dept d on u.dept_num = d.dept_num" +
+                " join position p on u.position_num = p.position_num";  // user 테이블과 salary_log를 user_num을 기준으로 조인
 
         List<AdminSalaryData> salaryLogs = new ArrayList<>();
         PreparedStatement pstmt = null;
@@ -133,6 +135,8 @@ public class SalaryRepository {
                         .positionNum(rs.getLong("position_num"))  // position_num 확인
                         .role(role)
                         .totalSalary(rs.getInt("total_salary"))
+                        .deptName(rs.getString("d.dept_name"))
+                        .positionName(rs.getString("p.position_name"))
                         .build();
 
                 salaryLogs.add(adminSalary);
