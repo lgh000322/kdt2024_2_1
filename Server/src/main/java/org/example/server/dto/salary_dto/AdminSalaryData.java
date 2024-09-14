@@ -9,6 +9,8 @@ public class AdminSalaryData {
     private Long positionNum;
     private Role role; //월급을 지급받은 직원의 직책
     private int totalSalary; //지급한 총 월급액
+    private String deptName;
+    private String positionName;
 
     private AdminSalaryData(Builder builder) {
         this.salaryNum = builder.salaryNum;
@@ -17,6 +19,8 @@ public class AdminSalaryData {
         this.positionNum = builder.positionNum;
         this.role = builder.role;
         this.totalSalary = builder.totalSalary;
+        this.deptName=builder.deptName;
+        this.positionName=builder.positionName;
     }// Getter methods
 
     public Long getSalaryNum() {
@@ -62,6 +66,18 @@ public class AdminSalaryData {
         private Long positionNum;
         private Role role;
         private int totalSalary;
+        private String deptName;
+        private String positionName;
+
+        public Builder deptName(String deptName) {
+            this.deptName=deptName;
+            return this;
+        }
+
+        public Builder positionName(String positionName) {
+            this.positionName = positionName;
+            return this;
+        }
 
         public Builder salaryNum(Long salaryNum) {
             this.salaryNum = salaryNum;
