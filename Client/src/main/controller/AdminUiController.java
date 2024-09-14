@@ -415,12 +415,15 @@ public class AdminUiController {
 				for (int i = 0; i < list.size(); i++) {
 					Long no = Long.valueOf(i + 1);
 					AdminSalaryData adminSalaryData = list.get(i);
+					AdminSalaryRecord adminSalaryRecord = new AdminSalaryRecord(adminSalaryData.getSalaryNum(), no,
+							adminSalaryData.getName(), adminSalaryData.getTel(), adminSalaryData.getDeptName(),
+							adminSalaryData.getPositionName(), adminSalaryData.getTotalSalary());
 
-					
+					salaryRecordList.add(adminSalaryRecord);
 				}
 
 				Platform.runLater(() -> {
-					leaveTable.setItems(leaveRecordList);
+					salaryTable.setItems(salaryRecordList);
 				});
 
 			}
