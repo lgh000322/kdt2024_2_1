@@ -68,8 +68,9 @@ public class BoardController implements Controller {
             }
             case MessageTypeConst.MESSAGE_BOARD_ONE_SEARCH -> {
                 System.out.println("특정 게시글 조회 실행");
-                if (requestData.getData() instanceof Long) {
-                    Long boardNum = (Long) requestData.getData();
+                if (requestData.getData() instanceof Double) {
+                    Double num = (Double) requestData.getData();
+                    Long boardNum = num.longValue(); // 소수점 이하가 버려짐
                     result = boardService.findOneBoard(boardNum);
                 } else {
                     result = new ResponseData("잘못된 데이터 타입", null);
