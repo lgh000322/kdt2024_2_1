@@ -39,7 +39,10 @@ import main.domain.mail.MailType;
 import main.domain.user.Role;
 import main.domain.user.User;
 import main.dto.ResponseData;
+import main.dto.answer_dto.AnswerInBoardDto;
+import main.dto.board_dto.BoardAndAnswer;
 import main.dto.board_dto.BoardFindAllDto;
+import main.dto.board_dto.BoardInfoDto2;
 import main.dto.board_dto.QnARecord;
 import main.dto.leave_dto.ForFindLeaveDto;
 import main.dto.leave_dto.LeaveLogOfUserDto;
@@ -395,6 +398,21 @@ public class UserUiController implements Initializable {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
+		   
+		qnaRecordTableView.setOnMouseClicked(event -> {
+			QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
+
+			if (selectedQnAItem != null) {
+				System.out.println("Selected QnARecord: " + selectedQnAItem);
+			}
+			try {
+				qnaItemClickMethod(selectedQnAItem.getKeyNo());
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 	}
 
 	/* 좌측 사용자 정보 표시 */
@@ -627,107 +645,77 @@ public class UserUiController implements Initializable {
 	}
 
 	/* Q&A 리스트 아이템 선택 시, 선택된 아이템 창 연결 */
-	public void qnaItemClickMethod() {
-//		CommunicationUtils communicationUtils = new CommunicationUtils();
-//
-//		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
-//
-//		/**
-//		 * 데이터를 주고받기 위해 stream을 받아옴
+	public void qnaItemClickMethod(Long boardKeyNo) throws IOException {
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+		
+		/**
+		 * requestData 생성
 //		 */
-//		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
-//		DataInputStream dis = serverConnectUtils.getDataInputStream();
-//
-//		/**
-//		 * requestData의 data에 넣어줄 객체를 생성
-//		 */
-//		UserLoginDto userLoginDto = new UserLoginDto();
-//		userLoginDto.setUserId(userId.getText());
-//		userLoginDto.setPassword(userPwd.getText());
-//		if (userCheck.isSelected()) {
-//			userLoginDto.setRole(Role.USER);
-//		} else if (adminCheck.isSelected()) {
-//			userLoginDto.setRole(Role.ADMIN);
-//		} else {
-//			userLoginDto.setRole(null);
-//		}
-//
-//		/**
-//		 * requestData 생성
-////		 */
-////		RequestData requestData = new RequestData();
-////		requestData.setData(userLoginDto);
-////		requestData.setMessageType(MessageTypeConst.MESSAGE_LOGIN);
-//
-//		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_LOGIN, userLoginDto);
-//
-//		try {
-//			communicationUtils.sendServer(jsonSendStr, dos);
-//			String jsonReceivedStr = dis.readUTF();
-//			
-//			ResponseData<UserInfo> responseData=communicationUtils.jsonToResponseData(jsonReceivedStr, UserInfo.class);
-//			String messageType = responseData.getMessageType();
-//
-//			if (messageType.contains("성공")) {
-//				UserInfo userInfo = responseData.getData();
-//				
-//				//클라이언트에 유저 정보를 저장해주는 로직 추가
-//				UserInfoSavedUtil.setUserInfo(userInfo);
-//				UserInfoSavedUtil.setUserId(userLoginDto.getUserId());
-//				UserInfoSavedUtil.setRole(userLoginDto.getRole());
-//
-//				if (userLoginDto.getRole() == Role.USER) {
-//
-//					Platform.runLater(() -> {
-//						try {
-//								FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/user_ui/UserUi.fxml"));
-//							Parent loginRoot = fxmlLoader.load();
-//
-//							UserUiController userUiController = fxmlLoader.getController();
-//							userUiController.setUserData(userInfo);
-//							
-//							Stage loginStage = new Stage();
-//							loginStage.setTitle("인사 시스템 (사용자)");
-//							loginStage.setScene(new Scene(loginRoot));
-//
-//							Stage currentStage = (Stage) loginBtn.getScene().getWindow();
-//							currentStage.hide();
-//
-//							loginStage.show();
-//
-//						} catch (IOException e) {
-//							e.printStackTrace();
-//						}
-//					});
-//				} else {
-//					Platform.runLater(() -> {
-//						try {
-//							FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/admin_ui/AdminUi.fxml"));
-//							Parent loginRoot = fxmlLoader.load();
-//
-//							Stage loginStage = new Stage();
-//							loginStage.setTitle("인사 시스템 (관리자)");
-//							loginStage.setScene(new Scene(loginRoot));
-//
-//							Stage currentStage = (Stage) loginBtn.getScene().getWindow();
-//							currentStage.hide();
-//
-//							loginStage.show();
-//						} catch (IOException e) {
-//							e.printStackTrace();
-//						}
-//					});
-//				}
-//			} else {
-//				Platform.runLater(() -> {
-//					LoginFailAlert("로그인 실패", "입력하신 정보가 맞지 않습니다. 다시 입력해주세요.");
-//				});
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} finally {
-//			serverConnectUtils.close();
-//		}
+//		RequestData requestData = new RequestData();
+//		requestData.setData(userLoginDto);
+//		requestData.setMessageType(MessageTypeConst.MESSAGE_LOGIN);
+
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_ONE_SEARCH, boardKeyNo);
+		
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+			
+			ResponseData<BoardAndAnswer> responseData=communicationUtils.jsonToResponseData(jsonReceivedStr, BoardAndAnswer.class);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				BoardAndAnswer boardAndAnswer = responseData.getData();
+				
+				// 데이터가 null인지 확인
+	            if (boardAndAnswer != null) {
+	                // 성공적으로 데이터를 받았는지 확인
+	                if (responseData.getMessageType().contains("성공")) {
+	                    Platform.runLater(() -> {
+	                        try {
+	                            // QnA 상세 화면 로드
+	                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/qna_ui/ShowQnA.fxml"));
+	                            Parent qnaRoot = fxmlLoader.load();
+
+	                            // QnAShowController를 가져와서 데이터를 설정
+	                            QnAShowController qnaShowController = fxmlLoader.getController();
+	                            qnaShowController.setBoardAndAnswerData(boardAndAnswer);
+
+	                            // 새 창을 띄우고 현재 창 숨기기
+	                            Stage qnaStage = new Stage();
+	                            qnaStage.setTitle("Q&A 상세보기");
+	                            qnaStage.setScene(new Scene(qnaRoot));
+
+	                            qnaStage.show();
+
+	                        } catch (IOException e) {
+	                            e.printStackTrace();
+	                        }
+	                    });
+	                } else {
+	                    System.out.println("게시글 정보를 가져오는 데 실패했습니다.");
+	                }
+	            } else {
+	                System.out.println("BoardAndAnswer 객체가 null입니다.");
+	            }
+	        } else {
+	            System.out.println("서버 응답이 null입니다.");
+	        }
+
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    } finally {
+	        // 연결 종료
+	        serverConnectUtils.close();
+	    }
 	}
 
 	// 근태기록 선택되었을 때

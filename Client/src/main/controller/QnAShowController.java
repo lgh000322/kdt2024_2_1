@@ -41,16 +41,23 @@ public class QnAShowController {
     @FXML
 	private ObservableList<AnswerInBoardDto> answerList = FXCollections.observableArrayList();
 
-    // 게시글 정보를 UI에 설정하는 메소드
     public void setBoardAndAnswerData(BoardAndAnswer boardAndAnswer) {
-        PostUser.setText(boardAndAnswer.getBoardInfoDto().getBoardUserName());
-        ReceivedTitle.setText(boardAndAnswer.getBoardInfoDto().getBoardTitle());
-        ReceivedContents.setText(boardAndAnswer.getBoardInfoDto().getBoardContents());
-        List<AnswerInBoardDto> List = boardAndAnswer.getAnswerInBoard();
-        for(int i=0; i<List.size(); i++) {
-        	AnswerInBoardDto answerInBoardDto = List.get(i);
-        	answerList.add(answerInBoardDto);
+        if (boardAndAnswer != null && boardAndAnswer.getBoardInfoDto() != null) {
+            PostUser.setText(boardAndAnswer.getBoardInfoDto().getBoardUserName());
+            ReceivedTitle.setText(boardAndAnswer.getBoardInfoDto().getBoardTitle());
+            ReceivedContents.setText(boardAndAnswer.getBoardInfoDto().getBoardContents());
+            
+            // 댓글 목록 설정
+            List<AnswerInBoardDto> list = boardAndAnswer.getAnswerInBoard();
+            if (list != null && !list.isEmpty()) {
+                answerList.clear(); // 기존의 데이터를 초기화
+                answerList.addAll(list); // 새 데이터를 추가
+                CommentListView.setItems(answerList);
+            } else {
+                System.out.println("댓글 목록이 없습니다.");
+            }
+        } else {
+            System.out.println("게시글 정보가 없습니다.");
         }
-        CommentListView.setItems(answerList);
     }
 }
