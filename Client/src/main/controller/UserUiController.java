@@ -399,14 +399,15 @@ public class UserUiController implements Initializable {
 			e1.printStackTrace();
 		}
 		
+		   
 		qnaRecordTableView.setOnMouseClicked(event -> {
 			QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
-			
+
 			if (selectedQnAItem != null) {
 				System.out.println("Selected QnARecord: " + selectedQnAItem);
 			}
 			try {
-				qnaItemClickMethod();
+				qnaItemClickMethod(selectedQnAItem.getKeyNo());
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -644,7 +645,7 @@ public class UserUiController implements Initializable {
 	}
 
 	/* Q&A 리스트 아이템 선택 시, 선택된 아이템 창 연결 */
-	public void qnaItemClickMethod() throws IOException {
+	public void qnaItemClickMethod(Long boardKeyNo) throws IOException {
 		CommunicationUtils communicationUtils = new CommunicationUtils();
 
 		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
@@ -654,11 +655,7 @@ public class UserUiController implements Initializable {
 		 */
 		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
 		DataInputStream dis = serverConnectUtils.getDataInputStream();
-
-		/**
-		 * requestData의 data에 넣어줄 객체를 생성
-		 */
-//		BoardAndAnswer boardAndAnswer = new BoardAndAnswer();
+		
 		/**
 		 * requestData 생성
 //		 */
@@ -666,10 +663,10 @@ public class UserUiController implements Initializable {
 //		requestData.setData(userLoginDto);
 //		requestData.setMessageType(MessageTypeConst.MESSAGE_LOGIN);
 
-		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_ONE_SEARCH, boardNo);
-
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_ONE_SEARCH, boardKeyNo);
+		
 		try {
-			communicationUtils.sendServer(jsonSendStr,	 dos);
+			communicationUtils.sendServer(jsonSendStr, dos);
 			String jsonReceivedStr = dis.readUTF();
 			
 			ResponseData<BoardAndAnswer> responseData=communicationUtils.jsonToResponseData(jsonReceivedStr, BoardAndAnswer.class);
