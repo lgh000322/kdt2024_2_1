@@ -44,7 +44,7 @@ public class BoardRepository {
         // 특정 게시물 pk 값과 일치하는 게시물 데이터를 가져오는 쿼리문
         String sql = "select b.title, b.contents, u.user_id, u.name " +
                 "from board b inner join user u " +
-                "on b.user_num = u.user_num" +
+                "on b.user_num = u.user_num " +
                 "where b.board_num = ?";
 
 
