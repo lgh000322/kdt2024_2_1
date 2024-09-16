@@ -220,6 +220,60 @@ public class UserService {
     }
 
 
+
+    /**
+    *  회원정보 수정 ( 관리자 페이지)
+    * */
+    public ResponseData updateUser(UpdateUserDto updateUserDto) throws SQLException {
+
+        ResponseData responseData = null;
+        Connection con = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = updateUserBizLogic(updateUserDto, con);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+        return responseData;
+    }
+
+    private ResponseData updateUserBizLogic(UpdateUserDto updateUserDto, Connection con) throws SQLException {
+
+        int row = 0;
+
+        // deptname이 null이고  positioname이 null이 아닐경우 position만 바꿔줌.
+        if(updateUserDto.getDeptName() == null && updateUserDto.getPositionName() != null) {
+            LeaveDay positionNumByPositionName = positionRepository.findPositionNumByPositionName(con, updateUserDto.getPositionName());
+            Long positionNum = positionNumByPositionName.getPositionNum();
+
+            row = userRepository.updatePosition(updateUserDto.getEmail(), positionNum, con);
+        }
+        // deptName만 null이 아니라면  deptName만 수정한다.
+        else if(updateUserDto.getPositionName() == null && updateUserDto.getDeptName() != null) {
+            Long deptNumByDeptName = deptRepository.findDeptNumByDeptName(con, updateUserDto.getDeptName());
+
+            row = userRepository.updatedept(updateUserDto.getEmail(), deptNumByDeptName, con);
+        }
+        // 만약 둘다 다른 값을 가진다면 직위, 부서 모두 변경
+        else if(updateUserDto.getPositionName() != null && updateUserDto.getDeptName() != null) {
+            LeaveDay positionNumByPositionName = positionRepository.findPositionNumByPositionName(con, updateUserDto.getPositionName());
+            Long deptNumByDeptName = deptRepository.findDeptNumByDeptName(con, updateUserDto.getDeptName());
+            row = userRepository.updatePositionAndDept(updateUserDto.getEmail(), positionNumByPositionName.getPositionNum(), deptNumByDeptName, con);
+        }
+
+        if(row == 0){
+            return new ResponseData("관리자 회원 정보 수정 실패", null);
+        }
+
+        return new ResponseData("관리자 회원 정보 수정 성공", null);
+    }
+
+
     private ResponseData findAllByAdminBizLogic(Connection con) throws SQLException {
         List<UserInfo> userInfos = userRepository.findAllForAdmin(con);
         if (userInfos.isEmpty()) {
@@ -341,7 +395,6 @@ public class UserService {
             }
         }
     }
-
 
 
 }

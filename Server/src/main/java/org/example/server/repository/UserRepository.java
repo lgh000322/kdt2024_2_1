@@ -2,6 +2,7 @@ package org.example.server.repository;
 
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
+import org.example.server.dto.user_dto.UpdateUserDto;
 import org.example.server.dto.user_dto.UserInfo;
 import org.example.server.dto.user_dto.UserNameAndEmailDto;
 
@@ -63,6 +64,70 @@ public class UserRepository {
         return row; // 0 일경우 수정 실패 , 0이 아니면 수정 성공.
     }
 
+    public int updatePosition(String email, Long positionNum, Connection conn) throws SQLException {
+        PreparedStatement pstmt = null;
+        String sql = "update user set position_num = ? where email = ?";
+        int row = 0;
+
+        try{
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, positionNum);
+            pstmt.setString(2, email);
+            row = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, null);
+        }
+
+        return row; // 0 일경우 수정 실패 , 0이 아니면 수정 성공.
+    }
+
+    public int updatedept(String email, Long deptNum, Connection conn) throws SQLException {
+        PreparedStatement pstmt = null;
+        String sql = "update user set dept_num = ? where email = ?";
+        int row = 0;
+
+        try{
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, deptNum);
+            pstmt.setString(2, email);
+            row = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, null);
+        }
+
+        return row; // 0 일경우 수정 실패 , 0이 아니면 수정 성공.
+    }
+
+
+    public int updatePositionAndDept(String email, Long positionNum, Long deptNum, Connection conn) throws SQLException {
+        PreparedStatement pstmt = null;
+        String sql = "update user set position_num = ?, dept_num = ? where email = ?";
+        int row = 0;
+
+        try{
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, positionNum);
+            pstmt.setLong(2, deptNum);
+            pstmt.setString(3, email);
+            row = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, null);
+        }
+
+        return row; // 0 일경우 수정 실패 , 0이 아니면 수정 성공.
+    }
 
 
     public Optional<User> findUserByIDAndRole(Connection conn, String userId, Role role) throws SQLException {
