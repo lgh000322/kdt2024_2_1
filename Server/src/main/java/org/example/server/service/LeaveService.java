@@ -115,6 +115,15 @@ public class LeaveService {
     /**
      * 휴가 수정 비즈니스 로직
      */
+
+
+    /**
+     * 수정 예정 2024 9 15
+     * leave num으로 user_num을 찾고 user_num에서 userId찾아서 reamainedLeave를 찾아야한다.
+    *  admin에서 넘겨오는값이 이름으로 넘겨옴. (이름 중복되는게 여러개 있을수 있다.)
+     *  userId를 leaveNum으로 확인하고  확인된 id의 남은 휴가일수를 확인한다
+    *
+    * */
     public ResponseData updateLeaveBizLogic(ForUpdateLeaveDto leaveLog, Connection conn) throws SQLException {
 
         //남은 후가일수
@@ -162,6 +171,7 @@ public class LeaveService {
 
         // 휴가 수정하고 유저데이터에서 남은 휴가일수 갱신
         int row = userRepository.updateRemainedLeave(leaveLog.getUserId(), remainedLeave ,conn);
+
 
         if(row == 0) {
             return new ResponseData("남은 휴가 일수 수정 실패", null);

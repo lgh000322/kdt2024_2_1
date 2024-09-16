@@ -8,6 +8,7 @@ import org.example.server.adapter.LocalTimeTypeAdapter;
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.user_dto.UpdateUserDto;
 import org.example.server.dto.user_dto.UserIdAndRole;
 import org.example.server.dto.user_dto.UserJoinDto;
 import org.example.server.dto.user_dto.UserLoginDto;
@@ -74,7 +75,11 @@ public class UserController implements Controller {
                 System.out.println("모든 회원 조회");
                 result = userService.findAll();
             }
-
+            case MessageTypeConst.MESSAGE_UPDATE -> {
+                System.out.println("특정 회원 정보 수정");
+                UpdateUserDto updateUserDto = gson.fromJson(gson.toJson(requestData.getData()), UpdateUserDto.class);
+                result = userService.updateUser(updateUserDto);
+            }
             case MessageTypeConst.MESSAGE_SEARCH_ALL_BYADMIN -> {
                 System.out.println("모든 회원 조회 (관리자)");
                 result = userService.findAllByAdmin();
