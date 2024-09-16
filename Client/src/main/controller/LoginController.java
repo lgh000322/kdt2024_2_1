@@ -157,7 +157,11 @@ public class LoginController {
 							try {
 								FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/admin_ui/AdminUi.fxml"));
 								Parent loginRoot = fxmlLoader.load();
+								
 
+								AdminUiController adminUiController = fxmlLoader.getController();
+								adminUiController.setUserData(userInfo);
+								
 								Stage loginStage = new Stage();
 								loginStage.setTitle("인사 시스템 (관리자)");
 								loginStage.setScene(new Scene(loginRoot));
