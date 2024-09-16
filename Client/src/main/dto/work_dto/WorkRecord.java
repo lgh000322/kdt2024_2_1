@@ -19,9 +19,9 @@ public class WorkRecord {
     public WorkRecord(Long no, LocalDate localDate, Status status, LocalTime startTime, LocalTime endTime, String note) {
     	 	this.no = new SimpleLongProperty(no);
     	    this.date = new SimpleStringProperty(localDate.toString()); // LocalDate를 String으로 변환
-    	    this.workStatus = new SimpleStringProperty(status.toString()); // Status를 String으로 변환
-    	    this.startTime = new SimpleStringProperty(startTime != null ? startTime.toString() : "값 없음"); // null 체크
-    	    this.endTime = new SimpleStringProperty(endTime != null ? endTime.toString() : "값 없음"); // null 체크
+    	    this.workStatus = new SimpleStringProperty(status.getDescription()); // Status를 String으로 변환
+    	    this.startTime = new SimpleStringProperty(startTime != null ? startTime.toString() : ""); // null 체크
+    	    this.endTime = new SimpleStringProperty(endTime != null ? endTime.toString() : ""); // null 체크
     	    this.note = new SimpleStringProperty(note);
     }
 
