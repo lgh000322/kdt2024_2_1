@@ -28,6 +28,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -271,6 +272,11 @@ public class UserUiController implements Initializable {
 				qnaRecordList.clear();
 				salaryRecordList.clear();
 				mailRecordList.clear();
+				
+				selectWorkDate.setValue(null);
+				selectMoneyDate.setValue(null);
+				mailTitle.clear();
+				qnaTitle.clear();
 			}
 		});
 
@@ -286,7 +292,12 @@ public class UserUiController implements Initializable {
 				workRecordList.clear();
 				qnaRecordList.clear();
 				salaryRecordList.clear();
-				mailRecordList.clear();
+				mailRecordList.clear();	
+				selectWorkDate.setValue(null);
+				selectMoneyDate.setValue(null);
+				mailTitle.clear();
+				qnaTitle.clear();
+
 			}
 		});
 
@@ -303,6 +314,11 @@ public class UserUiController implements Initializable {
 				leaveRecordList.clear();
 				qnaRecordList.clear();
 				mailRecordList.clear();
+				
+				selectWorkDate.setValue(null);
+				selectMoneyDate.setValue(null);
+				mailTitle.clear();
+				qnaTitle.clear();
 			}
 		});
 
@@ -319,6 +335,11 @@ public class UserUiController implements Initializable {
 				leaveRecordList.clear();
 				qnaRecordList.clear();
 				salaryRecordList.clear();
+				
+				selectWorkDate.setValue(null);
+				selectMoneyDate.setValue(null);
+				mailTitle.clear();
+				qnaTitle.clear();
 			}
 		});
 
@@ -336,6 +357,11 @@ public class UserUiController implements Initializable {
 			workRecordList.clear();
 			salaryRecordList.clear();
 			mailRecordList.clear();
+			
+			selectWorkDate.setValue(null);
+			selectMoneyDate.setValue(null);
+			mailTitle.clear();
+			qnaTitle.clear();
 		});
 
 		Timeline clock = new Timeline(new KeyFrame(Duration.ZERO, e -> {
@@ -854,9 +880,21 @@ public class UserUiController implements Initializable {
 					leaveRecordList.add(leaveRecord);
 
 				}
-
-				Platform.runLater(() -> {
-					leaveRecordTableView.setItems(leaveRecordList);
+	
+					Platform.runLater(() -> {
+						leaveRecordTableView.setItems(leaveRecordList);
+						
+						leaveAcceptColumn.setCellFactory(column -> new TableCell<LeaveRecord, Boolean>() {
+					        @Override
+					        protected void updateItem(Boolean item, boolean empty) {
+					            super.updateItem(item, empty);
+					            if (empty || item == null) {
+					                setText(null);
+					            } else {
+					                setText(item ? "승인 됨" : "승인 안됨");
+					            }
+					        }
+					    });
 				});
 
 			}
