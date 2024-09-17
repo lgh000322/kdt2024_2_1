@@ -249,7 +249,11 @@ public class UserUiController implements Initializable {
 	private ObservableList<MailRecord> mailRecordList = FXCollections.observableArrayList();
 
 	@FXML
-	private ObservableList<String> list = FXCollections.observableArrayList("출근", "결근", "조퇴");
+	private ObservableList<String> worklist = FXCollections.observableArrayList("출근", "결근", "조퇴");
+	
+	@FXML
+	private ObservableList<String> maillist = FXCollections.observableArrayList("받은메일함", "보낸메일함");
+
 
 	/* 현재시간 표시 */
 	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -377,6 +381,7 @@ public class UserUiController implements Initializable {
 		clock.play();
 
 		handleworkComboList();
+		handlemailComboList();
 
 		noColumn.setCellValueFactory(new PropertyValueFactory<>("no"));
 		dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
@@ -486,7 +491,7 @@ public class UserUiController implements Initializable {
 	}
 
 	public void handleworkComboList() {
-		workComboList.setItems(list);
+		workComboList.setItems(worklist);
 	}
 
 	/*
@@ -511,6 +516,11 @@ public class UserUiController implements Initializable {
 	/*
 	 * 메일함 탭
 	 */
+	/* 메일 콤보 리스트 */
+	public void handlemailComboList() {
+		mailComboList.setItems(maillist);
+	}
+	
 	/* 메일쓰기 버튼 클릭 시, 메일작성 창 띄우기 */
 	public void handlesendMailBtn() throws IOException {
 		ObservableList<String> emailList = FXCollections.observableArrayList();
@@ -577,6 +587,7 @@ public class UserUiController implements Initializable {
 
 	/* 메일삭제 버튼 클릭 시, 메일삭제 처리 로직 */
 	public void handledeleteMailBtn() {
+		mailComboList.setItems(maillist);
 	}
 
 	/*
