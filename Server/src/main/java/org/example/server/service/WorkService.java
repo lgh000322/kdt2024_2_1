@@ -6,6 +6,8 @@ import org.example.server.domain.user.User;
 import org.example.server.domain.work_log.Status;
 import org.example.server.domain.work_log.WorkLog;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.user_dto.UserSearchData;
+import org.example.server.dto.user_dto.UserSearchDto;
 import org.example.server.repository.UserRepository;
 import org.example.server.repository.WorkRepository;
 
@@ -38,7 +40,7 @@ public class WorkService {
         dataSource = DBUtils.createOrGetDataSource();
     }
     //////////////////////////////////// 비즈니스 로직 ////////////////////////////////////////
-    public ResponseData workSearchBizLogic(User user, Connection conn) throws SQLException {
+    public ResponseData workSearchBizLogic(UserSearchDto user, Connection conn) throws SQLException {
         /*
         2024-09-07수정
          */
@@ -48,11 +50,33 @@ public class WorkService {
         Optional<User> findUser = userRepository.findUserByIDAndRole(conn, user.getUserId(), user.getRole());
         if (findUser.isPresent()) {
             User DBUser = findUser.get();
-            if (DBUser.getRole() == Role.USER)
-                //findUser가 존재한다면 Repository로가서 해당 근퇴을 조회시킨다.
-                workLogResponse = workRepository.UserworkSearchAllonDB(DBUser, conn); //특정 유저의 월급리스트 반환
-            else
+            if (DBUser.getRole() == Role.USER){
+                //검색 기능 추가
+                UserSearchData userSearchData = user.getUserSearchData();
+
+                //기본 검색
+                if (userSearchData.getDate() == null && userSearchData.getStatus() == null) {
+                    workLogResponse = workRepository.UserworkSearchAllonDB(DBUser, conn); //특정 유저의 월급리스트 반환
+                }
+
+                //근태 기록만 검색
+                if (userSearchData.getDate() == null && userSearchData.getStatus() != null) {
+                    workLogResponse = workRepository.findUserWorksByUserNumAndStatus(DBUser, conn, userSearchData.getStatus());
+                }
+
+                //날짜만 검색
+                if (userSearchData.getDate() != null && userSearchData.getStatus() == null) {
+                    workLogResponse = workRepository.findUserWorksByUserNumAndDate(DBUser, conn, userSearchData.getDate());
+                }
+
+                //날짜와 근태기록으로 검색
+                if (userSearchData.getDate() != null && userSearchData.getStatus() != null) {
+                    workLogResponse = workRepository.findUserWorksByUserNumAndDateAndStatus(DBUser, conn, userSearchData.getDate(), userSearchData.getStatus());
+                }
+            }
+            else{
                 workLogResponse = workRepository.AdminworkSearchAllonDB(conn); //월급보단 유저테이블을 반환시키게
+            }
         }
         else{
             return new ResponseData("User not found", null);  // 사용자가 없을 경우 반환
@@ -155,7 +179,7 @@ public class WorkService {
     }
 
 //////////////////////////////////////// 일반 로직 ////////////////////////////////////////
-    public ResponseData SearchWork(User user) throws SQLException {
+    public ResponseData SearchWork(UserSearchDto user) throws SQLException {
         Connection con = null;
         ResponseData responseData = null;
 

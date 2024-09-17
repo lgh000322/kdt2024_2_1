@@ -145,6 +145,151 @@ public class WorkRepository {
         }
     }
 
+    ///유저의 근퇴목록 근태상태로 조회
+    public ResponseData findUserWorksByUserNumAndStatus(User user, Connection conn,Status status) throws SQLException {
+        /*
+        2024-09-07수정
+         */
+
+        String sql = "select * from work_log where user_num = ? and status = ?";
+
+        List<UserWorkData> workLogs = new ArrayList<>(); // 여러 개의 WorkLog를 저장할 리스트
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, user.getUserNum());
+            pstmt.setString(2,status.name());
+
+            // SQL 쿼리 실행
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                UserWorkData workLog = new UserWorkData.Builder()
+                        .workNum(rs.getLong("log_num")) // 근퇴 기록 번호
+                        .workDate(rs.getDate("work_date").toLocalDate()) // 출근 날짜
+                        .status(Status.valueOf(rs.getString("status").toUpperCase())) // status 설정
+                        .startTime(rs.getTime("start_time") != null ? rs.getTime("start_time").toLocalTime() : null) // 시작 시간, null 체크 후 LocalTime 변환
+                        .endTime(rs.getTime("end_time") != null ? rs.getTime("end_time").toLocalTime() : null) // 퇴근 시간, null 체크 후 LocalTime 변환
+                        .build();
+
+                workLogs.add(workLog); // 리스트에 workLog 추가
+            }
+
+            // 리스트가 비어 있지 않다면 조회 성공 메시지와 함께 리스트 반환
+            if (!workLogs.isEmpty()) {
+                return new ResponseData("근퇴조회 성공", workLogs);
+            } else {
+                // 조회된 결과가 없을 때 적절한 메시지 반환
+                return new ResponseData("근퇴조회 실패", null);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력
+            throw e; // 예외를 다시 던짐
+        } finally {
+            close(pstmt, rs); // 자원 해제
+        }
+    }
+
+    ///유저의 근태목록 근태날짜로 조회
+    public ResponseData findUserWorksByUserNumAndDate(User user, Connection conn,LocalDate date) throws SQLException {
+        /*
+        2024-09-07수정
+         */
+
+        String sql = "select * from work_log where user_num = ? and work_date = ?";
+
+        List<UserWorkData> workLogs = new ArrayList<>(); // 여러 개의 WorkLog를 저장할 리스트
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, user.getUserNum());
+            pstmt.setDate(2,Date.valueOf(date));
+
+            // SQL 쿼리 실행
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                UserWorkData workLog = new UserWorkData.Builder()
+                        .workNum(rs.getLong("log_num")) // 근퇴 기록 번호
+                        .workDate(rs.getDate("work_date").toLocalDate()) // 출근 날짜
+                        .status(Status.valueOf(rs.getString("status").toUpperCase())) // status 설정
+                        .startTime(rs.getTime("start_time") != null ? rs.getTime("start_time").toLocalTime() : null) // 시작 시간, null 체크 후 LocalTime 변환
+                        .endTime(rs.getTime("end_time") != null ? rs.getTime("end_time").toLocalTime() : null) // 퇴근 시간, null 체크 후 LocalTime 변환
+                        .build();
+
+                workLogs.add(workLog); // 리스트에 workLog 추가
+            }
+
+            // 리스트가 비어 있지 않다면 조회 성공 메시지와 함께 리스트 반환
+            if (!workLogs.isEmpty()) {
+                return new ResponseData("근퇴조회 성공", workLogs);
+            } else {
+                // 조회된 결과가 없을 때 적절한 메시지 반환
+                return new ResponseData("근퇴조회 실패", null);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력
+            throw e; // 예외를 다시 던짐
+        } finally {
+            close(pstmt, rs); // 자원 해제
+        }
+    }
+
+
+    ///유저의 근태목록 근태날짜와 근태상태로 조회
+    public ResponseData findUserWorksByUserNumAndDateAndStatus(User user, Connection conn,LocalDate date,Status status) throws SQLException {
+        /*
+        2024-09-07수정
+         */
+
+        String sql = "select * from work_log where user_num = ? and work_date = ? and status = ?";
+
+        List<UserWorkData> workLogs = new ArrayList<>(); // 여러 개의 WorkLog를 저장할 리스트
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, user.getUserNum());
+            pstmt.setDate(2,Date.valueOf(date));
+            pstmt.setString(3,status.name());
+
+            // SQL 쿼리 실행
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                UserWorkData workLog = new UserWorkData.Builder()
+                        .workNum(rs.getLong("log_num")) // 근퇴 기록 번호
+                        .workDate(rs.getDate("work_date").toLocalDate()) // 출근 날짜
+                        .status(Status.valueOf(rs.getString("status").toUpperCase())) // status 설정
+                        .startTime(rs.getTime("start_time") != null ? rs.getTime("start_time").toLocalTime() : null) // 시작 시간, null 체크 후 LocalTime 변환
+                        .endTime(rs.getTime("end_time") != null ? rs.getTime("end_time").toLocalTime() : null) // 퇴근 시간, null 체크 후 LocalTime 변환
+                        .build();
+
+                workLogs.add(workLog); // 리스트에 workLog 추가
+            }
+
+            // 리스트가 비어 있지 않다면 조회 성공 메시지와 함께 리스트 반환
+            if (!workLogs.isEmpty()) {
+                return new ResponseData("근퇴조회 성공", workLogs);
+            } else {
+                // 조회된 결과가 없을 때 적절한 메시지 반환
+                return new ResponseData("근퇴조회 실패", null);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력
+            throw e; // 예외를 다시 던짐
+        } finally {
+            close(pstmt, rs); // 자원 해제
+        }
+    }
     ///관리자의 유저목록 모두 조회
     public ResponseData AdminworkSearchAllonDB(Connection conn) throws SQLException {
         /*
