@@ -71,6 +71,12 @@ public class UserController implements Controller {
                     result = userService.findByUserId(userIdAndRole);
                 }
             }
+            case MessageTypeConst.MESSAGE_SEARCH_ADMIN -> {
+                if (requestData.getData() instanceof String userName) {
+                    System.out.println("회원 이름으로 회원 정보 조회");
+                    result = userService.findByUserName(userName);
+                }
+            }
             case MessageTypeConst.MESSAGE_SEARCH_ALL -> {
                 System.out.println("모든 회원 조회");
                 result = userService.findAll();

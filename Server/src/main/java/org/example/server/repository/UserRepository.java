@@ -242,6 +242,8 @@ public class UserRepository {
         }
     }
 
+
+
     public Optional<User> findUserByEmail(Connection conn, String email) throws SQLException {
         String sql = "select * from user where email = ?";
 
@@ -348,6 +350,38 @@ public class UserRepository {
         }
     }
 
+    public List<UserInfo> findUsersByName(Connection conn, String name) throws SQLException {
+        String sql = "select u.user_num, u.name, u.tel, u.email, d.dept_name, p.position_name" +
+                " from user u inner join dept d on u.dept_num = d.dept_num " +
+                "inner join position p on u.position_num = p.position_num where u.name = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<UserInfo> list = new ArrayList<>();
+
+        try{
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, name);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                UserInfo userInfo = new UserInfo();
+                userInfo.setUserNum(rs.getLong("user_num"));
+                userInfo.setName(rs.getString("name"));
+                userInfo.setTel(rs.getString("tel"));
+                userInfo.setEmail(rs.getString("email"));
+                userInfo.setDeptName(rs.getString("dept_name"));
+                userInfo.setPositionName(rs.getString("position_name"));
+                list.add(userInfo);
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
 
     public List<User> findAll(Connection conn,Role role) throws SQLException {
         String sql = "select * from user where role = ?";
