@@ -48,7 +48,7 @@
                           <TableColumn fx:id="usereditEmail" prefWidth="163.0" text="이메일" />
                       </columns>
                   </TableView>
-                        <Button fx:id="userEditSearchBtn" layoutX="185.0" layoutY="383.0" mnemonicParsing="false" text="회원 검색" />
+                        <Button fx:id="userEditSearchBtn" layoutX="185.0" layoutY="383.0" mnemonicParsing="false" text="회원 검색" onAction="#handleUserEditSearchBtn"/>
                         <TextField fx:id="userEditSearch" layoutX="14.0" layoutY="383.0" />
                      </children>
                   </AnchorPane>
@@ -68,12 +68,14 @@
                               <TableColumn fx:id="deptNameColumn" prefWidth="46.0" text="부서" />
                               <TableColumn fx:id="statusColumn" prefWidth="53.0" text="승인여부" />
                               <TableColumn fx:id="userleaveCount" prefWidth="57.0" text="남은 휴가" />
+                              <TableColumn fx:id="checkStatus" prefWidth="52.0" text="상태" />
+                              <TableColumn fx:id="userId" prefWidth="45.0" text="Id." />
                            </columns>
                         </TableView>
-                        <Button fx:id="userLeaveSearchBtn" layoutX="185.0" layoutY="383.0" mnemonicParsing="false" text="회원 검색" />
+                        <Button fx:id="userLeaveSearchBtn" layoutX="185.0" layoutY="383.0" mnemonicParsing="false" text="회원 검색" onAction="#hadleLeaveSearchBtn"/>
                         <TextField fx:id="userLeaveSearch" layoutX="14.0" layoutY="383.0" />
-                        <Button layoutX="471.0" layoutY="383.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="승인" />
-                        <Button layoutX="395.0" layoutY="383.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="거절" />
+                        <Button layoutX="471.0" layoutY="383.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="승인" onAction="#handleRejectBtn" fx:id="rejectBtn"/>
+                        <Button layoutX="395.0" layoutY="383.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="거절" onAction="#handleAcceptBtn" fx:id="acceptBtn"/>
                      </children></AnchorPane>
             </content>
           </Tab>

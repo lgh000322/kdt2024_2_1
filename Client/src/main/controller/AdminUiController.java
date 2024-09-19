@@ -4,8 +4,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import com.google.gson.reflect.TypeToken;
@@ -39,14 +41,17 @@ import main.dto.ResponseData;
 import main.dto.board_dto.BoardFindAllDto;
 import main.dto.board_dto.QnARecord;
 import main.dto.leave_dto.ForFindLeaveDto;
+import main.dto.leave_dto.ForUpdateLeaveDto;
 import main.dto.leave_dto.LeaveLogOfAdminDto;
 import main.dto.leave_dto.LeaveRecordOfAdmin;
+import main.dto.leave_dto.LeaveStatus;
 import main.dto.mail_dto.MailAllDto;
 import main.dto.mail_dto.MailRecord;
 import main.dto.mail_dto.MailSearchDto;
 import main.dto.mail_dto.UserAndEmailDto;
 import main.dto.salary_dto.AdminSalaryData;
 import main.dto.salary_dto.AdminSalaryRecord;
+import main.dto.user_dto.UpdateUserDto;
 import main.dto.user_dto.UserInfo;
 import main.dto.user_dto.UserRecord;
 import main.dto.user_dto.UserRoleDto;
@@ -115,6 +120,9 @@ public class AdminUiController {
 	@FXML
 	private TableColumn<UserRecord, String> usereditEmail;
 
+	@FXML
+	private TextField userEditSearch;;
+
 	/*
 	 * 휴가관리 테이블 뷰
 	 */
@@ -136,7 +144,10 @@ public class AdminUiController {
 	private TableColumn<LeaveRecordOfAdmin, Boolean> statusColumn;
 	@FXML
 	private TableColumn<LeaveRecordOfAdmin, Integer> userleaveCount;
-
+	@FXML
+	private TableColumn<LeaveRecordOfAdmin, Boolean> checkStatus;
+	@FXML
+	private TableColumn<LeaveRecordOfAdmin, String> userId;
 	/*
 	 * 급여관리 테이블 뷰
 	 */
@@ -231,6 +242,12 @@ public class AdminUiController {
 	@FXML
 	private Button userSalarySearchBtn;
 	
+	@FXML
+	private Button rejectBtn;
+	
+	@FXML
+	private Button acceptBtn;
+	
 	/* 현재시간 표시 */
 	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -248,7 +265,13 @@ public class AdminUiController {
 	
 	@FXML
 	private ObservableList<QnARecord> qnaRecordList = FXCollections.observableArrayList();
+	
+	private LeaveRecordOfAdmin selectedLeaveRecord;
 
+	private LocalDate selectedLeaveEndDate;
+	private LocalDate selectedLeaveStartDate;
+	private Long selectedLeaveNum;
+	
 	@FXML
 	public void initialize() {
 		/*
@@ -367,6 +390,8 @@ public class AdminUiController {
 		deptNameColumn.setCellValueFactory(new PropertyValueFactory<>("deptName"));
 		statusColumn.setCellValueFactory(new PropertyValueFactory<>("leaveAcceptStatus"));
 		userleaveCount.setCellValueFactory(new PropertyValueFactory<>("remainedLeave"));
+		userId.setCellValueFactory(new PropertyValueFactory<>("userId"));
+		checkStatus.setCellValueFactory(new PropertyValueFactory<>("checkStatus"));
 
 		// 컬럼과 급여관리
 		usersalaryNum.setCellValueFactory(new PropertyValueFactory<>("salaryNum"));
@@ -382,6 +407,40 @@ public class AdminUiController {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
+		
+		//휴가테이블 클릭시 update를 위한 정보 가져옴.
+		leaveTable.setOnMouseClicked((MouseEvent e) -> {
+			LocalDate startDate = null;
+			LocalDate endDate = null;
+			if(e.getClickCount() == 2) {
+				selectedLeaveRecord = leaveTable.getSelectionModel().getSelectedItem();
+				
+				if (selectedLeaveRecord != null) {
+					
+					  // 날짜 문자열을 LocalDate로 변환하기 위한 포맷터 정의
+			        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+					
+			        try {
+			            // 문자열을 LocalDate로 변환
+			           startDate = LocalDate.parse(selectedLeaveRecord.getLeaveStartDate(), formatter);
+			           endDate = LocalDate.parse(selectedLeaveRecord.getLeaveEndDate(), formatter);
+			            
+			        } catch (DateTimeParseException er) {
+			            // 문자열이 올바른 날짜 형식이 아닌 경우 예외 처리
+			            System.err.println("Invalid date format: " + er.getMessage());
+			        }
+			        
+	
+			        
+			        selectedLeaveEndDate = endDate;
+			        selectedLeaveStartDate = startDate;
+			    	selectedLeaveNum = selectedLeaveRecord.getNo();
+			        
+		        }
+			}
+		});
+		
 		
 		// 사원관리 컬럼 클릭 이벤트
 		employeeTable.setOnMouseClicked((MouseEvent event) -> {
@@ -532,8 +591,8 @@ public class AdminUiController {
 		 * requestData의 data에 넣어줄 객체를 생성
 		 */
 		ForFindLeaveDto forFindLeaveDto = new ForFindLeaveDto();
-		forFindLeaveDto.setUserName(UserInfoSavedUtil.getUserInfo().getName());
-		forFindLeaveDto.setUserId(UserInfoSavedUtil.getUserId());
+		forFindLeaveDto.setUserName(null);
+		forFindLeaveDto.setUserId(null);
 		forFindLeaveDto.setUserRoleDto(UserRoleDto.ADMIN);
 
 		/**
@@ -559,7 +618,7 @@ public class AdminUiController {
 					LeaveRecordOfAdmin leaveRecordOfAdmin = new LeaveRecordOfAdmin(leaveLogOfAdminDto.getLeaveNum(), leaveLogOfAdminDto.getUserName(),
 							leaveLogOfAdminDto.getRequestDate(), leaveLogOfAdminDto.getStartDate(),
 							leaveLogOfAdminDto.getEndDate(), leaveLogOfAdminDto.getDeptName(),
-							leaveLogOfAdminDto.getStatus(), leaveLogOfAdminDto.getRemainedLeave());
+							leaveLogOfAdminDto.getStatus(), leaveLogOfAdminDto.getRemainedLeave(), leaveLogOfAdminDto.getCheckStatus(), leaveLogOfAdminDto.getUserId());
 
 					leaveRecordList.add(leaveRecordOfAdmin);
 
@@ -857,5 +916,144 @@ public class AdminUiController {
 				e.printStackTrace();
 			}
 		});
+	}
+	
+	public void hadleLeaveSearchBtn() throws IOException {
+		
+	}
+	
+	public void handleRejectBtn() throws IOException {
+		
+		leaveRecordList.clear();
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		ForUpdateLeaveDto forUpdateLeaveDto = new ForUpdateLeaveDto.Builder()
+				.leaveNum(selectedLeaveNum)
+				.startDate(selectedLeaveStartDate)
+				.endDate(selectedLeaveEndDate)
+				.status(LeaveStatus.REJECT)
+				.build();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_LEAVE_EDIT, forUpdateLeaveDto);
+		
+		
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			ResponseData<ForUpdateLeaveDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, ForUpdateLeaveDto.class);
+			String messageType = responseData.getMessageType();
+
+
+			if (messageType.contains("휴가 거절 성공")) {
+				List<UserInfo> list = (List<UserInfo>) responseData.getData();
+				for (int i = 0; i < list.size(); i++) {
+					System.out.println("이름과 일치하는 회원 정보 출력.");
+					UserInfo userInfo = list.get(i);
+			
+					UserRecord userRecord = new UserRecord(userInfo.getUserNum(), userInfo.getName(), userInfo.getTel(),
+							userInfo.getDeptName(), userInfo.getPositionName(), userInfo.getEmail());
+					userRecordList.add(userRecord);
+				}
+
+				Platform.runLater(() -> {
+					employeeTable.setItems(userRecordList);
+				});
+
+			}
+		} catch (
+
+		IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
+	}
+		
+	
+	
+	public void handleAcceptBtn() throws IOException {
+		
+	}
+	
+	
+	public void handleUserEditSearchBtn() throws IOException {
+		userRecordList.clear();
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		String userName = userEditSearch.getText();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_SEARCH_ADMIN, userName);
+		
+		
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			Type listType = new TypeToken<List<UserInfo>>() {
+			}.getType();
+			ResponseData<UserInfo> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					listType);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				List<UserInfo> list = (List<UserInfo>) responseData.getData();
+				for (int i = 0; i < list.size(); i++) {
+					System.out.println("이름과 일치하는 회원 정보 출력.");
+					UserInfo userInfo = list.get(i);
+			
+					UserRecord userRecord = new UserRecord(userInfo.getUserNum(), userInfo.getName(), userInfo.getTel(),
+							userInfo.getDeptName(), userInfo.getPositionName(), userInfo.getEmail());
+					userRecordList.add(userRecord);
+				}
+
+				Platform.runLater(() -> {
+					employeeTable.setItems(userRecordList);
+				});
+
+			}
+		} catch (
+
+		IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
 	}
 }

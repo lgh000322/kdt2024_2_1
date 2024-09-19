@@ -14,7 +14,8 @@ public class LeaveLogOfUserDto {
     private LocalDate endDate;
     private Boolean acceptanceStatus;
     private Boolean checkStatus;
-
+    
+    
 
     public LocalDate getRequestDate() {
         return requestDate;

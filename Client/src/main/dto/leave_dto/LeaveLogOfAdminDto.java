@@ -9,111 +9,139 @@ import java.time.LocalDate;
 * */
 public class LeaveLogOfAdminDto
 {
-	private Long leaveNum;
-	private String userName;
-	private LocalDate requestDate;
-	private LocalDate startDate;
-	private LocalDate endDate;
-	private String deptName;
-	private Boolean status;
-	private Integer remainedLeave;
 
-	public String getUserName() {
-		return userName;
-	}
+    private Long leaveNum;
+    private String userName;
+    private LocalDate requestDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private String deptName;
+    private Boolean status;
+    private Integer remainedLeave;
+    private Boolean checkStatus;
+    private String userId;
 
-	public Long getLeaveNum() {
-		return leaveNum;
-	}
+    public String getUserName() {
+        return userName;
+    }
 
-	public String getDeptName() {
-		return deptName;
-	}
+    public Long getLeaveNum() {
+        return leaveNum;
+    }
 
-	public Integer getRemainedLeave() {
-		return remainedLeave;
-	}
+    public String getUserId() {
+        return userId;
+    }
 
-	public LocalDate getRequestDate() {
-		return requestDate;
-	}
+    public Boolean getCheckStatus() {
+        return checkStatus;
+    }
 
-	public LocalDate getStartDate() {
-		return startDate;
-	}
+    public String getDeptName() {
+        return deptName;
+    }
 
-	public LocalDate getEndDate() {
-		return endDate;
-	}
+    public Integer getRemainedLeave() {return remainedLeave;}
 
-	public Boolean getStatus() {
-		return status;
-	}
+    public LocalDate getRequestDate() {
+        return requestDate;
+    }
 
-	public LeaveLogOfAdminDto(LeaveLogOfAdminDto.Builder builder) {
-		this.requestDate = builder.requestDate;
-		this.startDate = builder.startDate;
-		this.endDate = builder.endDate;
-		this.status = builder.status;
-		this.deptName = builder.deptName;
-		this.leaveNum = builder.leaveNum;
-		this.userName = builder.userName;
-		this.remainedLeave = builder.remainedLeave;
-	}
+    public LocalDate getStartDate() {
+        return startDate;
+    }
 
-	public static class Builder {
-		private LocalDate requestDate;
-		private LocalDate startDate;
-		private LocalDate endDate;
-		private Boolean status;
-		private String deptName;
-		private Integer remainedLeave;
-		private Long leaveNum;
-		private String userName;
+    public LocalDate getEndDate() {
+        return endDate;
+    }
 
-		public LeaveLogOfAdminDto.Builder requestDate(LocalDate requestDate) {
-			this.requestDate = requestDate;
-			return this;
-		}
+    public Boolean getStatus() {
+        return status;
+    }
+    
+    
 
-		public LeaveLogOfAdminDto.Builder startDate(LocalDate startDate) {
-			this.startDate = startDate;
-			return this;
-		}
+    public LeaveLogOfAdminDto(LeaveLogOfAdminDto.Builder builder) {
+        this.requestDate = builder.requestDate;
+        this.startDate = builder.startDate;
+        this.endDate = builder.endDate;
+        this.status = builder.status;
+        this.deptName = builder.deptName;
+        this.leaveNum = builder.leaveNum;
+        this.userName = builder.userName;
+        this.remainedLeave = builder.remainedLeave;
+        this.userId = builder.userId;
+        this.checkStatus = builder.checkStatus;
+    }
 
-		public LeaveLogOfAdminDto.Builder remainedLeave(Integer remainedLeave) {
-			this.remainedLeave = remainedLeave;
-			return this;
-		}
+    public static class Builder {
+        private LocalDate requestDate;
+        private LocalDate startDate;
+        private LocalDate endDate;
+        private Boolean status;
+        private String deptName;
+        private Integer remainedLeave;
+        private Long leaveNum;
+        private String userName;
+        private Boolean checkStatus;
+        private String userId;
 
-		public LeaveLogOfAdminDto.Builder endDate(LocalDate endDate) {
-			this.endDate = endDate;
-			return this;
-		}
+        public LeaveLogOfAdminDto.Builder checkStatus(Boolean checkStatus) {
+            this.checkStatus = checkStatus;
+            return this;
+        }
+        
+        public LeaveLogOfAdminDto.Builder userId(String userId) {
+            this.userId = userId;
+            return this;
+        }
+        
+        public LeaveLogOfAdminDto.Builder requestDate(LocalDate requestDate) {
+            this.requestDate = requestDate;
+            return this;
+        }
 
-		public LeaveLogOfAdminDto.Builder status(Boolean status) {
-			this.status = status;
-			return this;
-		}
+        public LeaveLogOfAdminDto.Builder startDate(LocalDate startDate) {
+            this.startDate = startDate;
+            return this;
+        }
 
-		public LeaveLogOfAdminDto.Builder deptName(String deptName) {
-			this.deptName = deptName;
-			return this;
-		}
+        public LeaveLogOfAdminDto.Builder remainedLeave(Integer remainedLeave) {
+            this.remainedLeave = remainedLeave;
+            return this;
+        }
 
-		public LeaveLogOfAdminDto.Builder leaveNum(Long leaveNum) {
-			this.leaveNum = leaveNum;
-			return this;
-		}
+        public LeaveLogOfAdminDto.Builder endDate(LocalDate endDate) {
+            this.endDate = endDate;
+            return this;
+        }
 
-		public LeaveLogOfAdminDto.Builder userName(String userName) {
-			this.userName = userName;
-			return this;
-		}
+        public LeaveLogOfAdminDto.Builder status(Boolean status) {
+            this.status = status;
+            return this;
+        }
 
-		public LeaveLogOfAdminDto build() {
-			return new LeaveLogOfAdminDto(this);
-		}
+        public LeaveLogOfAdminDto.Builder deptName(String deptName) {
+            this.deptName = deptName;
+            return this;
+        }
 
-	}
+
+        public LeaveLogOfAdminDto.Builder leaveNum(Long leaveNum) {
+            this.leaveNum = leaveNum;
+            return this;
+        }
+
+        public LeaveLogOfAdminDto.Builder userName(String userName) {
+            this.userName = userName;
+            return this;
+        }
+
+
+
+        public LeaveLogOfAdminDto build() {
+            return new LeaveLogOfAdminDto(this);
+        }
+
+    }
 }
