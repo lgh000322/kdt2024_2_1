@@ -3,6 +3,7 @@ package main.controller;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.sql.Savepoint;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,8 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import main.consts.MessageTypeConst;
 import main.domain.board.Board;
+import main.domain.board.BoardAnswer;
+import main.domain.user.Role;
 import main.domain.user.User;
 import main.dto.ResponseData;
 import main.dto.answer_dto.AnswerInBoardDto;
@@ -34,6 +37,10 @@ import main.util.ServerConnectUtils;
 import main.util.UserInfoSavedUtil;
 
 public class QnAShowController {
+	
+	private Long boardNum;
+	
+	private Long userNum;
 
     @FXML
     private TextArea ReceivedContents;
@@ -58,23 +65,25 @@ public class QnAShowController {
     @FXML
 	private ObservableList<AnswerInBoardDto> answerList = FXCollections.observableArrayList();
 
-    public void setBoardAndAnswerData(BoardAndAnswer boardAndAnswer) {
+    public void setBoardAndAnswerData(BoardAndAnswer boardAndAnswer,Long boardNum,Long userNum) {
         if (boardAndAnswer != null && boardAndAnswer.getBoardInfoDto() != null) {
             PostUser.setText(boardAndAnswer.getBoardInfoDto().getBoardUserName());
             ReceivedTitle.setText(boardAndAnswer.getBoardInfoDto().getBoardTitle());
             ReceivedContents.setText(boardAndAnswer.getBoardInfoDto().getBoardContents());
+            this.boardNum=boardNum;
+            this.userNum=userNum;
             
             // 댓글 목록 설정
             List<AnswerInBoardDto> list = boardAndAnswer.getAnswerInBoard();
-            if (list != null && !list.isEmpty()) {
-                answerList.clear(); // 기존의 데이터를 초기화
-                answerList.addAll(list); // 새 데이터를 추가
-                CommentListView.setItems(answerList);
-            } else {
-                System.out.println("댓글 목록이 없습니다.");
+            answerList.clear();
+            for(int i=0;i<list.size();i++) {
+            	AnswerInBoardDto answerInBoardDto=list.get(i);
+            	answerList.add(answerInBoardDto);
             }
-        } else {
-            System.out.println("게시글 정보가 없습니다.");
+            
+            Platform.runLater(()->{
+            	CommentListView.setItems(answerList);
+            });
         }
     }
     
@@ -85,28 +94,28 @@ public class QnAShowController {
         DataOutputStream dos = serverConnectUtils.getDataOutputStream();
         DataInputStream dis = serverConnectUtils.getDataInputStream();
 
-        // 댓글 정보를 설정
-        AnswerInBoardDto answerInBoardDto = new AnswerInBoardDto.Builder()
-            .answerUserId(UserInfoSavedUtil.getUserId()) // 작성자 ID
-            .answerContent(AnswerContents.getText()) // 댓글 내용
-            .build();
-
-        // 서버에 보낼 Board, User, BoardAnswer 데이터를 설정
-        User user = new User.Builder()
-            .userNum(UserInfoSavedUtil.getUserInfo().getUserNum())
-            .role(UserInfoSavedUtil.getRole())
-            .build();
+        Board board=new Board.Builder()
+        		.userNum(userNum)
+        		.build();
         
-        // 게시글 번호를 정확히 설정해야 합니다.
-        Board board = new Board.Builder()
-                .boardNum(null) // 게시글 번호 설정
-                .build();
+        User user=new User.Builder()
+        		.userId(UserInfoSavedUtil.getUserId())
+        		.role(Role.USER)
+        		.userNum(UserInfoSavedUtil.getUserInfo().getUserNum())
+        		.build();
+        
+        BoardAnswer boardAnswer=new BoardAnswer.Builder()
+        		.contents(AnswerContents.getText())
+        		.boardNum(boardNum)
+        		.userNum(UserInfoSavedUtil.getUserInfo().getUserNum())
+        		.createdDate(LocalDate.now())
+        		.build();
         
         // 서버에서 처리할 수 있도록 Board, User, Answer 정보를 하나의 객체로 포장하여 전송
         Map<String, Object> requestData = new HashMap<>();
         requestData.put("board", board);
         requestData.put("writeUser", user);
-        requestData.put("boardAnswer", answerInBoardDto);
+        requestData.put("boardAnswer", boardAnswer);
 
         // JSON 변환 및 전송
         String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_ANSWER_ADD, requestData);

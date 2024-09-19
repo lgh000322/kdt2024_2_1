@@ -6,6 +6,11 @@ public class BoardInfoDto2 {
     private String boardContents;
     private String boardUserId;
     private String boardUserName;
+    private Long userNum;
+    
+    public Long getUserNum() {
+    	return userNum;
+    }
 
     public String getBoardTitle() {
         return boardTitle;
@@ -26,6 +31,7 @@ public class BoardInfoDto2 {
         this.boardUserId = builder.boardUserId;
         this.boardContents = builder.boardContents;
         this.boardUserName = builder.boardUserName;
+        this.userNum=builder.userNum;
 
     }
 
@@ -34,7 +40,12 @@ public class BoardInfoDto2 {
         private String boardContents;
         private String boardUserId;
         private String boardUserName;
-
+        private Long userNum;
+        
+        public Builder userNum(Long userNum) {
+        	this.userNum=userNum;
+        	return this;
+        }
 
         public Builder boardTitle(String boardTitle) {
             this.boardTitle = boardTitle;
