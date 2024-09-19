@@ -365,7 +365,7 @@ public class UserService {
         userInfo.setDeptName(findUser.getDeptName());
         userInfo.setEmail(findUser.getEmail());
         userInfo.setTel(findUser.getTel());
-        userInfo.setName(userInfo.getName());
+        userInfo.setName(findUser.getName());
 
         return new ResponseData("로그인 성공", userInfo);
     }
