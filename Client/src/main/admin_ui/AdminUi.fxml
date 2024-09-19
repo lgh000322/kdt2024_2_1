@@ -74,8 +74,8 @@
                         </TableView>
                         <Button fx:id="userLeaveSearchBtn" layoutX="185.0" layoutY="383.0" mnemonicParsing="false" text="회원 검색" onAction="#hadleLeaveSearchBtn"/>
                         <TextField fx:id="userLeaveSearch" layoutX="14.0" layoutY="383.0" />
-                        <Button layoutX="471.0" layoutY="383.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="승인" onAction="#handleRejectBtn" fx:id="rejectBtn"/>
-                        <Button layoutX="395.0" layoutY="383.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="거절" onAction="#handleAcceptBtn" fx:id="acceptBtn"/>
+                        <Button layoutX="471.0" layoutY="383.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="승인" onAction="#handleAcceptBtn" fx:id="rejectBtn"/>
+                        <Button layoutX="395.0" layoutY="383.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="거절" onAction="#handleRejectBtn" fx:id="acceptBtn"/>
                      </children></AnchorPane>
             </content>
           </Tab>

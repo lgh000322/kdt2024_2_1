@@ -21,6 +21,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -148,6 +150,11 @@ public class AdminUiController {
 	private TableColumn<LeaveRecordOfAdmin, Boolean> checkStatus;
 	@FXML
 	private TableColumn<LeaveRecordOfAdmin, String> userId;
+	
+	
+	@FXML
+	private TextField userLeaveSearch;
+	
 	/*
 	 * 급여관리 테이블 뷰
 	 */
@@ -271,6 +278,7 @@ public class AdminUiController {
 	private LocalDate selectedLeaveEndDate;
 	private LocalDate selectedLeaveStartDate;
 	private Long selectedLeaveNum;
+	private String selectedUserId;
 	
 	@FXML
 	public void initialize() {
@@ -413,7 +421,7 @@ public class AdminUiController {
 		leaveTable.setOnMouseClicked((MouseEvent e) -> {
 			LocalDate startDate = null;
 			LocalDate endDate = null;
-			if(e.getClickCount() == 2) {
+			if(e.getClickCount() == 2 || e.getClickCount() == 1) {  // 한번 클릭하거나 더블 클릭하면. 해당정보들을 가져
 				selectedLeaveRecord = leaveTable.getSelectionModel().getSelectedItem();
 				
 				if (selectedLeaveRecord != null) {
@@ -436,6 +444,7 @@ public class AdminUiController {
 			        selectedLeaveEndDate = endDate;
 			        selectedLeaveStartDate = startDate;
 			    	selectedLeaveNum = selectedLeaveRecord.getNo();
+			    	selectedUserId = selectedLeaveRecord.getUserId();
 			        
 		        }
 			}
@@ -920,6 +929,68 @@ public class AdminUiController {
 	
 	public void hadleLeaveSearchBtn() throws IOException {
 		
+		leaveRecordList.clear();
+		
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		
+		
+		ForFindLeaveDto forFindLeaveDto = new ForFindLeaveDto();
+		forFindLeaveDto.setUserName(userLeaveSearch.getText());
+		forFindLeaveDto.setUserId(null);
+		forFindLeaveDto.setUserRoleDto(UserRoleDto.ADMIN);
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_LEAVE_SEARCH, forFindLeaveDto);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			Type listType = new TypeToken<List<LeaveLogOfAdminDto>>() {
+			}.getType();
+			ResponseData<LeaveLogOfAdminDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					listType);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				List<LeaveLogOfAdminDto> list = (List<LeaveLogOfAdminDto>) responseData.getData();
+				for (int i = 0; i < list.size(); i++) {
+					
+					LeaveLogOfAdminDto leaveLogOfAdminDto = list.get(i);
+					LeaveRecordOfAdmin leaveRecordOfAdmin = new LeaveRecordOfAdmin(leaveLogOfAdminDto.getLeaveNum(), leaveLogOfAdminDto.getUserName(),
+							leaveLogOfAdminDto.getRequestDate(), leaveLogOfAdminDto.getStartDate(),
+							leaveLogOfAdminDto.getEndDate(), leaveLogOfAdminDto.getDeptName(),
+							leaveLogOfAdminDto.getStatus(), leaveLogOfAdminDto.getRemainedLeave(), leaveLogOfAdminDto.getCheckStatus(), leaveLogOfAdminDto.getUserId());
+
+					leaveRecordList.add(leaveRecordOfAdmin);
+
+				}
+
+				Platform.runLater(() -> {
+					leaveTable.setItems(leaveRecordList);
+				});
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
 	}
 	
 	public void handleRejectBtn() throws IOException {
@@ -940,6 +1011,7 @@ public class AdminUiController {
 		 * requestData의 data에 넣어줄 객체를 생성
 		 */
 		ForUpdateLeaveDto forUpdateLeaveDto = new ForUpdateLeaveDto.Builder()
+				.userId(selectedUserId)
 				.leaveNum(selectedLeaveNum)
 				.startDate(selectedLeaveStartDate)
 				.endDate(selectedLeaveEndDate)
@@ -951,47 +1023,133 @@ public class AdminUiController {
 		 */
 		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_LEAVE_EDIT, forUpdateLeaveDto);
 		
-		
-
 		try {
 			communicationUtils.sendServer(jsonSendStr, dos);
 			String jsonReceivedStr = dis.readUTF();
 
-			ResponseData<ForUpdateLeaveDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, ForUpdateLeaveDto.class);
+			Type listType = new TypeToken<List<LeaveLogOfAdminDto>>() {
+			}.getType();
+			ResponseData<LeaveLogOfAdminDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					listType);
 			String messageType = responseData.getMessageType();
 
-
-			if (messageType.contains("휴가 거절 성공")) {
-				List<UserInfo> list = (List<UserInfo>) responseData.getData();
+			if (messageType.contains("성공")) {
+				List<LeaveLogOfAdminDto> list = (List<LeaveLogOfAdminDto>) responseData.getData();
 				for (int i = 0; i < list.size(); i++) {
-					System.out.println("이름과 일치하는 회원 정보 출력.");
-					UserInfo userInfo = list.get(i);
-			
-					UserRecord userRecord = new UserRecord(userInfo.getUserNum(), userInfo.getName(), userInfo.getTel(),
-							userInfo.getDeptName(), userInfo.getPositionName(), userInfo.getEmail());
-					userRecordList.add(userRecord);
+					
+					LeaveLogOfAdminDto leaveLogOfAdminDto = list.get(i);
+					LeaveRecordOfAdmin leaveRecordOfAdmin = new LeaveRecordOfAdmin(leaveLogOfAdminDto.getLeaveNum(), leaveLogOfAdminDto.getUserName(),
+							leaveLogOfAdminDto.getRequestDate(), leaveLogOfAdminDto.getStartDate(),
+							leaveLogOfAdminDto.getEndDate(), leaveLogOfAdminDto.getDeptName(),
+							leaveLogOfAdminDto.getStatus(), leaveLogOfAdminDto.getRemainedLeave(), leaveLogOfAdminDto.getCheckStatus(), leaveLogOfAdminDto.getUserId());
+
+					leaveRecordList.add(leaveRecordOfAdmin);
+
 				}
 
 				Platform.runLater(() -> {
-					employeeTable.setItems(userRecordList);
+					leaveTable.setItems(leaveRecordList);
 				});
 
 			}
-		} catch (
-
-		IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			serverConnectUtils.close();
 		}
+
+		
 	}
 		
 	
 	
 	public void handleAcceptBtn() throws IOException {
 		
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		ForUpdateLeaveDto forUpdateLeaveDto = new ForUpdateLeaveDto.Builder()
+				.userId(selectedUserId)
+				.leaveNum(selectedLeaveNum)
+				.startDate(selectedLeaveStartDate)
+				.endDate(selectedLeaveEndDate)
+				.status(LeaveStatus.ACCEPT)
+				.build();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_LEAVE_EDIT, forUpdateLeaveDto);
+		
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			Type listType = new TypeToken<List<LeaveLogOfAdminDto>>() {
+			}.getType();
+			ResponseData<LeaveLogOfAdminDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					listType);
+			String messageType = responseData.getMessageType();
+				
+			if (messageType.contains("휴가 수락 실패 (신청 일수가 남은 일수를 초과함.)")) {
+				Alert alert = new Alert(AlertType.INFORMATION);
+		        alert.setTitle("휴가 수락 실패");
+		        alert.setHeaderText("휴가 수락 실패");
+		        alert.setContentText("휴가 일수를 초과하여 신청하였습니다.");
+
+		        // Alert 창을 띄우고, 사용자가 닫을 때까지 대기
+		        alert.showAndWait();
+		        
+		        // Alert 창이 닫힌 후 실행할 코드
+		        System.out.println("Alert 창이 닫혔습니다.");
+		        
+		        return;
+		        
+			}
+			
+			leaveRecordList.clear();
+			
+			
+			if (messageType.contains("성공")) {
+				List<LeaveLogOfAdminDto> list = (List<LeaveLogOfAdminDto>) responseData.getData();
+				for (int i = 0; i < list.size(); i++) {
+					
+					LeaveLogOfAdminDto leaveLogOfAdminDto = list.get(i);
+					LeaveRecordOfAdmin leaveRecordOfAdmin = new LeaveRecordOfAdmin(leaveLogOfAdminDto.getLeaveNum(), leaveLogOfAdminDto.getUserName(),
+							leaveLogOfAdminDto.getRequestDate(), leaveLogOfAdminDto.getStartDate(),
+							leaveLogOfAdminDto.getEndDate(), leaveLogOfAdminDto.getDeptName(),
+							leaveLogOfAdminDto.getStatus(), leaveLogOfAdminDto.getRemainedLeave(), leaveLogOfAdminDto.getCheckStatus(), leaveLogOfAdminDto.getUserId());
+
+					leaveRecordList.add(leaveRecordOfAdmin);
+
+				}
+
+				Platform.runLater(() -> {
+					leaveTable.setItems(leaveRecordList);
+				});
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
+
 	}
 	
 	
