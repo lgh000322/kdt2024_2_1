@@ -24,7 +24,7 @@ module Client {
 	opens main.domain.position to com.google.gson, javafx.base; // 필요한 경우
 	opens main.domain.salary_log to com.google.gson, javafx.base; // 필요한 경우
 	opens main.domain.work_log to com.google.gson, javafx.base; // 필요한 경우
-
+	
 	exports main.dto.work_dto;
 	exports main to javafx.graphics, javafx.controls, javafx.fxml; // JavaFX에 내보내기
 	exports main.controller; // 컨트롤러를 JavaFX에 내보내기

@@ -431,17 +431,20 @@ public class UserUiController implements Initializable {
 		
 		   
 		qnaRecordTableView.setOnMouseClicked(event -> {
-			QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
+		    QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
 
-			if (selectedQnAItem != null) {
-				System.out.println("Selected QnARecord: " + selectedQnAItem);
-			}
-			try {
-				qnaItemClickMethod(selectedQnAItem.getKeyNo());
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+		    if (selectedQnAItem != null) {
+		        System.out.println("Selected QnARecord: " + selectedQnAItem);
+
+		        // 선택된 QnARecord의 keyNo 가져오기
+		        Long selectedKeyNo = selectedQnAItem.getKeyNo();
+		        
+		        try {
+		            qnaItemClickMethod(selectedKeyNo);
+		        } catch (IOException e1) {
+		            e1.printStackTrace();
+		        }
+		    }
 		});
 	}
 
@@ -519,6 +522,10 @@ public class UserUiController implements Initializable {
 	/* 메일 콤보 리스트 */
 	public void handlemailComboList() {
 		mailComboList.setItems(maillist);
+	}
+	
+	/* 메일검색 버튼 로직 */
+	public void handlesearchMailTitleBtn() {
 	}
 	
 	/* 메일쓰기 버튼 클릭 시, 메일작성 창 띄우기 */
@@ -681,7 +688,7 @@ public class UserUiController implements Initializable {
 	}
 
 	/* Q&A 리스트 아이템 선택 시, 선택된 아이템 창 연결 */
-	public void qnaItemClickMethod(Long boardKeyNo) throws IOException {
+	public void qnaItemClickMethod(Long keyNo) throws IOException {
 		CommunicationUtils communicationUtils = new CommunicationUtils();
 
 		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
@@ -699,7 +706,7 @@ public class UserUiController implements Initializable {
 //		requestData.setData(userLoginDto);
 //		requestData.setMessageType(MessageTypeConst.MESSAGE_LOGIN);
 
-		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_ONE_SEARCH, boardKeyNo);
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_ONE_SEARCH, keyNo);
 		
 		try {
 			communicationUtils.sendServer(jsonSendStr, dos);
@@ -724,6 +731,8 @@ public class UserUiController implements Initializable {
 	                            // QnAShowController를 가져와서 데이터를 설정
 	                            QnAShowController qnaShowController = fxmlLoader.getController();
 	                            qnaShowController.setBoardAndAnswerData(boardAndAnswer);
+	                            // QnAShowController의 keyNo 설정
+	                            qnaShowController.setKeyNo(keyNo);
 
 	                            // 새 창을 띄우고 현재 창 숨기기
 	                            Stage qnaStage = new Stage();

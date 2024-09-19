@@ -398,7 +398,7 @@ public class AdminUiController {
 		/**
 		 * requestData 생성
 		 */
-		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_SALARY_SEARCH, user);
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_SALARY_SEARCH, user.getClass());
 
 		try {
 			communicationUtils.sendServer(jsonSendStr, dos);
