@@ -125,7 +125,7 @@ public class LeaveRepository {
         ResultSet rs = null;
 
         //모든 leave_log를 가져오기위한 쿼리
-        String sql = "select l.leave_num, u.name, l.request_date, l.start_date, l.end_date, d.dept_name, l.acceptance_status, u.remained_leave" +
+        String sql = "select l.leave_num, u.name, l.request_date, l.start_date, l.end_date, d.dept_name, l.acceptance_status, u.remained_leave, l.check_status, u.user_id" +
                 " from leave_log l inner join user u on l.user_num = u.user_num" +
                 " inner join dept d on u.dept_num = d.dept_num";
 
@@ -143,6 +143,8 @@ public class LeaveRepository {
                         .deptName(rs.getString("dept_name"))
                         .status(rs.getBoolean("acceptance_status"))
                         .remainedLeave(rs.getInt("remained_leave"))
+                        .checkStatus(rs.getBoolean("check_status"))
+                        .userId(rs.getString("user_id"))
                         .build();
 
                 leaveLogOfAdminDtos.add(leaveLogOfAdminDto);

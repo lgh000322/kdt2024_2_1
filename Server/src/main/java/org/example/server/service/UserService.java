@@ -17,6 +17,7 @@ import org.example.server.repository.UserRepository;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -108,6 +109,24 @@ public class UserService {
         }
         return responseData;
     }
+
+    public ResponseData findByUserName(String userName) throws SQLException {
+        ResponseData responseData = null;
+        Connection con = null;
+
+        try{
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = findByUserNameBizLogic(userName, con);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+        return responseData;
+    }
+
 
 
     /**
@@ -240,6 +259,15 @@ public class UserService {
             release(con);
         }
         return responseData;
+    }
+
+
+    private ResponseData findByUserNameBizLogic(String userName, Connection con) throws SQLException {
+        List<UserInfo> userInfos = new ArrayList<>();
+
+        userInfos = userRepository.findUsersByName(con, userName);
+
+        return new ResponseData("회원 이름으로 매칭된 정보 검색 성공", userInfos);
     }
 
     private ResponseData updateUserBizLogic(UpdateUserDto updateUserDto, Connection con) throws SQLException {
