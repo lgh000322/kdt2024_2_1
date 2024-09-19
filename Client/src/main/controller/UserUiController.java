@@ -28,6 +28,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -39,6 +40,7 @@ import main.consts.MessageTypeConst;
 import main.domain.mail.MailType;
 import main.domain.user.Role;
 import main.domain.user.User;
+import main.domain.work_log.Status;
 import main.domain.work_log.WorkLog;
 import main.dto.ResponseData;
 import main.dto.board_dto.BoardAndAnswer;
@@ -55,6 +57,8 @@ import main.dto.salary_dto.SalaryRecord;
 import main.dto.user_dto.UserInfo;
 import main.dto.user_dto.UserRoleDto;
 import main.dto.user_dto.UserSalaryData;
+import main.dto.user_dto.UserSearchData;
+import main.dto.user_dto.UserSearchDto;
 import main.dto.user_dto.UserWorkData;
 import main.dto.work_dto.WorkRecord;
 import main.util.CommunicationUtils;
@@ -248,7 +252,7 @@ public class UserUiController implements Initializable {
 	private ObservableList<MailRecord> mailRecordList = FXCollections.observableArrayList();
 
 	@FXML
-	private ObservableList<String> list = FXCollections.observableArrayList("출근", "결근", "조퇴");
+	private ObservableList<String> list = FXCollections.observableArrayList("출근", "결근", "지각");
 
 	/* 현재시간 표시 */
 	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -268,6 +272,11 @@ public class UserUiController implements Initializable {
 				qnaRecordList.clear();
 				salaryRecordList.clear();
 				mailRecordList.clear();
+				
+				selectWorkDate.setValue(null);
+				selectMoneyDate.setValue(null);
+				mailTitle.clear();
+				qnaTitle.clear();
 			}
 		});
 
@@ -283,7 +292,12 @@ public class UserUiController implements Initializable {
 				workRecordList.clear();
 				qnaRecordList.clear();
 				salaryRecordList.clear();
-				mailRecordList.clear();
+				mailRecordList.clear();	
+				selectWorkDate.setValue(null);
+				selectMoneyDate.setValue(null);
+				mailTitle.clear();
+				qnaTitle.clear();
+
 			}
 		});
 
@@ -300,6 +314,11 @@ public class UserUiController implements Initializable {
 				leaveRecordList.clear();
 				qnaRecordList.clear();
 				mailRecordList.clear();
+				
+				selectWorkDate.setValue(null);
+				selectMoneyDate.setValue(null);
+				mailTitle.clear();
+				qnaTitle.clear();
 			}
 		});
 
@@ -316,6 +335,11 @@ public class UserUiController implements Initializable {
 				leaveRecordList.clear();
 				qnaRecordList.clear();
 				salaryRecordList.clear();
+				
+				selectWorkDate.setValue(null);
+				selectMoneyDate.setValue(null);
+				mailTitle.clear();
+				qnaTitle.clear();
 			}
 		});
 
@@ -333,6 +357,11 @@ public class UserUiController implements Initializable {
 			workRecordList.clear();
 			salaryRecordList.clear();
 			mailRecordList.clear();
+			
+			selectWorkDate.setValue(null);
+			selectMoneyDate.setValue(null);
+			mailTitle.clear();
+			qnaTitle.clear();
 		});
 
 		Timeline clock = new Timeline(new KeyFrame(Duration.ZERO, e -> {
@@ -406,8 +435,8 @@ public class UserUiController implements Initializable {
 		LocalTime sixPM = LocalTime.of(18, 10);
 
 		// 17:50:00에서 18:10:00 사이이거나 같은 경우 버튼을 활성화
-		if ((currentTime.isAfter(fiveFiftyPM) || currentTime.equals(fiveFiftyPM)) &&
-		    (currentTime.isBefore(sixPM) || currentTime.equals(sixPM))) {
+		if ((currentTime.isAfter(fiveFiftyPM) || currentTime.equals(fiveFiftyPM))
+				&& (currentTime.isBefore(sixPM) || currentTime.equals(sixPM))) {
 			endWorkBtn.setDisable(false); // 버튼 활성화
 		} else {
 			endWorkBtn.setDisable(true); // 버튼 비활성화
@@ -456,7 +485,16 @@ public class UserUiController implements Initializable {
 	 */
 	/* 날짜 검색 버튼 클릭 시, 선택한 날짜에 대한 검색 로직 */
 	public void handlesearchWorkDateBtn() {
-		System.out.println("근태기록에서 날짜 검색");
+		System.out.println("근태탭에서 검색 수행");
+		workRecordList.clear();
+		try {
+			workTabClickedMethod();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 	public void handleworkComboList() {
@@ -734,12 +772,33 @@ public class UserUiController implements Initializable {
 		/**
 		 * requestData의 data에 넣어줄 객체를 생성
 		 */
-		User user = new User.Builder().userId(UserInfoSavedUtil.getUserId()).role(UserInfoSavedUtil.getRole()).build();
+		Status status = null;
+
+		// 결근이 선택됨
+		if (workComboList.getValue() != null && workComboList.getValue().equals(Status.ABSENCE.getDescription())) {
+			status = Status.ABSENCE;
+		}
+
+		// 출근이 선택됨
+		if (workComboList.getValue() != null && workComboList.getValue().equals(Status.ATTENDANCE.getDescription())) {
+			status = Status.ATTENDANCE;
+		}
+
+		// 지각이 선택됨
+		if (workComboList.getValue() != null && workComboList.getValue().equals(Status.TARDINESS.getDescription())) {
+			status = Status.TARDINESS;
+		}
+
+		UserSearchData userSearchData = new UserSearchData.Builder().date(selectWorkDate.getValue()).status(status)
+				.build();
+
+		UserSearchDto userSearchDto = new UserSearchDto.Builder().userId(UserInfoSavedUtil.getUserId())
+				.role(UserInfoSavedUtil.getRole()).userSearchData(userSearchData).build();
 
 		/**
 		 * requestData 생성
 		 */
-		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_WORK_SEARCH, user);
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_WORK_SEARCH, userSearchDto);
 
 		try {
 			communicationUtils.sendServer(jsonSendStr, dos);
@@ -821,9 +880,21 @@ public class UserUiController implements Initializable {
 					leaveRecordList.add(leaveRecord);
 
 				}
-
-				Platform.runLater(() -> {
-					leaveRecordTableView.setItems(leaveRecordList);
+	
+					Platform.runLater(() -> {
+						leaveRecordTableView.setItems(leaveRecordList);
+						
+						leaveAcceptColumn.setCellFactory(column -> new TableCell<LeaveRecord, Boolean>() {
+					        @Override
+					        protected void updateItem(Boolean item, boolean empty) {
+					            super.updateItem(item, empty);
+					            if (empty || item == null) {
+					                setText(null);
+					            } else {
+					                setText(item ? "승인 됨" : "승인 안됨");
+					            }
+					        }
+					    });
 				});
 
 			}
