@@ -37,6 +37,8 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.consts.MessageTypeConst;
+import main.domain.board.BoardAnswer;
+import main.domain.mail.Mail;
 import main.domain.mail.MailType;
 import main.domain.user.Role;
 import main.domain.user.User;
@@ -272,7 +274,7 @@ public class UserUiController implements Initializable {
 				qnaRecordList.clear();
 				salaryRecordList.clear();
 				mailRecordList.clear();
-				
+
 				selectWorkDate.setValue(null);
 				selectMoneyDate.setValue(null);
 				mailTitle.clear();
@@ -292,7 +294,7 @@ public class UserUiController implements Initializable {
 				workRecordList.clear();
 				qnaRecordList.clear();
 				salaryRecordList.clear();
-				mailRecordList.clear();	
+				mailRecordList.clear();
 				selectWorkDate.setValue(null);
 				selectMoneyDate.setValue(null);
 				mailTitle.clear();
@@ -314,7 +316,7 @@ public class UserUiController implements Initializable {
 				leaveRecordList.clear();
 				qnaRecordList.clear();
 				mailRecordList.clear();
-				
+
 				selectWorkDate.setValue(null);
 				selectMoneyDate.setValue(null);
 				mailTitle.clear();
@@ -335,7 +337,7 @@ public class UserUiController implements Initializable {
 				leaveRecordList.clear();
 				qnaRecordList.clear();
 				salaryRecordList.clear();
-				
+
 				selectWorkDate.setValue(null);
 				selectMoneyDate.setValue(null);
 				mailTitle.clear();
@@ -357,7 +359,7 @@ public class UserUiController implements Initializable {
 			workRecordList.clear();
 			salaryRecordList.clear();
 			mailRecordList.clear();
-			
+
 			selectWorkDate.setValue(null);
 			selectMoneyDate.setValue(null);
 			mailTitle.clear();
@@ -426,6 +428,19 @@ public class UserUiController implements Initializable {
 				e1.printStackTrace();
 			}
 		});
+
+		mailRecordTableView.setOnMouseClicked(event -> {
+			MailRecord mailRecord = mailRecordTableView.getSelectionModel().getSelectedItem();
+			Long mailNum = mailRecord.getMailKeyNo();
+			String receivedUserEmail = mailRecord.getMailReceived();
+
+			try {
+				mailItemClickedMethod(mailNum, receivedUserEmail);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			System.out.println("특정 메일 선택 메소드 실행");
+		});
 	}
 
 	// 버튼 활성화/비활성화 상태를 결정하는 메서드
@@ -493,8 +508,7 @@ public class UserUiController implements Initializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
 	}
 
 	public void handleworkComboList() {
@@ -658,7 +672,7 @@ public class UserUiController implements Initializable {
 					BoardFindAllDto boardFindAllDto = list.get(i);
 					Long no = Long.valueOf(i + 1);
 
-					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
+					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getUserNum(),boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
 							boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
 
 					qnaRecordList.add(qnaRecord);
@@ -711,11 +725,11 @@ public class UserUiController implements Initializable {
 
 			if (messageType.contains("성공")) {
 				BoardAndAnswer boardAndAnswer = responseData.getData();
-
 				// 데이터가 null인지 확인
 				if (boardAndAnswer != null) {
 					// 성공적으로 데이터를 받았는지 확인
 					if (responseData.getMessageType().contains("성공")) {
+					
 						Platform.runLater(() -> {
 							try {
 								// QnA 상세 화면 로드
@@ -725,7 +739,7 @@ public class UserUiController implements Initializable {
 
 								// QnAShowController를 가져와서 데이터를 설정
 								QnAShowController qnaShowController = fxmlLoader.getController();
-								qnaShowController.setBoardAndAnswerData(boardAndAnswer);
+								qnaShowController.setBoardAndAnswerData(boardAndAnswer,boardKeyNo,boardAndAnswer.getBoardInfoDto().getUserNum());
 
 								// 새 창을 띄우고 현재 창 숨기기
 								Stage qnaStage = new Stage();
@@ -733,6 +747,74 @@ public class UserUiController implements Initializable {
 								qnaStage.setScene(new Scene(qnaRoot));
 
 								qnaStage.show();
+
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						});
+					} else {
+						System.out.println("게시글 정보를 가져오는 데 실패했습니다.");
+					}
+				} else {
+					System.out.println("BoardAndAnswer 객체가 null입니다.");
+				}
+			} else {
+				System.out.println("서버 응답이 null입니다.");
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			// 연결 종료
+			serverConnectUtils.close();
+		}
+	}
+
+	/* Q&A 리스트 아이템 선택 시, 선택된 아이템 창 연결 */
+	public void mailItemClickedMethod(Long mailNum, String receivedUserEmail) throws IOException {
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData 생성 //
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_MAIL_ONE_SEARCH, mailNum);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			ResponseData<Mail> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, Mail.class);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				Mail mail = responseData.getData();
+
+				// 데이터가 null인지 확인
+				if (mail != null) {
+					// 성공적으로 데이터를 받았는지 확인
+					if (responseData.getMessageType().contains("성공")) {
+						Platform.runLater(() -> {
+							try {
+								// QnA 상세 화면 로드
+								FXMLLoader fxmlLoader = new FXMLLoader(
+										getClass().getResource("/main/mail_ui/ShowMail.fxml"));
+								Parent qnaRoot = fxmlLoader.load();
+
+								MailShowController mailShowController = fxmlLoader.getController();
+								mailShowController.setMailWindow(mail, receivedUserEmail);
+						
+								Stage mailStage = new Stage();
+								mailStage.setTitle("메일 상세보기");
+								mailStage.setScene(new Scene(qnaRoot));
+
+								mailStage.show();
 
 							} catch (IOException e) {
 								e.printStackTrace();
@@ -880,21 +962,21 @@ public class UserUiController implements Initializable {
 					leaveRecordList.add(leaveRecord);
 
 				}
-	
-					Platform.runLater(() -> {
-						leaveRecordTableView.setItems(leaveRecordList);
-						
-						leaveAcceptColumn.setCellFactory(column -> new TableCell<LeaveRecord, Boolean>() {
-					        @Override
-					        protected void updateItem(Boolean item, boolean empty) {
-					            super.updateItem(item, empty);
-					            if (empty || item == null) {
-					                setText(null);
-					            } else {
-					                setText(item ? "승인 됨" : "승인 안됨");
-					            }
-					        }
-					    });
+
+				Platform.runLater(() -> {
+					leaveRecordTableView.setItems(leaveRecordList);
+
+					leaveAcceptColumn.setCellFactory(column -> new TableCell<LeaveRecord, Boolean>() {
+						@Override
+						protected void updateItem(Boolean item, boolean empty) {
+							super.updateItem(item, empty);
+							if (empty || item == null) {
+								setText(null);
+							} else {
+								setText(item ? "승인 됨" : "승인 안됨");
+							}
+						}
+					});
 				});
 
 			}
@@ -1009,8 +1091,8 @@ public class UserUiController implements Initializable {
 					System.out.println("휴가로그 출력 실행");
 					MailAllDto mailAllDto = list.get(i);
 					Long no = (long) (i + 1);
-					MailRecord mailRecord = new MailRecord(no, mailAllDto.getUserEmail(), mailAllDto.getTitle(),
-							mailAllDto.getCreatedDate().toString());
+					MailRecord mailRecord = new MailRecord(mailAllDto.getMailNum(), no, mailAllDto.getUserEmail(),
+							mailAllDto.getTitle(), mailAllDto.getCreatedDate().toString());
 
 					mailRecordList.add(mailRecord);
 				}
@@ -1068,7 +1150,7 @@ public class UserUiController implements Initializable {
 					System.out.println("QnA게시판 로그 출력 실행");
 					BoardFindAllDto boardFindAllDto = list.get(i);
 					Long no = Long.valueOf(i + 1);
-					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
+					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getUserNum(),boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
 							boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
 					qnaRecordList.add(qnaRecord);
 				}
