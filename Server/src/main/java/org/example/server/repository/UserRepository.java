@@ -131,7 +131,10 @@ public class UserRepository {
 
 
     public Optional<User> findUserByIDAndRole(Connection conn, String userId, Role role) throws SQLException {
-        String sql = "select * from user where user_id = ? and role = ?";
+        String sql = "select * from user" +
+                " left join dept on user.dept_num = dept.dept_num" +
+                " left join position on user.position_num = position.position_num" +
+                " where user_id = ? and role = ?";
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -146,16 +149,18 @@ public class UserRepository {
 
             if (rs.next()) {
                 user = new User.Builder()
-                        .userNum(rs.getLong("user_num"))
-                        .userId(rs.getString("user_id"))
-                        .password(rs.getString("password"))
-                        .name(rs.getString("name"))
-                        .tel(rs.getString("tel"))
-                        .email(rs.getString("email"))
-                        .role(Role.fromString(rs.getString("role")))
-                        .remainedLeave(rs.getInt("remained_leave"))
-                        .positionNum(rs.getLong("position_num"))
-                        .deptNum(rs.getLong("dept_num"))
+                        .userNum(rs.getLong("user.user_num"))
+                        .userId(rs.getString("user.user_id"))
+                        .password(rs.getString("user.password"))
+                        .name(rs.getString("user.name"))
+                        .tel(rs.getString("user.tel"))
+                        .email(rs.getString("user.email"))
+                        .role(Role.fromString(rs.getString("user.role")))
+                        .remainedLeave(rs.getInt("user.remained_leave"))
+                        .positionNum(rs.getLong("user.position_num"))
+                        .deptNum(rs.getLong("user.dept_num"))
+                        .positionName(rs.getString("position.position_name"))
+                        .deptName(rs.getString("position.position_name"))
                         .build();
             }
 

@@ -345,21 +345,27 @@ public class UserService {
     }
 
 
-    private ResponseData loginBizLogicUser(UserLoginDto user, Connection con) throws SQLException {
-        Optional<UserInfo> findUser = Optional.empty();
+    private ResponseData loginBizLogicUser(UserLoginDto userLoginDto, Connection con) throws SQLException {
+        Optional<User> findUserOptional = Optional.empty();
 
-        findUser = userRepository.findUserInfoByIDAndRole(con, user.getUserId(), user.getRole());
-        if (findUser.isEmpty()) {
+        findUserOptional = userRepository.findUserByIDAndRole(con, userLoginDto.getUserId(), userLoginDto.getRole());
+        if (findUserOptional.isEmpty()) {
             return new ResponseData("실패(존재하지 않는 회원)", null);
         }
 
-        if (!user.getPassword().equals(user.getPassword())) {
+        User findUser = findUserOptional.get();
+
+        if (!findUser.getPassword().equals(userLoginDto.getPassword())) {
             return new ResponseData("로그인 실패", null);
         }
 
-        //이름, 사용자 번호, 이메일, 부서, 직급,
-        UserInfo userInfo = findUser.get();
-
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserNum(findUser.getUserNum());
+        userInfo.setPositionName(findUser.getPositionName());
+        userInfo.setDeptName(findUser.getDeptName());
+        userInfo.setEmail(findUser.getEmail());
+        userInfo.setTel(findUser.getTel());
+        userInfo.setName(userInfo.getName());
 
         return new ResponseData("로그인 성공", userInfo);
     }
