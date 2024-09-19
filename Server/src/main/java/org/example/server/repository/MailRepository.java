@@ -208,7 +208,7 @@ public class MailRepository {
 
     public Optional<Mail> findMailOne(Connection con, Long mailNum) throws SQLException {
 
-        String sql = "select * from mail where mail_num = ?";
+        String sql = "select * from mail where mai_num = ?";
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;

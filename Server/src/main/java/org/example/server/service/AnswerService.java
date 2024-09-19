@@ -32,12 +32,13 @@ public class AnswerService {
         System.out.println("AnswerService 싱글톤 반환");
         return answerService;
     }
-    public AnswerService(AnswerRepository answerRepository,  UserRepository userRepository) {
+
+    public AnswerService(AnswerRepository answerRepository, UserRepository userRepository) {
         this.answerRepository = answerRepository;
         this.userRepository = userRepository;
         dataSource = DBUtils.createOrGetDataSource();
     }
-    
+
     //////////////////////댓글추가
     public ResponseData addAnswer(Board board, BoardAnswer boardAnswer, User user) throws SQLException {
         Connection con = null;
@@ -56,26 +57,24 @@ public class AnswerService {
         return responseData;
     }
 
-    public ResponseData addAnswerBizLogic(Board board, BoardAnswer boardAnswer, User user,Connection con) throws SQLException {
+    public ResponseData addAnswerBizLogic(Board board, BoardAnswer boardAnswer, User user, Connection con) throws SQLException {
         //댓글을 작성할 유저의 정보를 가져온다. 관리자이거나 일반 직원(게시물작성자) 이어야함
         Optional<User> findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
 
         if (findUser.isPresent()) {
             User DBUser = findUser.get();
-            if(DBUser.getUserNum().equals(board.getUserNum()) || DBUser.getRole()== Role.ADMIN) {//해당 게시물의 작성자이거나 관리자만 가능
+            if (DBUser.getUserNum().equals(board.getUserNum()) || DBUser.getRole() == Role.ADMIN) {//해당 게시물의 작성자이거나 관리자만 가능
                 //댓글을 작성하기위해 게시물정보, 입력한 댓글정보, 작성자정보를 보낸다.
-                ResponseData answerResponse = answerRepository.addAnswerOnDB(con, board, boardAnswer, DBUser);
+                ResponseData answerResponse = answerRepository.addAnswerOnDB(con, boardAnswer);
 
                 return new ResponseData("답글 비즈니스 로직 성공", answerResponse.getData());
+            } else {
+                return new ResponseData("작성자가 아니거나 관리자가 아님", null);
             }
-            else{
-                return new ResponseData("작성자가 아니거나 관리자가 아님",null);
-            }
-        }
-        else
-            return new ResponseData("실패",null);
+        } else
+            return new ResponseData("실패", null);
     }
-    
+
     ///////////////////////////////게시물의 댓글 조회
 
     public ResponseData searchAnswer(Board board) throws SQLException {
@@ -107,7 +106,6 @@ public class AnswerService {
             return new ResponseData("실패", null);
         }
     }
-
 
 
     //얜 그냥 쭉쓰면됨
