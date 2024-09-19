@@ -422,33 +422,37 @@ public class UserUiController implements Initializable {
 		}
 
 		qnaRecordTableView.setOnMouseClicked(event -> {
-		    QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
+		    if (event.getClickCount() == 2) { // 2번 클릭을 감지
+		        QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
 
-		    if (selectedQnAItem != null) {
-		        System.out.println("Selected QnARecord: " + selectedQnAItem);
+		        if (selectedQnAItem != null) {
+		            System.out.println("Selected QnARecord: " + selectedQnAItem);
 
-		        // 선택된 QnARecord의 keyNo 가져오기
-		        Long selectedKeyNo = selectedQnAItem.getKeyNo();
-		        
-		        try {
-		            qnaItemClickMethod(selectedKeyNo);
-		        } catch (IOException e1) {
-		            e1.printStackTrace();
+		            // 선택된 QnARecord의 keyNo 가져오기
+		            Long selectedKeyNo = selectedQnAItem.getKeyNo();
+
+		            try {
+		                qnaItemClickMethod(selectedKeyNo);
+		            } catch (IOException e1) {
+		                e1.printStackTrace();
+		            }
 		        }
 		    }
 		});
 
 		mailRecordTableView.setOnMouseClicked(event -> {
-			MailRecord mailRecord = mailRecordTableView.getSelectionModel().getSelectedItem();
-			Long mailNum = mailRecord.getMailKeyNo();
-			String receivedUserEmail = mailRecord.getMailReceived();
+		    if (event.getClickCount() == 2) {
+		        MailRecord mailRecord = mailRecordTableView.getSelectionModel().getSelectedItem();
+		        Long mailNum = mailRecord.getMailKeyNo();
+		        String receivedUserEmail = mailRecord.getMailReceived();
 
-			try {
-				mailItemClickedMethod(mailNum, receivedUserEmail);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			System.out.println("특정 메일 선택 메소드 실행");
+		        try {
+		            mailItemClickedMethod(mailNum, receivedUserEmail);
+		        } catch (IOException e1) {
+		            e1.printStackTrace();
+		        }
+		        System.out.println("특정 메일 선택 메소드 실행");
+		    }
 		});
 	}
 
