@@ -674,7 +674,7 @@ public class AdminUiController {
 					System.out.println("휴가로그 출력 실행");
 					MailAllDto mailAllDto = list.get(i);
 					Long no = (long) (i + 1);
-					MailRecord mailRecord = new MailRecord(no, mailAllDto.getUserEmail(), mailAllDto.getTitle(),
+					MailRecord mailRecord = new MailRecord(mailAllDto.getMailNum(),no, mailAllDto.getUserEmail(), mailAllDto.getTitle(),
 							mailAllDto.getCreatedDate().toString());
 
 					mailRecordList.add(mailRecord);
@@ -806,7 +806,7 @@ public class AdminUiController {
 					BoardFindAllDto boardFindAllDto = list.get(i);
 					Long no = Long.valueOf(i + 1);
 
-					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
+					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getUserNum(),boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
 					        boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
 
 
