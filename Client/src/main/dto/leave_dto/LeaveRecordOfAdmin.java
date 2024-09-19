@@ -21,19 +21,21 @@ public class LeaveRecordOfAdmin {
     private final SimpleStringProperty deptName;
     private final SimpleBooleanProperty leaveAcceptStatus;
     private final SimpleIntegerProperty remainedLeave;
-
+	private final SimpleBooleanProperty checkStatus;
+    private final SimpleStringProperty userId;
     // 생성자
     public LeaveRecordOfAdmin(Long no, String userName, LocalDate leaveRequestDate, LocalDate leaveStartDate,
-            LocalDate leaveEndDate, String deptName, Boolean leaveAcceptStatus, Integer remainedLeave) {
+            LocalDate leaveEndDate, String deptName, Boolean leaveAcceptStatus, Integer remainedLeave, Boolean checkStatus, String userId) {
         this.no = new SimpleLongProperty(no);
         this.userName = new SimpleStringProperty(userName);
-        // LocalDate를 String으로 변환
         this.leaveRequestDate = new SimpleStringProperty(leaveRequestDate.toString());
         this.leaveStartDate = new SimpleStringProperty(leaveStartDate.toString());
         this.leaveEndDate = new SimpleStringProperty(leaveEndDate.toString());
         this.deptName = new SimpleStringProperty(deptName);
         this.leaveAcceptStatus = new SimpleBooleanProperty(leaveAcceptStatus);
         this.remainedLeave = new SimpleIntegerProperty(remainedLeave);
+        this.checkStatus = new SimpleBooleanProperty(checkStatus);
+        this.userId = new SimpleStringProperty(userId);
     }
 
     // Property 반환 메서드
@@ -132,5 +134,23 @@ public class LeaveRecordOfAdmin {
 
     public void setRemainedLeave(int remainedLeave) {
         this.remainedLeave.set(remainedLeave);
+    }
+    
+    // CheckStatus
+    public boolean getCheckStatus() {
+        return checkStatus.get();
+    }
+
+    public void setCheckStatus(boolean checkStatus) {
+        this.checkStatus.set(checkStatus);
+    }
+
+    // UserId
+    public String getUserId() {
+        return userId.get();
+    }
+
+    public void setUserId(String userId) {
+        this.userId.set(userId);
     }
 }
