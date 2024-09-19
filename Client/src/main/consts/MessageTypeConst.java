@@ -13,7 +13,8 @@ public abstract class MessageTypeConst {
 	// 회원 조회
 	public static final String MESSAGE_SEARCH = "/user/search";
 
-
+	// 회원 정보 수정
+	public static final String MESSAGE_UPDATE = "/user/update";
 
     //관리자 모든 회원 조회
     public static final String MESSAGE_SEARCH_ALL_BYADMIN = "/user/search/all/byadmin";

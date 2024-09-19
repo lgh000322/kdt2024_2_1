@@ -4,47 +4,45 @@ import java.time.LocalDate;
 
 public class ForUpdateLeaveDto {
 
-    private Long leaveNum;
 
-    private LocalDate requestDate;
+    private Long leaveNum;
 
     private LocalDate startDate;
 
     private LocalDate endDate;
 
-    private boolean acceptanceStatus;
+    private String userId;
 
-    private Long userNum;
+    private LeaveStatus leaveStatus;
 
     private ForUpdateLeaveDto(Builder builder) {
         this.leaveNum = builder.leaveNum;
-        this.requestDate=builder.requestDate;
+        this.leaveStatus = builder.leaveStatus;
         this.startDate=builder.startDate;
         this.endDate=builder.endDate;
-        this.acceptanceStatus=builder.acceptanceStatus;
-        this.userNum = builder.userNum;
+
+        this.userId = builder.userId;
+
     }
 
     public static class Builder{
         private Long leaveNum;
 
-        private LocalDate requestDate;
+        private LeaveStatus leaveStatus;
 
         private LocalDate startDate;
 
         private LocalDate endDate;
 
-        private boolean acceptanceStatus;
-
-        private Long userNum;
+        private String userId;
 
         public Builder leaveNum(Long leaveNum) {
             this.leaveNum = leaveNum;
             return this;
         }
 
-        public Builder requestDate(LocalDate requestDate) {
-            this.requestDate = requestDate;
+        public Builder status(LeaveStatus leaveStatus) {
+            this.leaveStatus = leaveStatus;
             return this;
         }
 
@@ -58,15 +56,14 @@ public class ForUpdateLeaveDto {
             return this;
         }
 
-        public Builder acceptanceStatus(boolean acceptanceStatus) {
-            this.acceptanceStatus = acceptanceStatus;
+
+
+        public Builder userId(String userId) {
+            this.userId = userId;
             return this;
         }
 
-        public Builder userNum(Long userNum) {
-            this.userNum = userNum;
-            return this;
-        }
+
 
         public ForUpdateLeaveDto build() {
             return new ForUpdateLeaveDto(this);
@@ -77,8 +74,8 @@ public class ForUpdateLeaveDto {
         return leaveNum;
     }
 
-    public LocalDate getRequestDate() {
-        return requestDate;
+    public LeaveStatus getStatus() {
+        return leaveStatus;
     }
 
     public LocalDate getStartDate() {
@@ -89,11 +86,8 @@ public class ForUpdateLeaveDto {
         return endDate;
     }
 
-    public boolean isAcceptanceStatus() {
-        return acceptanceStatus;
-    }
 
-    public Long getUserNum() {
-        return userNum;
+    public String getUserId() {
+        return userId;
     }
 }

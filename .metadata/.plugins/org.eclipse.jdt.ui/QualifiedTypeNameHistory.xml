@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="javafx.scene.control.ListCell"/>
+    <fullyQualifiedTypeName name="main.dto.answer_dto.AnswerData"/>
+    <fullyQualifiedTypeName name="main.dto.answer_dto.AnswerInBoardDto.Builder"/>
+    <fullyQualifiedTypeName name="main.dto.answer_dto.AnswerInBoardDto"/>
+    <fullyQualifiedTypeName name="main.domain.user.User.Builder"/>
+    <fullyQualifiedTypeName name="main.dto.user_dto.UserRoleDto"/>
+    <fullyQualifiedTypeName name="main.domain.board.Board.Builder"/>
+    <fullyQualifiedTypeName name="main.dto.board_dto.BoardAndAnswer"/>
+    <fullyQualifiedTypeName name="main.domain.board.Board"/>
+    <fullyQualifiedTypeName name="main.util.UserInfoSavedUtil"/>
+    <fullyQualifiedTypeName name="main.dto.board_dto.BoardFindAllDto"/>
+    <fullyQualifiedTypeName name="javax.lang.model.element.QualifiedNameable"/>
+    <fullyQualifiedTypeName name="main.dto.board_dto.QnARecord"/>
+    <fullyQualifiedTypeName name="main.dto.board_dto.BoardInfoDto2"/>
+    <fullyQualifiedTypeName name="main.domain.board.BoardAnswer"/>
+    <fullyQualifiedTypeName name="java.lang.System"/>
+</qualifiedTypeNameHistroy>

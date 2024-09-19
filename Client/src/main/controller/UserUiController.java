@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -39,11 +40,11 @@ import main.consts.MessageTypeConst;
 import main.domain.mail.MailType;
 import main.domain.user.Role;
 import main.domain.user.User;
+import main.domain.work_log.Status;
+import main.domain.work_log.WorkLog;
 import main.dto.ResponseData;
-import main.dto.answer_dto.AnswerInBoardDto;
 import main.dto.board_dto.BoardAndAnswer;
 import main.dto.board_dto.BoardFindAllDto;
-import main.dto.board_dto.BoardInfoDto2;
 import main.dto.board_dto.QnARecord;
 import main.dto.leave_dto.ForFindLeaveDto;
 import main.dto.leave_dto.LeaveLogOfUserDto;
@@ -56,6 +57,8 @@ import main.dto.salary_dto.SalaryRecord;
 import main.dto.user_dto.UserInfo;
 import main.dto.user_dto.UserRoleDto;
 import main.dto.user_dto.UserSalaryData;
+import main.dto.user_dto.UserSearchData;
+import main.dto.user_dto.UserSearchDto;
 import main.dto.user_dto.UserWorkData;
 import main.dto.work_dto.WorkRecord;
 import main.util.CommunicationUtils;
@@ -254,7 +257,6 @@ public class UserUiController implements Initializable {
 	@FXML
 	private ObservableList<String> maillist = FXCollections.observableArrayList("받은메일함", "보낸메일함");
 
-
 	/* 현재시간 표시 */
 	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -267,10 +269,8 @@ public class UserUiController implements Initializable {
 				try {
 					workTabClickedMethod();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				// 원하는 동작을 여기에 추가
 				leaveRecordList.clear();
 				qnaRecordList.clear();
 				salaryRecordList.clear();
@@ -285,34 +285,32 @@ public class UserUiController implements Initializable {
 
 		// 휴가신청 탭이 선택되었을 때 이벤트 추가
 		leaveTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue) { // Tab 2가 선택되었을 때
+			if (newValue) {
 				System.out.println("휴가신청 탭이 선택됨");
 				try {
 					leaveTablClickedMethod();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				workRecordList.clear();
 				qnaRecordList.clear();
 				salaryRecordList.clear();
-				mailRecordList.clear();
-				
+				mailRecordList.clear();	
 				selectWorkDate.setValue(null);
 				selectMoneyDate.setValue(null);
 				mailTitle.clear();
 				qnaTitle.clear();
+
 			}
 		});
 
 		// 급여내역 탭이 선택되었을 때 이벤트 추가
 		moneyTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue) { // Tab 2가 선택되었을 때
+			if (newValue) {
 				System.out.println("급여내역 탭이 선택됨");
 				try {
 					moneyTabClickedMethod();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				workRecordList.clear();
@@ -329,15 +327,13 @@ public class UserUiController implements Initializable {
 
 		// 메일함 탭이 선택되었을 때 이벤트 추가
 		mailTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue) { // Tab 2가 선택되었을 때
+			if (newValue) {
 				System.out.println("메일함 탭이 선택됨");
 				try {
 					mailTabClickedMethod();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
 				workRecordList.clear();
 				leaveRecordList.clear();
 				qnaRecordList.clear();
@@ -352,12 +348,11 @@ public class UserUiController implements Initializable {
 
 		// Q&A 탭이 선택되었을 때 이벤트 추가
 		qnaTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue) { // Tab 2가 선택되었을 때
+			if (newValue) {
 				System.out.println("Q&A 탭이 선택됨");
 				try {
 					qnaTabClickedMethod();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -410,26 +405,20 @@ public class UserUiController implements Initializable {
 		mailTitleColumn.setCellValueFactory(new PropertyValueFactory<>("mailTitle"));
 		mailReceivedDateColumn.setCellValueFactory(new PropertyValueFactory<>("mailReceivedDate"));
 
-		// TableView의 onMouseClicked 이벤트 핸들러 설정
-		workRecordTableView.setOnMouseClicked(event -> {
-			// 클릭된 셀의 인덱스와 해당 항목을 가져옴
-			WorkRecord selectedItem = workRecordTableView.getSelectionModel().getSelectedItem();
+		// 버튼의 초기 상태 설정
+		checkAndSetButtonState();
 
-			if (selectedItem != null) {
-				// 선택된 항목에 대한 처리 로직
-				System.out.println("Selected WorkRecord: " + selectedItem);
-				// 예를 들어, 선택된 항목의 정보를 사용하여 추가적인 작업을 수행할 수 있음
-			}
-		});
+		// Timeline을 사용해 1분마다 버튼 상태를 확인하고 업데이트
+		Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(60), event -> checkAndSetButtonState()));
+		timeline.setCycleCount(Timeline.INDEFINITE); // 무한 반복
+		timeline.play(); // 타임라인 시작
 
 		try {
 			workTabClickedMethod();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		   
+
 		qnaRecordTableView.setOnMouseClicked(event -> {
 		    QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
 
@@ -446,6 +435,21 @@ public class UserUiController implements Initializable {
 		        }
 		    }
 		});
+	}
+
+	// 버튼 활성화/비활성화 상태를 결정하는 메서드
+	private void checkAndSetButtonState() {
+		LocalTime currentTime = LocalTime.now();
+		LocalTime fiveFiftyPM = LocalTime.of(17, 50);
+		LocalTime sixPM = LocalTime.of(18, 10);
+
+		// 17:50:00에서 18:10:00 사이이거나 같은 경우 버튼을 활성화
+		if ((currentTime.isAfter(fiveFiftyPM) || currentTime.equals(fiveFiftyPM))
+				&& (currentTime.isBefore(sixPM) || currentTime.equals(sixPM))) {
+			endWorkBtn.setDisable(false); // 버튼 활성화
+		} else {
+			endWorkBtn.setDisable(true); // 버튼 비활성화
+		}
 	}
 
 	/* 좌측 사용자 정보 표시 */
@@ -490,7 +494,16 @@ public class UserUiController implements Initializable {
 	 */
 	/* 날짜 검색 버튼 클릭 시, 선택한 날짜에 대한 검색 로직 */
 	public void handlesearchWorkDateBtn() {
-		System.out.println("근태기록에서 날짜 검색");
+		System.out.println("근태탭에서 검색 수행");
+		workRecordList.clear();
+		try {
+			workTabClickedMethod();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 	public void handleworkComboList() {
@@ -665,8 +678,7 @@ public class UserUiController implements Initializable {
 					Long no = Long.valueOf(i + 1);
 
 					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
-					        boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
-
+							boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
 
 					qnaRecordList.add(qnaRecord);
 				}
@@ -698,10 +710,10 @@ public class UserUiController implements Initializable {
 		 */
 		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
 		DataInputStream dis = serverConnectUtils.getDataInputStream();
-		
+
 		/**
-		 * requestData 생성
-//		 */
+		 * requestData 생성 //
+		 */
 //		RequestData requestData = new RequestData();
 //		requestData.setData(userLoginDto);
 //		requestData.setMessageType(MessageTypeConst.MESSAGE_LOGIN);
@@ -711,22 +723,24 @@ public class UserUiController implements Initializable {
 		try {
 			communicationUtils.sendServer(jsonSendStr, dos);
 			String jsonReceivedStr = dis.readUTF();
-			
-			ResponseData<BoardAndAnswer> responseData=communicationUtils.jsonToResponseData(jsonReceivedStr, BoardAndAnswer.class);
+
+			ResponseData<BoardAndAnswer> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					BoardAndAnswer.class);
 			String messageType = responseData.getMessageType();
 
 			if (messageType.contains("성공")) {
 				BoardAndAnswer boardAndAnswer = responseData.getData();
-				
+
 				// 데이터가 null인지 확인
-	            if (boardAndAnswer != null) {
-	                // 성공적으로 데이터를 받았는지 확인
-	                if (responseData.getMessageType().contains("성공")) {
-	                    Platform.runLater(() -> {
-	                        try {
-	                            // QnA 상세 화면 로드
-	                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/qna_ui/ShowQnA.fxml"));
-	                            Parent qnaRoot = fxmlLoader.load();
+				if (boardAndAnswer != null) {
+					// 성공적으로 데이터를 받았는지 확인
+					if (responseData.getMessageType().contains("성공")) {
+						Platform.runLater(() -> {
+							try {
+								// QnA 상세 화면 로드
+								FXMLLoader fxmlLoader = new FXMLLoader(
+										getClass().getResource("/main/qna_ui/ShowQnA.fxml"));
+								Parent qnaRoot = fxmlLoader.load();
 
 	                            // QnAShowController를 가져와서 데이터를 설정
 	                            QnAShowController qnaShowController = fxmlLoader.getController();
@@ -734,33 +748,33 @@ public class UserUiController implements Initializable {
 	                            // QnAShowController의 keyNo 설정
 	                            qnaShowController.setKeyNo(keyNo);
 
-	                            // 새 창을 띄우고 현재 창 숨기기
-	                            Stage qnaStage = new Stage();
-	                            qnaStage.setTitle("Q&A 상세보기");
-	                            qnaStage.setScene(new Scene(qnaRoot));
+								// 새 창을 띄우고 현재 창 숨기기
+								Stage qnaStage = new Stage();
+								qnaStage.setTitle("Q&A 상세보기");
+								qnaStage.setScene(new Scene(qnaRoot));
 
-	                            qnaStage.show();
+								qnaStage.show();
 
-	                        } catch (IOException e) {
-	                            e.printStackTrace();
-	                        }
-	                    });
-	                } else {
-	                    System.out.println("게시글 정보를 가져오는 데 실패했습니다.");
-	                }
-	            } else {
-	                System.out.println("BoardAndAnswer 객체가 null입니다.");
-	            }
-	        } else {
-	            System.out.println("서버 응답이 null입니다.");
-	        }
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						});
+					} else {
+						System.out.println("게시글 정보를 가져오는 데 실패했습니다.");
+					}
+				} else {
+					System.out.println("BoardAndAnswer 객체가 null입니다.");
+				}
+			} else {
+				System.out.println("서버 응답이 null입니다.");
+			}
 
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    } finally {
-	        // 연결 종료
-	        serverConnectUtils.close();
-	    }
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			// 연결 종료
+			serverConnectUtils.close();
+		}
 	}
 
 	// 근태기록 선택되었을 때
@@ -779,12 +793,33 @@ public class UserUiController implements Initializable {
 		/**
 		 * requestData의 data에 넣어줄 객체를 생성
 		 */
-		User user = new User.Builder().userId(UserInfoSavedUtil.getUserId()).role(UserInfoSavedUtil.getRole()).build();
+		Status status = null;
+
+		// 결근이 선택됨
+		if (workComboList.getValue() != null && workComboList.getValue().equals(Status.ABSENCE.getDescription())) {
+			status = Status.ABSENCE;
+		}
+
+		// 출근이 선택됨
+		if (workComboList.getValue() != null && workComboList.getValue().equals(Status.ATTENDANCE.getDescription())) {
+			status = Status.ATTENDANCE;
+		}
+
+		// 지각이 선택됨
+		if (workComboList.getValue() != null && workComboList.getValue().equals(Status.TARDINESS.getDescription())) {
+			status = Status.TARDINESS;
+		}
+
+		UserSearchData userSearchData = new UserSearchData.Builder().date(selectWorkDate.getValue()).status(status)
+				.build();
+
+		UserSearchDto userSearchDto = new UserSearchDto.Builder().userId(UserInfoSavedUtil.getUserId())
+				.role(UserInfoSavedUtil.getRole()).userSearchData(userSearchData).build();
 
 		/**
 		 * requestData 생성
 		 */
-		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_WORK_SEARCH, user);
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_WORK_SEARCH, userSearchDto);
 
 		try {
 			communicationUtils.sendServer(jsonSendStr, dos);
@@ -796,11 +831,12 @@ public class UserUiController implements Initializable {
 			String messageType = responseData.getMessageType();
 			if (messageType.contains("성공")) {
 				List<UserWorkData> list = (List<UserWorkData>) responseData.getData();
-				for (int i = 0; i < list.size(); i++) {
+				Long no = 1L;
+				for (int i = list.size() - 1; i >= 0; i--) {
 					UserWorkData userWorkData = list.get(i);
-					Long no = Long.valueOf(i + 1);
 					WorkRecord workRecord = new WorkRecord(no, userWorkData.getWorkDate(), userWorkData.getStatus(),
 							userWorkData.getStartTime(), userWorkData.getEndTime(), "");
+					no++;
 					workRecordList.add(workRecord);
 				}
 
@@ -1063,9 +1099,7 @@ public class UserUiController implements Initializable {
 				});
 
 			}
-		} catch (
-
-		IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1073,5 +1107,128 @@ public class UserUiController implements Initializable {
 			serverConnectUtils.close();
 		}
 
+	}
+
+	public void handleStartWork() throws IOException {
+		System.out.println("출근 로직 실행");
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		User user = new User.Builder().userId(UserInfoSavedUtil.getUserId()).role(Role.USER).build();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_WORK_START, user);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+			ResponseData<WorkLog> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, WorkLog.class);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				WorkLog workLog = responseData.getData();
+				System.out.println("근태 상태 변경 성공");
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
+	}
+
+	public void handleEndWork() throws IOException {
+		System.out.println("퇴근 로직 실행");
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		User user = new User.Builder().userId(UserInfoSavedUtil.getUserId()).role(Role.USER).build();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_WORK_FINISH, user);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+			ResponseData<WorkLog> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, WorkLog.class);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				WorkLog workLog = responseData.getData();
+				System.out.println("근태 상태 변경 성공");
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
+	}
+
+	public void handleEndWorkEarly() throws IOException {
+		System.out.println("조퇴 로직 실행");
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		User user = new User.Builder().userId(UserInfoSavedUtil.getUserId()).role(Role.USER).build();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_WORK_FINISH, user);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+			ResponseData<WorkLog> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, WorkLog.class);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				WorkLog workLog = responseData.getData();
+				System.out.println("근태 상태 변경 성공");
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
 	}
 }

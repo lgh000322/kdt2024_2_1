@@ -54,9 +54,9 @@
                              <TableColumn fx:id="noteColumn" minWidth="0.0" prefWidth="63.2" text="비고" />
                          </columns>
                      </TableView>
-                        <Button fx:id="startWorkBtn" layoutX="400.0" layoutY="5.0" mnemonicParsing="false" text="출근" />
-                        <Button fx:id="endWorkBtn" layoutX="451.0" layoutY="5.0" mnemonicParsing="false" text="퇴근" />
-                        <Button fx:id="leaveEarlyBtn" layoutX="500.0" layoutY="4.0" mnemonicParsing="false" text="조퇴" />
+                        <Button fx:id="startWorkBtn" layoutX="400.0" layoutY="5.0" mnemonicParsing="false" text="출근" onAction="#handleStartWork"/>
+                        <Button fx:id="endWorkBtn" layoutX="451.0" layoutY="5.0" mnemonicParsing="false" text="퇴근" onAction="#handleEndWork"/>
+                        <Button fx:id="leaveEarlyBtn" layoutX="500.0" layoutY="4.0" mnemonicParsing="false" text="조퇴" onAction="#handleEndWorkEarly" />
                      </children>
                   </AnchorPane>
                </content>
