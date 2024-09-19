@@ -9,6 +9,7 @@ import org.example.server.consts.MessageTypeConst;
 import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.user_dto.UserSearchDto;
 import org.example.server.service.WorkService;
 
 import java.sql.SQLException;
@@ -51,7 +52,7 @@ public class WorkController implements Controller {
                 System.out.println("근퇴 내역 조회");
                 if (requestData.getData() instanceof LinkedTreeMap) { //프론트로부터 requestData에 linkedtreemap으로 넘어옴
                     LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
-                    User user = gson.fromJson(gson.toJson(map), User.class); //받아올 객체가 하나뿐이므로 이렇게 지정
+                    UserSearchDto user = gson.fromJson(gson.toJson(map), UserSearchDto.class); //받아올 객체가 하나뿐이므로 이렇게 지정
                     result = workService.SearchWork(user); // 급여내역 조회 결과를 result에 저장
                 }
             }
