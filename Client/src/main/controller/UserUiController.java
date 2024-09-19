@@ -254,7 +254,10 @@ public class UserUiController implements Initializable {
 	private ObservableList<MailRecord> mailRecordList = FXCollections.observableArrayList();
 
 	@FXML
-	private ObservableList<String> list = FXCollections.observableArrayList("출근", "결근", "지각");
+	private ObservableList<String> worklist = FXCollections.observableArrayList("출근", "결근", "조퇴");
+	
+	@FXML
+	private ObservableList<String> maillist = FXCollections.observableArrayList("받은메일함", "보낸메일함");
 
 	/* 현재시간 표시 */
 	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -375,6 +378,7 @@ public class UserUiController implements Initializable {
 		clock.play();
 
 		handleworkComboList();
+		handlemailComboList();
 
 		noColumn.setCellValueFactory(new PropertyValueFactory<>("no"));
 		dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
@@ -418,15 +422,20 @@ public class UserUiController implements Initializable {
 		}
 
 		qnaRecordTableView.setOnMouseClicked(event -> {
-			QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
-			if (selectedQnAItem != null) {
-				System.out.println("Selected QnARecord: " + selectedQnAItem);
-			}
-			try {
-				qnaItemClickMethod(selectedQnAItem.getKeyNo());
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+		    QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
+
+		    if (selectedQnAItem != null) {
+		        System.out.println("Selected QnARecord: " + selectedQnAItem);
+
+		        // 선택된 QnARecord의 keyNo 가져오기
+		        Long selectedKeyNo = selectedQnAItem.getKeyNo();
+		        
+		        try {
+		            qnaItemClickMethod(selectedKeyNo);
+		        } catch (IOException e1) {
+		            e1.printStackTrace();
+		        }
+		    }
 		});
 
 		mailRecordTableView.setOnMouseClicked(event -> {
@@ -512,7 +521,7 @@ public class UserUiController implements Initializable {
 	}
 
 	public void handleworkComboList() {
-		workComboList.setItems(list);
+		workComboList.setItems(worklist);
 	}
 
 	/*
@@ -537,6 +546,15 @@ public class UserUiController implements Initializable {
 	/*
 	 * 메일함 탭
 	 */
+	/* 메일 콤보 리스트 */
+	public void handlemailComboList() {
+		mailComboList.setItems(maillist);
+	}
+	
+	/* 메일검색 버튼 로직 */
+	public void handlesearchMailTitleBtn() {
+	}
+	
 	/* 메일쓰기 버튼 클릭 시, 메일작성 창 띄우기 */
 	public void handlesendMailBtn() throws IOException {
 		ObservableList<String> emailList = FXCollections.observableArrayList();
@@ -603,6 +621,7 @@ public class UserUiController implements Initializable {
 
 	/* 메일삭제 버튼 클릭 시, 메일삭제 처리 로직 */
 	public void handledeleteMailBtn() {
+		mailComboList.setItems(maillist);
 	}
 
 	/*
@@ -695,7 +714,7 @@ public class UserUiController implements Initializable {
 	}
 
 	/* Q&A 리스트 아이템 선택 시, 선택된 아이템 창 연결 */
-	public void qnaItemClickMethod(Long boardKeyNo) throws IOException {
+	public void qnaItemClickMethod(Long keyNo) throws IOException {
 		CommunicationUtils communicationUtils = new CommunicationUtils();
 
 		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
@@ -713,8 +732,8 @@ public class UserUiController implements Initializable {
 //		requestData.setData(userLoginDto);
 //		requestData.setMessageType(MessageTypeConst.MESSAGE_LOGIN);
 
-		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_ONE_SEARCH, boardKeyNo);
-
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_ONE_SEARCH, keyNo);
+		
 		try {
 			communicationUtils.sendServer(jsonSendStr, dos);
 			String jsonReceivedStr = dis.readUTF();

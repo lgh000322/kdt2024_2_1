@@ -29,18 +29,20 @@ import main.domain.user.User;
 import main.dto.ResponseData;
 import main.dto.answer_dto.AnswerInBoardDto;
 import main.dto.board_dto.BoardAndAnswer;
-import main.dto.board_dto.BoardSaveDto;
 import main.dto.user_dto.UserRoleDto;
-import main.dto.work_dto.WorkRecord;
 import main.util.CommunicationUtils;
 import main.util.ServerConnectUtils;
 import main.util.UserInfoSavedUtil;
 
 public class QnAShowController {
 	
+
+	private Long keyNo;
+
 	private Long boardNum;
 	
 	private Long userNum;
+
 
     @FXML
     private TextArea ReceivedContents;
@@ -53,17 +55,17 @@ public class QnAShowController {
 
     @FXML
     private Label PostDate;
-    
+
     @FXML
     private TextField AnswerContents;
-    
+
     @FXML
     private Button AnswerSaveBtn;
 
     @FXML
     private ListView<AnswerInBoardDto> CommentListView; // 댓글 리스트는 AnswerInBoardDto로 관리
     @FXML
-	private ObservableList<AnswerInBoardDto> answerList = FXCollections.observableArrayList();
+    private ObservableList<AnswerInBoardDto> answerList = FXCollections.observableArrayList();
 
     public void setBoardAndAnswerData(BoardAndAnswer boardAndAnswer,Long boardNum,Long userNum) {
         if (boardAndAnswer != null && boardAndAnswer.getBoardInfoDto() != null) {
@@ -86,8 +88,19 @@ public class QnAShowController {
             });
         }
     }
-    
+
+    // 댓글 저장 버튼 클릭 시 처리하는 메서드
     public void handleAnswerSaveBtn() throws IOException {
+        if (boardAndAnswer == null || boardAndAnswer.getBoardInfoDto() == null) {
+            System.out.println("게시글 정보가 설정되지 않았습니다.");
+            return;
+        }
+        
+        if (keyNo == null) {
+            System.out.println("keyNo 값이 설정되지 않았습니다.");
+            return;
+        }
+
         // 서버와의 통신 준비
         CommunicationUtils communicationUtils = new CommunicationUtils();
         ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
@@ -111,6 +124,7 @@ public class QnAShowController {
         		.createdDate(LocalDate.now())
         		.build();
         
+
         // 서버에서 처리할 수 있도록 Board, User, Answer 정보를 하나의 객체로 포장하여 전송
         Map<String, Object> requestData = new HashMap<>();
         requestData.put("board", board);
@@ -145,6 +159,9 @@ public class QnAShowController {
             serverConnectUtils.close();
         }
     }
-
-
+    
+    // keyNo를 설정하는 메서드
+    public void setKeyNo(Long keyNo) {
+        this.keyNo = keyNo;
+    }
 }
