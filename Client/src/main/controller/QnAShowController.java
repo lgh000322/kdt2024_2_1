@@ -3,7 +3,6 @@ package main.controller;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.sql.Savepoint;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -15,12 +14,10 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import main.consts.MessageTypeConst;
 import main.domain.board.Board;
 import main.domain.board.BoardAnswer;
@@ -29,7 +26,6 @@ import main.domain.user.User;
 import main.dto.ResponseData;
 import main.dto.answer_dto.AnswerInBoardDto;
 import main.dto.board_dto.BoardAndAnswer;
-import main.dto.user_dto.UserRoleDto;
 import main.util.CommunicationUtils;
 import main.util.ServerConnectUtils;
 import main.util.UserInfoSavedUtil;
@@ -91,16 +87,6 @@ public class QnAShowController {
 
     // 댓글 저장 버튼 클릭 시 처리하는 메서드
     public void handleAnswerSaveBtn() throws IOException {
-        if (boardAndAnswer == null || boardAndAnswer.getBoardInfoDto() == null) {
-            System.out.println("게시글 정보가 설정되지 않았습니다.");
-            return;
-        }
-        
-        if (keyNo == null) {
-            System.out.println("keyNo 값이 설정되지 않았습니다.");
-            return;
-        }
-
         // 서버와의 통신 준비
         CommunicationUtils communicationUtils = new CommunicationUtils();
         ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();

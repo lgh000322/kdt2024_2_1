@@ -758,7 +758,7 @@ public class UserUiController implements Initializable {
 
 								// QnAShowController를 가져와서 데이터를 설정
 								QnAShowController qnaShowController = fxmlLoader.getController();
-								qnaShowController.setBoardAndAnswerData(boardAndAnswer,boardKeyNo,boardAndAnswer.getBoardInfoDto().getUserNum());
+								qnaShowController.setBoardAndAnswerData(boardAndAnswer,keyNo,boardAndAnswer.getBoardInfoDto().getUserNum());
 
 								// 새 창을 띄우고 현재 창 숨기기
 								Stage qnaStage = new Stage();
