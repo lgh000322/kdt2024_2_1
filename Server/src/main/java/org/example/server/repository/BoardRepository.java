@@ -42,7 +42,7 @@ public class BoardRepository {
         ResultSet rs = null;
 
         // 특정 게시물 pk 값과 일치하는 게시물 데이터를 가져오는 쿼리문
-        String sql = "select b.title, b.contents, u.user_id, u.name " +
+        String sql = "select b.title, b.contents, u.user_id, u.name, u.user_num " +
                 "from board b inner join user u " +
                 "on b.user_num = u.user_num " +
                 "where b.board_num = ?";
@@ -61,6 +61,7 @@ public class BoardRepository {
                         .boardContents(rs.getString("contents"))
                         .boardUserId( rs.getString("user_id"))
                         .boardUserName(rs.getString("u.name"))
+                        .userNum(rs.getLong("u.user_num"))
                         .build();
 
             } else {
@@ -143,7 +144,7 @@ public class BoardRepository {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
-        String sql = "select b.board_num, b.title, u.user_id, b.created_date " +
+        String sql = "select b.board_num, b.title, u.user_id, b.created_date, u.user_num " +
                 "from board b inner join user u on b.user_num = u.user_num";
 
 
@@ -163,6 +164,8 @@ public class BoardRepository {
                 String userId = rs.getString("user_id");
                 // 게시물 작성일
                 LocalDate createdDate = rs.getDate("created_date").toLocalDate();
+                //사용자 번호
+                Long userNum = rs.getLong("u.user_num");
 
 
 
@@ -171,6 +174,7 @@ public class BoardRepository {
                         .title(title)
                         .userId(userId)
                         .createdDate(createdDate)
+                        .userNum(userNum)
                         .build();
 
                 boards.add(board);

@@ -35,7 +35,7 @@ public class AnswerRepository {
         System.out.println("DB를통해 댓글을 조회");
     }
 
-    public ResponseData addAnswerOnDB(Connection con, Board board, BoardAnswer boardAnswer, User user) throws SQLException {
+    public ResponseData addAnswerOnDB(Connection con, BoardAnswer boardAnswer) throws SQLException {
         /*
          * 선택된 Board의 board_num을 기반으로 답글을 저장
          */
@@ -49,8 +49,8 @@ public class AnswerRepository {
 
             // PreparedStatement에 값 설정
             pstmt.setString(1, boardAnswer.getContents()); // 답글 내용
-            pstmt.setLong(2, board.getBoardNum()); // 게시물 번호
-            pstmt.setLong(3, user.getUserNum()); // 답글 작성자의 user_num
+            pstmt.setLong(2, boardAnswer.getBoardNum()); // 게시물 번호
+            pstmt.setLong(3, boardAnswer.getUserNum()); // 답글 작성자의 user_num
             pstmt.setDate(4, Date.valueOf(boardAnswer.getCreatedDate())); // 작성일자 (LocalDate -> java.sql.Date 변환)
 
             // SQL 쿼리 실행

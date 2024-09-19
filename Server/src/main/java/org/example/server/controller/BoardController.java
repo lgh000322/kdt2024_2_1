@@ -84,7 +84,6 @@ public class BoardController implements Controller {
                 if (requestData.getData() instanceof LinkedTreeMap) {
                     LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
                     BoardSaveDto boardSaveDto = gson.fromJson(gson.toJson(map), BoardSaveDto.class);
-
                     result = boardService.createBoard(boardSaveDto);
                 }
 
