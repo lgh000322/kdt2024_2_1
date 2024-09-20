@@ -272,7 +272,7 @@ public class UserUiController implements Initializable {
 			Image image = new Image(file.toURI().toString());
 			userImage.setImage(image);
 		} else {
-			System.out.println("임ㄴㅇㅁㄴㅇㄴㅁㅇ");
+			System.out.println("이미지 로딩 오류");
 		}
 		// 근태기록 탭이 선택되었을 때 이벤트 추가
 		workTab.selectedProperty().addListener((observable, oldValue, newValue) -> {

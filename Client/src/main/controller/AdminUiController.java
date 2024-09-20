@@ -2,6 +2,7 @@ package main.controller;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
@@ -31,6 +32,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -283,6 +285,13 @@ public class AdminUiController {
 	
 	@FXML
 	public void initialize() {
+		File file = new File("src/UserImage/userImage.jpg");
+		if (file.exists()) {
+			Image image = new Image(file.toURI().toString());
+			userImage.setImage(image);
+		} else {
+			System.out.println("이미지 로딩 오류");
+		}
 		/*
 		 * 
 		 * 
@@ -303,9 +312,10 @@ public class AdminUiController {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
 				leaveRecordList.clear();
-
+				salaryRecordList.clear();
+				mailRecordList.clear();
+				qnaRecordList.clear();
 			}
 		});
 
@@ -319,9 +329,10 @@ public class AdminUiController {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
 				userRecordList.clear();
-
+				salaryRecordList.clear();
+				mailRecordList.clear();
+				qnaRecordList.clear();
 			}
 		});
 
@@ -334,10 +345,10 @@ public class AdminUiController {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
 				userRecordList.clear();
 				leaveRecordList.clear();
-
+				mailRecordList.clear();
+				qnaRecordList.clear();
 			}
 		});
 
@@ -350,10 +361,10 @@ public class AdminUiController {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
-				leaveRecordList.clear();
 				userRecordList.clear();
-
+				leaveRecordList.clear();
+				salaryRecordList.clear();
+				qnaRecordList.clear();
 			}
 		});
 
@@ -366,10 +377,10 @@ public class AdminUiController {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
-				leaveRecordList.clear();
 				userRecordList.clear();
-
+				leaveRecordList.clear();
+				salaryRecordList.clear();
+				mailRecordList.clear();
 			}
 		});
 		
@@ -381,7 +392,6 @@ public class AdminUiController {
 		clock.setCycleCount(Timeline.INDEFINITE);
 		clock.play();
 
-		
 		// 컬럼과 Employee 속성 바인딩
 		usereditNum.setCellValueFactory(new PropertyValueFactory<>("num"));
 		usereditName.setCellValueFactory(new PropertyValueFactory<>("name"));
