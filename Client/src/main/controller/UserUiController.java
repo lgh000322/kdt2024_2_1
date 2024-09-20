@@ -665,10 +665,6 @@ public class UserUiController implements Initializable {
 		}
 	}
 
-	/* Q&A 글 수정 버튼 클릭 시, 글 수정 창 띄우기 */
-	public void handleupdatePostQnABtn() {
-	}
-
 	/* Q&A 글 삭제 버튼 클릭 시, 글 삭제 처리 로칙 */
 	public void handledeletePostQnABtn() {
 	}

@@ -129,8 +129,7 @@
                               <TableColumn fx:id="boardNo" prefWidth="38.4000244140625" text="boardNo" visible="false" />
                           </columns>
                         </TableView>
-                        <Button fx:id="writePostQnABtn" layoutX="367.0" layoutY="389.0" mnemonicParsing="false" onAction="#handlewritePostQnABtn" text="글 작성" />
-                        <Button fx:id="updatePostQnABtn" layoutX="428.0" layoutY="389.0" mnemonicParsing="false" onAction="#handleupdatePostQnABtn" text="글 수정" />
+                        <Button fx:id="writePostQnABtn" layoutX="428.0" layoutY="389.0" mnemonicParsing="false" onAction="#handlewritePostQnABtn" text="글 작성" />
                         <Button fx:id="deletePostQnABtn" layoutX="489.0" layoutY="389.0" mnemonicParsing="false" onAction="#handledeletePostQnABtn" text="글 삭제" />
                         <TextField fx:id="qnaTitle" layoutX="1.0" layoutY="389.0" promptText="제목명" />
                         <Button fx:id="titleSearchQnABtn" layoutX="164.0" layoutY="389.0" mnemonicParsing="false" onAction="#handletitleSearchBtn" text="검색" />
