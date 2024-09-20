@@ -2,6 +2,7 @@ package main.controller;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -23,6 +24,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -32,12 +34,13 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.consts.MessageTypeConst;
-import main.domain.board.BoardAnswer;
 import main.domain.mail.Mail;
 import main.domain.mail.MailType;
 import main.domain.user.Role;
@@ -267,6 +270,13 @@ public class UserUiController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		File file = new File("src/UserImage/userImage.jpg");
+		if (file.exists()) {
+			Image image = new Image(file.toURI().toString());
+			userImage.setImage(image);
+		} else {
+			System.out.println("이미지 로딩 오류");
+		}
 		// 근태기록 탭이 선택되었을 때 이벤트 추가
 		workTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue) {
@@ -449,7 +459,7 @@ public class UserUiController implements Initializable {
 			MailRecord mailRecord = mailRecordTableView.getSelectionModel().getSelectedItem();
 			String receivedUserEmail = mailRecord.getMailReceived();
 			mailNum = mailRecord.getMailKeyNo();
-			
+      
 			if (event.getClickCount() == 2) {
 				try {
 					mailItemClickedMethod(mailNum, receivedUserEmail);
@@ -563,6 +573,15 @@ public class UserUiController implements Initializable {
 	/* 메일검색 버튼 로직 */
 	public void handlesearchMailTitleBtn() {
 		mailRecordList.clear();
+		String selectedMailBox = mailComboList.getValue(); // ComboBox에서 선택한 값 가져오기
+
+		if ("받은메일함".equals(selectedMailBox)) {
+			// 받은메일함을 선택한 경우
+			mailReceivedColumn.setText("보낸 사람");
+		} else if ("보낸메일함".equals(selectedMailBox)) {
+			// 보낸메일함을 선택한 경우
+			mailReceivedColumn.setText("받은 사람");
+		}
 		try {
 			mailTabClickedMethod();
 		} catch (IOException e) {
@@ -705,10 +724,6 @@ public class UserUiController implements Initializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	/* Q&A 글 수정 버튼 클릭 시, 글 수정 창 띄우기 */
-	public void handleupdatePostQnABtn() {
 	}
 
 	/* Q&A 글 삭제 버튼 클릭 시, 글 삭제 처리 로칙 */
@@ -1294,7 +1309,7 @@ public class UserUiController implements Initializable {
 			if (messageType.contains("성공")) {
 				WorkLog workLog = responseData.getData();
 				System.out.println("근태 상태 변경 성공");
-
+				UiAlert("상태변경", "출근 처리되었습니다.");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -1335,7 +1350,7 @@ public class UserUiController implements Initializable {
 			if (messageType.contains("성공")) {
 				WorkLog workLog = responseData.getData();
 				System.out.println("근태 상태 변경 성공");
-
+				UiAlert("상태변경", "퇴근 처리되었습니다.");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -1376,7 +1391,7 @@ public class UserUiController implements Initializable {
 			if (messageType.contains("성공")) {
 				WorkLog workLog = responseData.getData();
 				System.out.println("근태 상태 변경 성공");
-
+				UiAlert("상태변경", "조퇴 처리되었습니다.");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -1396,6 +1411,14 @@ public class UserUiController implements Initializable {
 			e.printStackTrace();
 		}
 
+	}
+	
+	private void UiAlert(String title, String message) {
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle(title);
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+		alert.showAndWait();
 	}
 
 }
