@@ -90,7 +90,15 @@ public class BoardController implements Controller {
             }
             case MessageTypeConst.MESSAGE_BOARD_DELETE -> {
                 System.out.println("게시글 삭제 조회 실행");
-                if (requestData.getData() instanceof Long) {
+                // 데이터 타입 확인 로그 추가
+                System.out.println("데이터 타입: " + requestData.getData().getClass().getName());
+
+                if (requestData.getData() instanceof Double) {
+                    // Double을 Long으로 변환
+                    Double removeBoardNumDouble = (Double) requestData.getData();
+                    Long removeBoardNum = removeBoardNumDouble.longValue(); // Long으로 변환
+                    result = boardService.removeBoard(removeBoardNum);
+                } else if (requestData.getData() instanceof Long) {
                     Long removeBoardNum = (Long) requestData.getData();
                     result = boardService.removeBoard(removeBoardNum);
                 } else {

@@ -41,9 +41,6 @@ public class WorkService {
     }
     //////////////////////////////////// 비즈니스 로직 ////////////////////////////////////////
     public ResponseData workSearchBizLogic(UserSearchDto user, Connection conn) throws SQLException {
-        /*
-        2024-09-07수정
-         */
         ResponseData workLogResponse = null;
 
         //connecter와 유저ID, (관리자or직원) 을 가져와서 해당 유저의 정보를 가져옴

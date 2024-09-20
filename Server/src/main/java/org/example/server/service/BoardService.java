@@ -264,6 +264,10 @@ public class BoardService {
         // 게시물 댓글 삭제 -> 삭제로직 구현시 추가.
         // answerRepository.deleteAnswer()
 
+
+        // 1. 먼저 게시물에 달린 댓글을 삭제
+        int answerDeleteCount = answerRepository.deleteAnswersByBoardNum(boardNum, conn);
+        System.out.println("삭제된 댓글 개수: " + answerDeleteCount);
         // 게시물 삭제
         checkRemove =  boardRepository.deleteBoard(boardNum, conn);
 
