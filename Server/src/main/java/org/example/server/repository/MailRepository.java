@@ -122,6 +122,34 @@ public class MailRepository {
         }
     }
 
+    public String findReceiverEmail(Connection con,Long mailNum) throws SQLException {
+        String sql = "select user.email from mail" +
+                " left join received_mail on mail.mai_num = received_mail.mail_num" +
+                " left join user on user.user_num = received_mail.user_num" +
+                " where mail.mai_num = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String result=null;
+        try {
+            pstmt = con.prepareStatement(sql);
+            pstmt.setLong(1, mailNum);
+
+            rs = pstmt.executeQuery();
+
+
+            if (rs.next()) {
+                result = rs.getString("user.email");
+            }
+
+            return result;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
     public UserAndMailStore findMailStoreByUserEmailAndMailType(Connection con, String userEmail, MailType mailType) throws SQLException {
         String sql = "select * from mail_store" +
                 " inner join user on mail_store.user_num = user.user_num" +
