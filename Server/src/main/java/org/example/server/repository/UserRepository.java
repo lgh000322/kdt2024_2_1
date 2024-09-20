@@ -358,7 +358,7 @@ public class UserRepository {
     public List<UserInfo> findUsersByName(Connection conn, String name) throws SQLException {
         String sql = "select u.user_num, u.name, u.tel, u.email, d.dept_name, p.position_name" +
                 " from user u inner join dept d on u.dept_num = d.dept_num " +
-                "inner join position p on u.position_num = p.position_num where u.name = ?";
+                "inner join position p on u.position_num = p.position_num where u.name like ?";
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -366,7 +366,7 @@ public class UserRepository {
 
         try{
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, name);
+            pstmt.setString(1, "%" + name + "%");
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
