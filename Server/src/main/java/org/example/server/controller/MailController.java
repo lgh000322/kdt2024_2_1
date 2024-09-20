@@ -8,6 +8,7 @@ import org.example.server.adapter.LocalTimeTypeAdapter;
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.mail_dto.MailDeleteDto;
 import org.example.server.dto.mail_dto.MailReceivedData;
 import org.example.server.dto.mail_dto.MailSearchDto;
 import org.example.server.service.MailService;
@@ -62,7 +63,13 @@ public class MailController implements Controller {
                 Double data = (Double) requestData.getData();
                 Long mailNum = data.longValue();
                 result = mailService.mailSearchOne(mailNum);
-
+            }
+            case MessageTypeConst.MESSAGE_MAIL_ONE_DELETE -> {
+                if (requestData.getData() instanceof LinkedTreeMap<?, ?> map) {
+                    System.out.println("특정 메일 삭제");
+                    MailDeleteDto mailDeleteDto = gson.fromJson(gson.toJson(map), MailDeleteDto.class);
+                    result = mailService.mailDeleteOne(mailDeleteDto);
+                }
             }
         }
 

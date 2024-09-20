@@ -5,11 +5,8 @@ import org.example.server.domain.mail.Mail;
 import org.example.server.domain.mail.MailType;
 import org.example.server.domain.mail.ReceivedMail;
 import org.example.server.domain.user.User;
-import org.example.server.dto.mail_dto.MailAllDto;
-import org.example.server.dto.mail_dto.MailReceivedData;
-import org.example.server.dto.mail_dto.MailSearchDto;
+import org.example.server.dto.mail_dto.*;
 import org.example.server.dto.ResponseData;
-import org.example.server.dto.mail_dto.UserAndMailStore;
 import org.example.server.repository.MailRepository;
 import org.example.server.repository.UserRepository;
 
@@ -97,6 +94,39 @@ public class MailService {
 
         return responseData;
     }
+
+    public ResponseData mailDeleteOne(MailDeleteDto mailDeleteDto) throws SQLException {
+        Connection con = null;
+        ResponseData responseData = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = mailDeleteOneBizLogic(con, mailDeleteDto);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+
+        return responseData;
+    }
+
+
+    private ResponseData mailDeleteOneBizLogic(Connection con, MailDeleteDto mailDeleteDto) throws SQLException {
+        if (mailDeleteDto.getMailType() == MailType.SEND) {
+            return mailRepository.changeMailStoreNum(con, mailDeleteDto.getMailNum()) ?
+                    new ResponseData("보낸 메일함에서 특정 메일 삭제 성공", null) :
+                    new ResponseData("보낸 메일함에서 특정 메일 삭제 실패", null);
+        } else {
+            return mailRepository.deleteMailByMailNum(con, mailDeleteDto.getMailNum())
+                    ? new ResponseData("받은 메일함에서 특정 메일 삭제 성공", null)
+                    : new ResponseData("받은 메일함에서 특정 메일 삭제 실패", null);
+        }
+
+    }
+
 
     private ResponseData mailSearchOneBizLogic(Connection con, Long mailNum) throws SQLException {
         Optional<Mail> mailOne = mailRepository.findMailOne(con, mailNum);
