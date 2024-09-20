@@ -112,6 +112,25 @@ public class AnswerRepository {
         return answers;
     }
 
+    // 게시물 번호에 해당하는 댓글 삭제 로직 추가
+    public int deleteAnswersByBoardNum(Long boardNum, Connection conn) throws SQLException {
+        String sql = "DELETE FROM board_answer WHERE board_num = ?";
+        PreparedStatement pstmt = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, boardNum); // 게시물 번호를 설정
+
+            // 댓글 삭제 실행
+            return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("댓글 삭제 중 오류 발생");
+        } finally {
+            close(pstmt, null);
+        }
+    }
+
 
 
     private static void close(PreparedStatement pstmt, ResultSet rs) {

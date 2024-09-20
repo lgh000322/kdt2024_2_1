@@ -243,8 +243,6 @@ public class BoardRepository {
     * 게시물 삭제하는 함수
     * */
     public int deleteBoard(Long boardNum, Connection conn) throws SQLException {
-
-
         PreparedStatement ps = null;
         // 게시물을 삭제하는 쿼리
         String deleteBoardSql = "delete from board where board_num = ?";
