@@ -55,6 +55,7 @@ import main.dto.leave_dto.ForFindLeaveDto;
 import main.dto.leave_dto.LeaveLogOfUserDto;
 import main.dto.leave_dto.LeaveRecord;
 import main.dto.mail_dto.MailAllDto;
+import main.dto.mail_dto.MailDeleteDto;
 import main.dto.mail_dto.MailRecord;
 import main.dto.mail_dto.MailSearchDto;
 import main.dto.mail_dto.UserAndEmailDto;
@@ -265,6 +266,8 @@ public class UserUiController implements Initializable {
 	/* 현재시간 표시 */
 	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+	private Long mailNum;
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		File file = new File("src/UserImage/userImage.jpg");
@@ -453,11 +456,11 @@ public class UserUiController implements Initializable {
 		});
 
 		mailRecordTableView.setOnMouseClicked(event -> {
+			MailRecord mailRecord = mailRecordTableView.getSelectionModel().getSelectedItem();
+			String receivedUserEmail = mailRecord.getMailReceived();
+			mailNum = mailRecord.getMailKeyNo();
+      
 			if (event.getClickCount() == 2) {
-				MailRecord mailRecord = mailRecordTableView.getSelectionModel().getSelectedItem();
-				Long mailNum = mailRecord.getMailKeyNo();
-				String receivedUserEmail = mailRecord.getMailReceived();
-
 				try {
 					mailItemClickedMethod(mailNum, receivedUserEmail);
 				} catch (IOException e1) {
@@ -652,8 +655,56 @@ public class UserUiController implements Initializable {
 	}
 
 	/* 메일삭제 버튼 클릭 시, 메일삭제 처리 로직 */
-	public void handledeleteMailBtn() {
-		mailComboList.setItems(maillist);
+	public void handledeleteMailBtn() throws IOException {
+		System.out.println("메일 삭제 로직 실행");
+		
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		MailDeleteDto mailDeleteDto=new MailDeleteDto();
+		mailDeleteDto.setMailType(MailType.RECEIVED);
+		mailDeleteDto.setMailNum(mailNum);
+		
+		if (mailComboList.getValue() != null) {
+			if (mailComboList.getValue().equals("받은메일함")) {
+				mailDeleteDto.setMailType(MailType.RECEIVED);
+			} else {
+				mailDeleteDto.setMailType(MailType.SEND);
+			}
+		}
+		
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_MAIL_ONE_DELETE,mailDeleteDto);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			ResponseData<MailDeleteDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,MailDeleteDto.class);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				mailRecordList.clear();
+				mailTabClickedMethod();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
 	}
 
 	/*
@@ -1369,4 +1420,5 @@ public class UserUiController implements Initializable {
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
+
 }
