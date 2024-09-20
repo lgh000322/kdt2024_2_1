@@ -83,7 +83,7 @@
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <DatePicker fx:id="selectMoneyDate" layoutX="1.0" layoutY="2.0" prefHeight="25.0" prefWidth="170.0" promptText="지급일 조회" />
-                        <Button fx:id="searchMoneyDateBtn" layoutX="175.0" layoutY="4.0" mnemonicParsing="false" text="검색" />
+                        <Button fx:id="searchMoneyDateBtn" layoutX="175.0" layoutY="4.0" mnemonicParsing="false" text="검색" onAction="#handleMoneySearch" />
                         <TableView fx:id="salaryRecordTableView" layoutY="31.0" prefHeight="388.0" prefWidth="550.0">
                            <columns>
                               <TableColumn fx:id="salaryNoColumn" prefWidth="40.800048828125" text="No." />
@@ -101,8 +101,8 @@
                      <children>
                         <ComboBox fx:id="mailComboList" layoutX="1.0" layoutY="4.0" onAction="#handlemailComboList" prefHeight="22.0" prefWidth="105.0" promptText="받은메일함" />
                         <Line endX="115.0999755859375" endY="30.999996185302734" layoutX="-1.0" opacity="0.2" startX="115.0999755859375" startY="0.7999984622001648" />
-                        <TextField fx:id="mailTitle" layoutX="121.0" layoutY="4.0" promptText="제목명" />
-                        <Button fx:id="searchMailTitleBtn" layoutX="286.0" layoutY="4.0" mnemonicParsing="false" onAction="#handlesearchMailTitleBtn" text="검색" />
+                        <TextField fx:id="mailTitle" layoutX="121.0" layoutY="4.0" promptText="제목명"  />
+                        <Button fx:id="searchMailTitleBtn" layoutX="286.0" layoutY="4.0" mnemonicParsing="false" text="검색" onAction="#handlesearchMailTitleBtn"/>
                         <Button fx:id="sendMailBtn" layoutX="410.0" layoutY="4.0" mnemonicParsing="false" onAction="#handlesendMailBtn" text="메일쓰기" />
                         <Button fx:id="deleteMailBtn" layoutX="482.0" layoutY="4.0" mnemonicParsing="false" onAction="#handledeleteMailBtn" text="메일삭제" />
                         <TableView fx:id="mailRecordTableView" layoutY="31.0" prefHeight="384.0" prefWidth="550.0">

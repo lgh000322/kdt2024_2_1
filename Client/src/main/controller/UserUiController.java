@@ -255,7 +255,7 @@ public class UserUiController implements Initializable {
 
 	@FXML
 	private ObservableList<String> worklist = FXCollections.observableArrayList("출근", "결근", "조퇴");
-	
+
 	@FXML
 	private ObservableList<String> maillist = FXCollections.observableArrayList("받은메일함", "보낸메일함");
 
@@ -422,6 +422,7 @@ public class UserUiController implements Initializable {
 		}
 
 		qnaRecordTableView.setOnMouseClicked(event -> {
+
 		    if (event.getClickCount() == 2) { // 2번 클릭을 감지
 		        QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
 
@@ -438,6 +439,7 @@ public class UserUiController implements Initializable {
 		            }
 		        }
 		    }
+
 		});
 
 		mailRecordTableView.setOnMouseClicked(event -> {
@@ -554,11 +556,18 @@ public class UserUiController implements Initializable {
 	public void handlemailComboList() {
 		mailComboList.setItems(maillist);
 	}
-	
+
 	/* 메일검색 버튼 로직 */
 	public void handlesearchMailTitleBtn() {
+		mailRecordList.clear();
+		try {
+			mailTabClickedMethod();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-	
+
 	/* 메일쓰기 버튼 클릭 시, 메일작성 창 띄우기 */
 	public void handlesendMailBtn() throws IOException {
 		ObservableList<String> emailList = FXCollections.observableArrayList();
@@ -695,8 +704,8 @@ public class UserUiController implements Initializable {
 					BoardFindAllDto boardFindAllDto = list.get(i);
 					Long no = Long.valueOf(i + 1);
 
-					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getUserNum(),boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
-							boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
+					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getUserNum(), boardFindAllDto.getBoardNum(), no,
+							boardFindAllDto.getTitle(), boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
 
 					qnaRecordList.add(qnaRecord);
 				}
@@ -737,7 +746,7 @@ public class UserUiController implements Initializable {
 //		requestData.setMessageType(MessageTypeConst.MESSAGE_LOGIN);
 
 		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_ONE_SEARCH, keyNo);
-		
+
 		try {
 			communicationUtils.sendServer(jsonSendStr, dos);
 			String jsonReceivedStr = dis.readUTF();
@@ -752,7 +761,7 @@ public class UserUiController implements Initializable {
 				if (boardAndAnswer != null) {
 					// 성공적으로 데이터를 받았는지 확인
 					if (responseData.getMessageType().contains("성공")) {
-					
+
 						Platform.runLater(() -> {
 							try {
 								// QnA 상세 화면 로드
@@ -762,7 +771,8 @@ public class UserUiController implements Initializable {
 
 								// QnAShowController를 가져와서 데이터를 설정
 								QnAShowController qnaShowController = fxmlLoader.getController();
-								qnaShowController.setBoardAndAnswerData(boardAndAnswer,keyNo,boardAndAnswer.getBoardInfoDto().getUserNum());
+								qnaShowController.setBoardAndAnswerData(boardAndAnswer, keyNo,
+										boardAndAnswer.getBoardInfoDto().getUserNum());
 
 								// 새 창을 띄우고 현재 창 숨기기
 								Stage qnaStage = new Stage();
@@ -832,7 +842,7 @@ public class UserUiController implements Initializable {
 
 								MailShowController mailShowController = fxmlLoader.getController();
 								mailShowController.setMailWindow(mail, receivedUserEmail);
-						
+
 								Stage mailStage = new Stage();
 								mailStage.setTitle("메일 상세보기");
 								mailStage.setScene(new Scene(qnaRoot));
@@ -1029,7 +1039,8 @@ public class UserUiController implements Initializable {
 		/**
 		 * requestData의 data에 넣어줄 객체를 생성
 		 */
-		User user = new User.Builder().userId(UserInfoSavedUtil.getUserId()).role(Role.USER).build();
+		User user = new User.Builder().userId(UserInfoSavedUtil.getUserId()).role(Role.USER)
+				.moneySearchDate(selectMoneyDate.getValue()).build();
 
 		/**
 		 * requestData 생성
@@ -1094,6 +1105,16 @@ public class UserUiController implements Initializable {
 		mailSearchDto.setEmail(userEmail.getText());
 		mailSearchDto.setMailType(MailType.RECEIVED);
 
+		if (mailComboList.getValue() != null) {
+			if (mailComboList.getValue().equals("받은메일함")) {
+				mailSearchDto.setMailType(MailType.RECEIVED);
+			} else {
+				mailSearchDto.setMailType(MailType.SEND);
+			}
+		}
+		
+		mailSearchDto.setMailTitle(mailTitle.getText());
+
 		/**
 		 * requestData 생성
 		 */
@@ -1111,7 +1132,6 @@ public class UserUiController implements Initializable {
 			if (messageType.contains("성공")) {
 				List<MailAllDto> list = (List<MailAllDto>) responseData.getData();
 				for (int i = 0; i < list.size(); i++) {
-					System.out.println("휴가로그 출력 실행");
 					MailAllDto mailAllDto = list.get(i);
 					Long no = (long) (i + 1);
 					MailRecord mailRecord = new MailRecord(mailAllDto.getMailNum(), no, mailAllDto.getUserEmail(),
@@ -1173,8 +1193,8 @@ public class UserUiController implements Initializable {
 					System.out.println("QnA게시판 로그 출력 실행");
 					BoardFindAllDto boardFindAllDto = list.get(i);
 					Long no = Long.valueOf(i + 1);
-					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getUserNum(),boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
-							boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
+					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getUserNum(), boardFindAllDto.getBoardNum(), no,
+							boardFindAllDto.getTitle(), boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
 					qnaRecordList.add(qnaRecord);
 				}
 
@@ -1315,4 +1335,16 @@ public class UserUiController implements Initializable {
 			serverConnectUtils.close();
 		}
 	}
+
+	public void handleMoneySearch() {
+		salaryRecordList.clear();
+		try {
+			moneyTabClickedMethod();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
 }
