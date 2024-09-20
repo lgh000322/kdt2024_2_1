@@ -180,7 +180,7 @@ public class LeaveService {
         remainedLeave = remainedLeave - daysBetween - 1;
 
         // 남은 휴가일수가 없거나 신청일수가 많다면, null값 반환
-        if(remainedLeave <= 0) {
+        if(remainedLeave < 0) {
                 return new ResponseData("휴가 수락 실패 (신청 일수가 남은 일수를 초과함.)", null);
         }
 
