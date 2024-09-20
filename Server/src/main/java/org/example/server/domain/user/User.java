@@ -1,5 +1,7 @@
 package org.example.server.domain.user;
 
+import java.time.LocalDate;
+
 public class User {
     private Long userNum;
 
@@ -24,6 +26,12 @@ public class User {
     private String deptName;
 
     private String positionName;
+
+    private LocalDate moneySearchDate;
+
+    public LocalDate getMoneySearchDate() {
+        return moneySearchDate;
+    }
 
     public String getDeptName() {
         return deptName;
@@ -94,6 +102,7 @@ public class User {
         this.deptNum = builder.deptNum;
         this.deptName=builder.deptName;
         this.positionName=builder.positionName;
+        this.moneySearchDate=builder.moneySearchDate;
     }
 
     public static class Builder{
@@ -120,6 +129,13 @@ public class User {
         private String deptName;
 
         private String positionName;
+
+        private LocalDate moneySearchDate;
+
+        public Builder moneyTitle(LocalDate moneySearchDate) {
+            this.moneySearchDate=moneySearchDate;
+            return this;
+        }
 
         public Builder deptName(String deptName) {
             this.deptName=deptName;

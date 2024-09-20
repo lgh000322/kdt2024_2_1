@@ -10,6 +10,13 @@ public class MailSearchDto {
     //클라이언트가 어떤 메일함인지 메일타입을 보내준다고 가정함.
     private MailType mailType;
 
+    //클라이언트의 제목 검색
+    private String mailTitle;
+
+    public String getMailTitle() {
+        return mailTitle;
+    }
+
     public String getEmail() {
         return email;
     }
