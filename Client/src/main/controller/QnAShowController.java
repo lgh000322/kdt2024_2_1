@@ -12,11 +12,13 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import main.consts.MessageTypeConst;
 import main.domain.board.Board;
@@ -137,6 +139,7 @@ public class QnAShowController {
                     stage.close();
                 });
             } else {
+            	AnswerSaveAlert("댓글 저장 실패", "관리자 또는 게시자만 댓글을 달 수 있습니다.");
                 System.out.println("댓글 저장 실패: " + messageType);
             }
         } catch (IOException e) {
@@ -150,4 +153,12 @@ public class QnAShowController {
     public void setKeyNo(Long keyNo) {
         this.keyNo = keyNo;
     }
+    
+    private void AnswerSaveAlert(String title, String message) {
+		Alert alert = new Alert(AlertType.ERROR);
+		alert.setTitle(title);
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+		alert.showAndWait();
+	}
 }

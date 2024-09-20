@@ -157,6 +157,7 @@ public class RegisterController {
 
 			if (messageType.contains("성공")) {
 				Platform.runLater(() -> {
+					RegisterAlert("회원가입 성공", "회원가입이 완료 되었습니다.");
 					try {
 						FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main/login_ui/LoginUi.fxml"));
 						Parent loginRoot = fxmlLoader.load();
