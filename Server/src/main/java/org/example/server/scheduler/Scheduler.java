@@ -36,7 +36,7 @@ public class Scheduler {
 
     public void start() {
         System.out.println("출근기록 자동저장 스케줄러 실행");
-        scheduleTask(LocalTime.of(13, 50), this::morningTask, "아침 8시에 데이터베이스 저장 로직 호출");
+        scheduleTask(LocalTime.of(8, 00), this::morningTask, "아침 8시에 데이터베이스 저장 로직 호출");
         scheduleTask(LocalTime.of(18, 10), this::eveningTask, "저녁 6시 10분에 데이터베이스 저장 로직 호출");
     }
 

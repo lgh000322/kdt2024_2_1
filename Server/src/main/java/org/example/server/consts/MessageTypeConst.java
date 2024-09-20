@@ -68,6 +68,9 @@ public abstract class MessageTypeConst {
     //특정 메일 조회
     public static final String MESSAGE_MAIL_ONE_SEARCH = "/mail/one/search";
 
+    //특정 메일 삭제
+    public static final String MESSAGE_MAIL_ONE_DELETE = "/mail/one/delete";
+
     //모든 게시판 조회
     public static final String MESSAGE_BOARD_LIST_SEARCH = "/board/list/search";
 

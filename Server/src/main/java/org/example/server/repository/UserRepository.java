@@ -367,6 +367,7 @@ public class UserRepository {
         try{
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, "%" + name + "%");
+
             rs = pstmt.executeQuery();
 
             while (rs.next()) {

@@ -140,22 +140,22 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `erp_db`.`mail`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `erp_db`.`mail` (
-  `mai_num` BIGINT NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(200) NOT NULL,
-  `contents` VARCHAR(5000) NULL,
-  `created_date` DATE NOT NULL,
-  `mail_store_num` BIGINT NOT NULL,
-  PRIMARY KEY (`mai_num`),
-  UNIQUE INDEX `mai_num_UNIQUE` (`mai_num` ASC),
-  INDEX `fk_mail_mail_store1_idx` (`mail_store_num` ASC),
-  CONSTRAINT `fk_mail_mail_store1`
-    FOREIGN KEY (`mail_store_num`)
-    REFERENCES `erp_db`.`mail_store` (`mail_store_num`)
+CREATE TABLE IF NOT EXISTS erp_db.mail (
+  mai_num BIGINT NOT NULL AUTO_INCREMENT,
+  title VARCHAR(200) NOT NULL,
+  contents VARCHAR(5000) NULL,
+  created_date DATE NOT NULL,
+  mail_store_num BIGINT NOT NULL,
+  is_deleted TINYINT(1) DEFAULT 0,  -- boolean 필드 추가, 기본값은 0 (false)
+  PRIMARY KEY (mai_num),
+  UNIQUE INDEX mai_num_UNIQUE (mai_num ASC),
+  INDEX fk_mail_mail_store1_idx (mail_store_num ASC),
+  CONSTRAINT fk_mail_mail_store1
+    FOREIGN KEY (mail_store_num)
+    REFERENCES erp_db.mail_store (mail_store_num)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
-
 -- -----------------------------------------------------
 -- Table `erp_db`.`received_mail`
 -- -----------------------------------------------------

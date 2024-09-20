@@ -5,6 +5,7 @@ import org.example.server.domain.mail.MailStore;
 import org.example.server.domain.mail.MailType;
 import org.example.server.domain.mail.ReceivedMail;
 import org.example.server.dto.mail_dto.MailAllDto;
+import org.example.server.dto.mail_dto.MailDeleteDto;
 import org.example.server.dto.mail_dto.MailSearchDto;
 import org.example.server.dto.mail_dto.UserAndMailStore;
 
@@ -185,7 +186,7 @@ public class MailRepository {
                 " from mail" +
                 " left join mail_store on mail.mail_store_num = mail_store.mail_store_num" +
                 " left join user on mail_store.user_num = user.user_num" +
-                " where user.email = ?" +
+                " where user.email = ? and mail.is_deleted = ?" +
                 " order by mail.mai_num desc";
 
 
@@ -196,6 +197,7 @@ public class MailRepository {
         try {
             pstmt = con.prepareStatement(sql);
             pstmt.setString(1, mailSearchDto.getEmail());
+            pstmt.setBoolean(2, false);
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -226,7 +228,7 @@ public class MailRepository {
                 " from mail" +
                 " left join mail_store on mail.mail_store_num = mail_store.mail_store_num" +
                 " left join user on mail_store.user_num = user.user_num" +
-                " where user.email = ? and mail.title like ?" +
+                " where user.email = ? and mail.title like ? and mail.is_deleted = ?" +
                 " order by mail.mai_num desc";
 
 
@@ -238,6 +240,7 @@ public class MailRepository {
             pstmt = con.prepareStatement(sql);
             pstmt.setString(1, mailSearchDto.getEmail());
             pstmt.setString(2, "%"+mailSearchDto.getMailTitle()+"%");
+            pstmt.setBoolean(3, false);
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -374,6 +377,48 @@ public class MailRepository {
             close(pstmt, rs);
         }
     }
+
+    public boolean deleteMailByMailNum(Connection con, Long  mailNum) throws SQLException {
+
+        String sql = "delete from received_mail where mail_num = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = con.prepareStatement(sql);
+            pstmt.setLong(1, mailNum);
+            int rows = pstmt.executeUpdate();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public boolean changeMailStoreNum(Connection con, Long mailNum) throws SQLException {
+        String sql = "update mail set is_deleted = ? where mai_num = ?";
+
+        PreparedStatement pstmt = null;
+
+        try {
+            pstmt = con.prepareStatement(sql);
+            pstmt.setBoolean(1, true);
+            pstmt.setLong(2, mailNum);
+
+            int rows = pstmt.executeUpdate();
+            return rows > 0;  // 업데이트된 행의 수가 0보다 크면 true 반환
+
+        } catch (SQLException e) {
+            throw e;  // 예외를 다시 던짐
+        } finally {
+            close(pstmt, null);
+        }
+    }
+
 
     private static void close(PreparedStatement pstmt, ResultSet rs) {
         if (rs != null) {
