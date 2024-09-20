@@ -15,6 +15,9 @@ public class MailAllDto {
 
     private Long mailStoreNum;
 
+    public void changeUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
     private MailAllDto(Builder builder) {
         this.mailNum=builder.mailNum;
         this.title=builder.title;

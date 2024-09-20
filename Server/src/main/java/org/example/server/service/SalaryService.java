@@ -113,7 +113,13 @@ public class SalaryService {
             if (DBUser.getRole() == Role.ADMIN) { // 관리자인 경우 전체 월급 데이터를 가져옴
                 salaryResponse = salaryRepository.searchSalaryAdminOnDB(con); // 관리자의 월급 데이터 조회
             } else { // 일반 유저의 월급을 조회
-                salaryResponse = salaryRepository.searchSalaryUserOnDB(con, DBUser); // 일반 유저의 월급 데이터 조회
+                if (user.getMoneySearchDate() == null) {
+                    salaryResponse = salaryRepository.searchSalaryUserOnDB(con, DBUser); // 일반 유저의 월급 데이터 조회
+                }
+
+                if (user.getMoneySearchDate() != null) {
+                    salaryResponse=salaryRepository.searchSalaryUserOnDBByDate(con,DBUser,user.getMoneySearchDate());
+                }
             }
         } else {
             return new ResponseData("User not found", null);  // 사용자가 없을 경우 반환

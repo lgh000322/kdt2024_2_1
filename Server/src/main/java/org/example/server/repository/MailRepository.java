@@ -94,6 +94,34 @@ public class MailRepository {
         }
     }
 
+    public String findSenderEmail(Connection con,Long mailNum) throws SQLException {
+        String sql = "select user.email from mail" +
+                " left join mail_store on mail.mail_store_num = mail_store.mail_store_num" +
+                " left join user on mail_store.user_num = user.user_num" +
+                " where mail.mai_num = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String result=null;
+        try {
+            pstmt = con.prepareStatement(sql);
+            pstmt.setLong(1, mailNum);
+
+            rs = pstmt.executeQuery();
+
+
+            if (rs.next()) {
+                result = rs.getString("user.email");
+            }
+
+            return result;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
     public UserAndMailStore findMailStoreByUserEmailAndMailType(Connection con, String userEmail, MailType mailType) throws SQLException {
         String sql = "select * from mail_store" +
                 " inner join user on mail_store.user_num = user.user_num" +
@@ -124,8 +152,8 @@ public class MailRepository {
         }
     }
 
-    public Optional<List<Mail>> findSendMailAll(Connection con, MailSearchDto mailSearchDto) throws SQLException {
-        String sql = "select mail.mai_num, mail.title, mail.created_date" +
+    public Optional<List<MailAllDto>> findSendMailAll(Connection con, MailSearchDto mailSearchDto) throws SQLException {
+        String sql = "select mail.mai_num, mail.title, mail.created_date, user.email" +
                 " from mail" +
                 " left join mail_store on mail.mail_store_num = mail_store.mail_store_num" +
                 " left join user on mail_store.user_num = user.user_num" +
@@ -135,7 +163,7 @@ public class MailRepository {
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
-        List<Mail> result = new ArrayList<>();
+        List<MailAllDto> result = new ArrayList<>();
 
         try {
             pstmt = con.prepareStatement(sql);
@@ -143,13 +171,56 @@ public class MailRepository {
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                Mail mail = new Mail.Builder()
-                        .mailNum(rs.getLong("mai_num"))
-                        .title(rs.getString("title"))
-                        .createdDate(rs.getDate("created_date").toLocalDate())
+                MailAllDto mailAllDto=new MailAllDto.Builder()
+                        .mailNum(rs.getLong("mail.mai_num"))
+                        .title(rs.getString("mail.title"))
+                        .createdDate(rs.getDate("mail.created_date").toLocalDate())
+                        .userEmail(rs.getString("user.email"))
                         .build();
 
-                result.add(mail);
+                result.add(mailAllDto);
+            }
+
+            if (result.isEmpty()) {
+                return Optional.empty();
+            }
+
+            return Optional.of(result);
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public Optional<List<MailAllDto>> findSendMailAllByTitle(Connection con, MailSearchDto mailSearchDto) throws SQLException {
+        String sql = "select mail.mai_num, mail.title, mail.created_date, user.email" +
+                " from mail" +
+                " left join mail_store on mail.mail_store_num = mail_store.mail_store_num" +
+                " left join user on mail_store.user_num = user.user_num" +
+                " where user.email = ? and mail.title like ?" +
+                " order by mail.mai_num desc";
+
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<MailAllDto> result = new ArrayList<>();
+
+        try {
+            pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, mailSearchDto.getEmail());
+            pstmt.setString(2, "%"+mailSearchDto.getMailTitle()+"%");
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                MailAllDto mailAllDto=new MailAllDto.Builder()
+                        .mailNum(rs.getLong("mail.mai_num"))
+                        .title(rs.getString("mail.title"))
+                        .createdDate(rs.getDate("mail.created_date").toLocalDate())
+                        .userEmail(rs.getString("user.email"))
+                        .build();
+
+                result.add(mailAllDto);
             }
 
             if (result.isEmpty()) {
@@ -165,7 +236,7 @@ public class MailRepository {
     }
 
     public Optional<List<MailAllDto>> findReceivedMailAll(Connection con, MailSearchDto mailSearchDto) throws SQLException {
-        String sql = "select mail.mai_num, mail.title, mail.created_date, user.email" +
+        String sql = "select mail.mai_num, mail.title, mail.created_date" +
                 " from mail" +
                 " left join received_mail on mail.mai_num = received_mail.mail_num" +
                 " left join user on received_mail.user_num = user.user_num" +
@@ -180,6 +251,48 @@ public class MailRepository {
         try {
             pstmt = con.prepareStatement(sql);
             pstmt.setString(1, mailSearchDto.getEmail());
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                MailAllDto mailAllDto=new MailAllDto.Builder()
+                        .mailNum(rs.getLong("mail.mai_num"))
+                        .title(rs.getString("mail.title"))
+                        .createdDate(rs.getDate("mail.created_date").toLocalDate())
+                        .build();
+
+
+                result.add(mailAllDto);
+            }
+
+            if (result.isEmpty()) {
+                return Optional.empty();
+            }
+
+            return Optional.of(result);
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public Optional<List<MailAllDto>> findReceivedMailAllByTitle(Connection con, MailSearchDto mailSearchDto) throws SQLException {
+        String sql = "select mail.mai_num, mail.title, mail.created_date, user.email" +
+                " from mail" +
+                " left join received_mail on mail.mai_num = received_mail.mail_num" +
+                " left join user on received_mail.user_num = user.user_num" +
+                " where user.email = ? and mail.title like ?" +
+                " order by mail.mai_num desc";
+
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<MailAllDto> result = new ArrayList<>();
+
+        try {
+            pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, mailSearchDto.getEmail());
+            pstmt.setString(2, "%"+mailSearchDto.getMailTitle()+"%");
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
