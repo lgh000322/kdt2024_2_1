@@ -560,6 +560,15 @@ public class UserUiController implements Initializable {
 	/* 메일검색 버튼 로직 */
 	public void handlesearchMailTitleBtn() {
 		mailRecordList.clear();
+		String selectedMailBox = mailComboList.getValue(); // ComboBox에서 선택한 값 가져오기
+
+	    if ("받은메일함".equals(selectedMailBox)) {
+	        // 받은메일함을 선택한 경우
+	        mailReceivedColumn.setText("보낸 사람");
+	    } else if ("보낸메일함".equals(selectedMailBox)) {
+	        // 보낸메일함을 선택한 경우
+	        mailReceivedColumn.setText("받은 사람");
+	    }
 		try {
 			mailTabClickedMethod();
 		} catch (IOException e) {
