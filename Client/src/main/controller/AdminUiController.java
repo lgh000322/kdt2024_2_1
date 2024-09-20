@@ -923,6 +923,7 @@ public class AdminUiController {
 
 	/* 메일삭제 버튼 클릭 시, 메일삭제 처리 로직 */
 	public void handledeleteMailBtn() {
+		
 	}
 	
 	/* Q&A 탭에서 검색 버튼 버튼 클릭 시, 입력한 제목명으로 검색 처리 로칙 */
@@ -987,9 +988,90 @@ public class AdminUiController {
 			serverConnectUtils.close();
 		}
 	}
+	
 	/* Q&A 글 삭제 버튼 클릭 시, 글 삭제 처리 로칙 */
 	public void handledeletePostQnABtn() {
+		
+		QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
+
+	    if (selectedQnAItem != null) {
+	        Long selectedQnAId = selectedQnAItem.getKeyNo(); // 선택된 QnARecord의 boardNum 가져오기
+
+	        try {
+	            // 서버에 삭제 요청 (boardNum만 전송)
+	            boolean deleteSuccess = deleteQnAPostFromServer(selectedQnAId);
+
+	            if (deleteSuccess) {
+	                // Q&A 리스트에서 해당 boardNum와 일치하는 항목 삭제
+	                qnaRecordList.removeIf(qna -> Long.valueOf(qna.getKeyNo()).equals(selectedQnAId));
+
+	                // UI 업데이트
+	                qnaRecordTableView.refresh();
+
+	                // 삭제 성공 메시지 출력
+	                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+	                alert.setTitle("성공");
+	                alert.setHeaderText(null);
+	                alert.setContentText("해당 Q&A 게시물이 성공적으로 삭제되었습니다.");
+	                alert.showAndWait();
+	            } else {
+	                // 삭제 실패 메시지 출력
+	                Alert alert = new Alert(Alert.AlertType.ERROR);
+	                alert.setTitle("오류");
+	                alert.setHeaderText(null);
+	                alert.setContentText("Q&A 게시물 삭제에 실패했습니다.");
+	                alert.showAndWait();
+	            }
+	        } catch (IOException e1) {
+	            e1.printStackTrace();
+	        }
+	    } else {
+	        // 글이 선택되지 않은 경우 경고 메시지를 표시
+	        Alert alert = new Alert(Alert.AlertType.WARNING);
+	        alert.setTitle("경고");
+	        alert.setHeaderText(null);
+	        alert.setContentText("삭제할 글을 선택해주세요.");
+	        alert.showAndWait();
+	    }
 	}
+	
+	
+	private boolean deleteQnAPostFromServer(Long boardNum) throws IOException {
+	    CommunicationUtils communicationUtils = new CommunicationUtils();
+	    ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+	    DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+	    DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+	    try {
+	        // boardNum만 JSON으로 직렬화
+	        String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_DELETE, boardNum);
+
+	        // 서버로 삭제 요청 전송
+	        communicationUtils.sendServer(jsonSendStr, dos);
+
+	        // 서버 응답 수신
+	        String jsonReceivedStr = dis.readUTF();
+
+	        // 서버 응답을 처리하여 성공 여부 판단
+	        ResponseData<String> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, String.class);
+	        String messageType = responseData.getMessageType();
+
+	        return messageType.contains("성공"); // 성공 여부 반환
+
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        return false; // 삭제 실패 시 false 반환
+	    } finally {
+	        // 서버 연결 종료
+	        serverConnectUtils.close();
+	    }
+	}
+
+
+	
+	
+	
 	
 	/* 로그아웃 버튼 처리 로직 */
 	public void handleLogoutBtn() {
