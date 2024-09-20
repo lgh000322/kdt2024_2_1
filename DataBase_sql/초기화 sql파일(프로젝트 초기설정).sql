@@ -270,4 +270,6 @@ INSERT INTO dept (dept_name) VALUES
 INSERT INTO `user` (user_id, password, name, tel, email, role, remained_leave, position_num, dept_num)
 VALUES ('admin', 'admin', 'admin', '010-1111-1111', 'admin@knu.com', 'ADMIN', 21, 1, 1);
 
+insert into mail_store (mail_type,user_num) values('SEND',1);
+insert into mail_store (mail_type,user_num) values('RECEIVED',1);
 
