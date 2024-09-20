@@ -160,7 +160,7 @@ public class UserRepository {
                         .positionNum(rs.getLong("user.position_num"))
                         .deptNum(rs.getLong("user.dept_num"))
                         .positionName(rs.getString("position.position_name"))
-                        .deptName(rs.getString("position.position_name"))
+                        .deptName(rs.getString("dept.dept_name"))
                         .build();
             }
 

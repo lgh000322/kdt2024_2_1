@@ -112,15 +112,39 @@ public class MailService {
             if (sendMailAll.isEmpty()) {
                 return new ResponseData("해당 유저의 송신메일함이 비어있습니다.", null);
             }
+            List<MailAllDto> mailAllDtos = sendMailAll.get();
 
-            return new ResponseData("유저의 송신메일함의 모든 메일 조회 성공", sendMailAll.get());
+            mailAllDtos.forEach(mailAllDto -> {
+                Long mailNum = mailAllDto.getMailNum();
+                String senderEmail = null;
+                try {
+                    senderEmail = mailRepository.findReceiverEmail(con, mailNum);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                mailAllDto.changeUserEmail(senderEmail);  // 기존 mailAllDto 객체 수정
+            });
+
+            return new ResponseData("유저의 송신메일함의 모든 메일 조회 성공", mailAllDtos);
         } else if (mailSearchDto.getMailType() == MailType.SEND && !mailSearchDto.getMailTitle().equals("")) {
             Optional<List<MailAllDto>> sendMailAllByTitle = mailRepository.findSendMailAllByTitle(con, mailSearchDto);
             if (sendMailAllByTitle.isEmpty()) {
                 return new ResponseData("해당 유저의 송신메일함이 비어있습니다.", null);
             }
 
-            return new ResponseData("유저의 송신메일함의 모든 메일 조회 성공", sendMailAllByTitle.get());
+            List<MailAllDto> mailAllDtos = sendMailAllByTitle.get();
+
+            mailAllDtos.forEach(mailAllDto -> {
+                Long mailNum = mailAllDto.getMailNum();
+                String senderEmail = null;
+                try {
+                    senderEmail = mailRepository.findReceiverEmail(con, mailNum);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                mailAllDto.changeUserEmail(senderEmail);  // 기존 mailAllDto 객체 수정
+            });
+            return new ResponseData("유저의 송신메일함의 모든 메일 조회 성공", mailAllDtos);
 
         } else if (mailSearchDto.getMailType() == MailType.RECEIVED && mailSearchDto.getMailTitle().equals("")) {
             Optional<List<MailAllDto>> receivedMailAll = mailRepository.findReceivedMailAll(con, mailSearchDto);
