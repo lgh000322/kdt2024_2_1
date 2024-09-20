@@ -51,6 +51,13 @@ public class RegisterController {
 	private Button registerBtn;
 
 	public void handleCheckId() throws IOException {
+		if (userId.getText() == null || userId.getText().trim().isEmpty()) {
+	        RegisterAlert("중복검사 실패", "아이디를 입력해주세요.");
+	        return;
+		} else if (userId.getText().length() < 8) {
+            RegisterAlert("중복검사 실패", "아이디가 8글자 이상이어야 합니다.");
+            return;
+        }
 		/**
 		 * 서버랑 연결
 		 */
@@ -89,6 +96,19 @@ public class RegisterController {
 	}
 
 	public void handleRegisterBtn() throws IOException {
+		if (userPwd.getText().length() < 8) {
+            RegisterAlert("회원가입 실패", "비밀번호가 8글자 이상이어야 합니다.");
+            return;
+        } else if (userName.getText() == null || userName.getText().trim().isEmpty()) {
+        	RegisterAlert("회원가입 실패", "이름을 입력해주세요.");
+        	return;
+        } else if (userTel1.getText() == null || userTel1.getText().trim().isEmpty()) {
+        	RegisterAlert("회원가입 실패", "전화번호를 입력해주세요.");
+        	return;
+        } else if (userEmail.getText() == null || userEmail.getText().trim().isEmpty()) {
+        	RegisterAlert("회원가입 실패", "이메일을 입력해주세요.");
+        	return;
+        }
 		/**
 		 * 서버랑 연결
 		 */
