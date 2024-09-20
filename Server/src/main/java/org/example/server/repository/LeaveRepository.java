@@ -177,11 +177,11 @@ public class LeaveRepository {
         //모든 leave_log를 가져오기위한 쿼리
         String sql = "select l.leave_num, u.name, l.request_date, l.start_date, l.end_date, d.dept_name, l.acceptance_status, u.remained_leave, l.check_status, u.user_id" +
                 " from leave_log l inner join user u on l.user_num = u.user_num" +
-                " inner join dept d on u.dept_num = d.dept_num where u.name = ?";
+                " inner join dept d on u.dept_num = d.dept_num where u.name like ?";
 
         try{
             ps = conn.prepareStatement(sql);
-            ps.setString(1, userName);
+            ps.setString(1, "%" + userName + "%");
             rs = ps.executeQuery();
 
             while (rs.next()) {
