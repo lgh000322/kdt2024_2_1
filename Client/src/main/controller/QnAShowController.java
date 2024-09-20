@@ -99,7 +99,7 @@ public class QnAShowController {
         
         User user=new User.Builder()
         		.userId(UserInfoSavedUtil.getUserId())
-        		.role(Role.USER)
+        		.role(UserInfoSavedUtil.getRole())
         		.userNum(UserInfoSavedUtil.getUserInfo().getUserNum())
         		.build();
         

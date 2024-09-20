@@ -40,6 +40,7 @@ import main.domain.mail.MailType;
 import main.domain.user.Role;
 import main.domain.user.User;
 import main.dto.ResponseData;
+import main.dto.board_dto.BoardAndAnswer;
 import main.dto.board_dto.BoardFindAllDto;
 import main.dto.board_dto.QnARecord;
 import main.dto.leave_dto.ForFindLeaveDto;
@@ -360,7 +361,7 @@ public class AdminUiController {
 			if (newValue) { // Tab 2가 선택되었을 때
 				System.out.println("q&a 탭이 선택됨");
 				try {
-					leaveTabClickedMethod();
+					qnaTabClickedMethod();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -408,7 +409,13 @@ public class AdminUiController {
 		usersalaryDept.setCellValueFactory(new PropertyValueFactory<>("salaryDept"));
 		usersalaryPosition.setCellValueFactory(new PropertyValueFactory<>("salaryPosition"));
 		usersalaryPayment.setCellValueFactory(new PropertyValueFactory<>("salaryPayment"));
-
+		
+		// 컬럼과 Q&A관리
+		qnaNoColumn.setCellValueFactory(new PropertyValueFactory<>("qnaNo"));
+		qnaTitleColumn.setCellValueFactory(new PropertyValueFactory<>("qnaTitle"));
+		qnaPostUserColumn.setCellValueFactory(new PropertyValueFactory<>("qnaPostUser"));
+		qnaDateColumn.setCellValueFactory(new PropertyValueFactory<>("qnaDate"));
+		
 		try {
 			employeeTabClickedMethod();
 		} catch (IOException e1) {
@@ -515,6 +522,24 @@ public class AdminUiController {
 		    }
 		});
 		
+		qnaRecordTableView.setOnMouseClicked(event -> {
+		    if (event.getClickCount() == 2) { // 2번 클릭을 감지
+		        QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
+
+		        if (selectedQnAItem != null) {
+		            System.out.println("Selected QnARecord: " + selectedQnAItem);
+
+		            // 선택된 QnARecord의 keyNo 가져오기
+		            Long selectedKeyNo = selectedQnAItem.getKeyNo();
+
+		            try {
+		                qnaItemClickMethod(selectedKeyNo);
+		            } catch (IOException e1) {
+		                e1.printStackTrace();
+		            }
+		        }
+		    }
+		});
 	}
 	
 	/* 좌측 사용자 정보 표시 */
@@ -763,8 +788,64 @@ public class AdminUiController {
 
 	}
 
-	
-	
+	// Q&A탭이 선택되었을때
+	public void qnaTabClickedMethod() throws IOException {
+		System.out.println("Q&A탭 클릭 이벤트 발생");
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData의 data에 넣어줄 객체를 생성
+		 */
+		String title = qnaTitle.getText();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_LIST_SEARCH, title);
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			Type listType = new TypeToken<List<BoardFindAllDto>>() {
+			}.getType();
+			ResponseData<BoardFindAllDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					listType);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				List<BoardFindAllDto> list = (List<BoardFindAllDto>) responseData.getData();
+				for (int i = 0; i < list.size(); i++) {
+					System.out.println("QnA게시판 로그 출력 실행");
+					BoardFindAllDto boardFindAllDto = list.get(i);
+					Long no = Long.valueOf(i + 1);
+					QnARecord qnaRecord = new QnARecord(boardFindAllDto.getUserNum(),boardFindAllDto.getBoardNum(), no, boardFindAllDto.getTitle(),
+							boardFindAllDto.getUserId(), boardFindAllDto.getCreatedDate());
+					qnaRecordList.add(qnaRecord);
+				}
+
+				Platform.runLater(() -> {
+					qnaRecordTableView.setItems(qnaRecordList);
+				});
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
+
+	}
 	
 	/* 메일쓰기 버튼 클릭 시, 메일작성 창 띄우기 */
 	public void handlesendMailBtn() throws IOException {
@@ -1211,6 +1292,79 @@ public class AdminUiController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			serverConnectUtils.close();
+		}
+	}
+	
+	/* Q&A 리스트 아이템 선택 시, 선택된 아이템 창 연결 */
+	public void qnaItemClickMethod(Long keyNo) throws IOException {
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData 생성 //
+		 */
+
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_ONE_SEARCH, keyNo);
+		
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+			ResponseData<BoardAndAnswer> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					BoardAndAnswer.class);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+				BoardAndAnswer boardAndAnswer = responseData.getData();
+				// 데이터가 null인지 확인
+				if (boardAndAnswer != null) {
+					// 성공적으로 데이터를 받았는지 확인
+					if (responseData.getMessageType().contains("성공")) {
+					
+						Platform.runLater(() -> {
+							try {
+								// QnA 상세 화면 로드
+								FXMLLoader fxmlLoader = new FXMLLoader(
+										getClass().getResource("/main/qna_ui/ShowQnA.fxml"));
+								Parent qnaRoot = fxmlLoader.load();
+
+								// QnAShowController를 가져와서 데이터를 설정
+								QnAShowController qnaShowController = fxmlLoader.getController();
+								qnaShowController.setBoardAndAnswerData(boardAndAnswer,keyNo,boardAndAnswer.getBoardInfoDto().getUserNum());
+
+								// 새 창을 띄우고 현재 창 숨기기
+								Stage qnaStage = new Stage();
+								qnaStage.setTitle("Q&A 상세보기");
+								qnaStage.setScene(new Scene(qnaRoot));
+
+								qnaStage.show();
+
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						});
+					} else {
+						System.out.println("게시글 정보를 가져오는 데 실패했습니다.");
+					}
+				} else {
+					System.out.println("BoardAndAnswer 객체가 null입니다.");
+				}
+			} else {
+				System.out.println("서버 응답이 null입니다.");
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			// 연결 종료
 			serverConnectUtils.close();
 		}
 	}
