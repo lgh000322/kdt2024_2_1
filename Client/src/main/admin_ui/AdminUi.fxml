@@ -15,24 +15,24 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="451.0" prefWidth="687.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.controller.AdminUiController">
    <children>
-      <Pane layoutY="-2.0" prefHeight="451.0" prefWidth="126.0">
+      <Pane layoutY="-2.0" prefHeight="451.0" prefWidth="138.0">
          <children>
-           <ImageView fx:id="userImage" fitHeight="162.0" fitWidth="124.0" layoutX="7.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true" />
-            <Label layoutX="4.0" layoutY="180.0" style="-fx-font-size: 10px;" text="이름:" />
-            <Label fx:id="userName" layoutX="37.0" layoutY="180.0" style="-fx-font-size: 10px;" text="사용자명" />
-            <Label layoutX="4.0" layoutY="210.0" style="-fx-font-size: 10px;" text="휴대폰:" />
-            <Label fx:id="userTel1" layoutX="47.0" layoutY="211.0" style="-fx-font-size: 10px;" text="휴대번호" />
-            <Label layoutX="4.0" layoutY="240.0" style="-fx-font-size: 10px;" text="이메일:" />
-            <Label fx:id="userEmail" layoutX="47.0" layoutY="240.0" style="-fx-font-size: 10px;" text="사용자 이메일" />
-            <Label layoutX="4.0" layoutY="270.0" style="-fx-font-size: 10px;" text="소속:" />
-            <Label fx:id="userDept" layoutX="37.0" layoutY="270.0" style="-fx-font-size: 10px;" text="사용자 소속" />
-            <Label layoutX="4.0" layoutY="300.0" style="-fx-font-size: 10px;" text="직위/직책:" />
-            <Label fx:id="userPosition" layoutX="60.0" layoutY="300.0" style="-fx-font-size: 10px;" text="사용자 직급" />
-            <Line endX="65.0" layoutX="60.0" layoutY="404.0" opacity="0.5" startX="-60.0" />
+           <ImageView fx:id="userImage" fitHeight="162.0" fitWidth="124.0" layoutX="7.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
+            <Label layoutX="4.0" layoutY="199.0" style="-fx-font-size: 10px;" text="이름:" />
+            <Label fx:id="userName" layoutX="37.0" layoutY="199.0" style="-fx-font-size: 10px;" text="사용자명" />
+            <Label layoutX="4.0" layoutY="229.0" style="-fx-font-size: 10px;" text="휴대폰:" />
+            <Label fx:id="userTel1" layoutX="47.0" layoutY="230.0" style="-fx-font-size: 10px;" text="휴대번호" />
+            <Label layoutX="4.0" layoutY="259.0" style="-fx-font-size: 10px;" text="이메일:" />
+            <Label fx:id="userEmail" layoutX="47.0" layoutY="259.0" style="-fx-font-size: 10px;" text="사용자 이메일" />
+            <Label layoutX="4.0" layoutY="289.0" style="-fx-font-size: 10px;" text="소속:" />
+            <Label fx:id="userDept" layoutX="37.0" layoutY="289.0" style="-fx-font-size: 10px;" text="사용자 소속" />
+            <Label layoutX="4.0" layoutY="319.0" style="-fx-font-size: 10px;" text="직위/직책:" />
+            <Label fx:id="userPosition" layoutX="60.0" layoutY="319.0" style="-fx-font-size: 10px;" text="사용자 직급" />
+            <Line endX="78.4000244140625" endY="-3.0517578125E-5" layoutX="60.0" layoutY="408.0" opacity="0.5" startX="-60.0" />
             <Label fx:id="currentTime" layoutX="2.0" layoutY="425.0" prefHeight="14.0" prefWidth="124.0" text="시스템 현재 날짜시간" />
          </children>
       </Pane>
-      <TabPane layoutX="125.0" prefHeight="442.0" prefWidth="548.0" tabClosingPolicy="UNAVAILABLE">
+      <TabPane layoutX="139.0" layoutY="4.0" prefHeight="442.0" prefWidth="548.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab fx:id="employeeTab" text="사원관리">
             <content>
@@ -45,10 +45,10 @@
                           <TableColumn fx:id="usereditPhone" prefWidth="100.0" text="전화번호" />
                           <TableColumn fx:id="usereditDept" prefWidth="75.0" text="부서" />
                           <TableColumn fx:id="usereditPosition" prefWidth="45.0" text="직급" />
-                          <TableColumn fx:id="usereditEmail" prefWidth="163.0" text="이메일" />
+                          <TableColumn fx:id="usereditEmail" prefWidth="169.5999755859375" text="이메일" />
                       </columns>
                   </TableView>
-                        <Button fx:id="userEditSearchBtn" layoutX="185.0" layoutY="383.0" mnemonicParsing="false" text="회원 검색" onAction="#handleUserEditSearchBtn"/>
+                        <Button fx:id="userEditSearchBtn" layoutX="185.0" layoutY="383.0" mnemonicParsing="false" onAction="#handleUserEditSearchBtn" text="회원 검색" />
                         <TextField fx:id="userEditSearch" layoutX="14.0" layoutY="383.0" />
                      </children>
                   </AnchorPane>
@@ -72,10 +72,10 @@
                               <TableColumn fx:id="userId" prefWidth="45.0" text="Id." />
                            </columns>
                         </TableView>
-                        <Button fx:id="userLeaveSearchBtn" layoutX="185.0" layoutY="383.0" mnemonicParsing="false" text="회원 검색" onAction="#hadleLeaveSearchBtn"/>
+                        <Button fx:id="userLeaveSearchBtn" layoutX="185.0" layoutY="383.0" mnemonicParsing="false" onAction="#hadleLeaveSearchBtn" text="회원 검색" />
                         <TextField fx:id="userLeaveSearch" layoutX="14.0" layoutY="383.0" />
-                        <Button layoutX="471.0" layoutY="383.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="승인" onAction="#handleAcceptBtn" fx:id="rejectBtn"/>
-                        <Button layoutX="395.0" layoutY="383.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="63.0" text="거절" onAction="#handleRejectBtn" fx:id="acceptBtn"/>
+                        <Button fx:id="rejectBtn" layoutX="471.0" layoutY="383.0" mnemonicParsing="false" onAction="#handleAcceptBtn" prefHeight="22.0" prefWidth="63.0" text="승인" />
+                        <Button fx:id="acceptBtn" layoutX="395.0" layoutY="383.0" mnemonicParsing="false" onAction="#handleRejectBtn" prefHeight="22.0" prefWidth="63.0" text="거절" />
                      </children></AnchorPane>
             </content>
           </Tab>
@@ -142,6 +142,6 @@
             </Tab>
         </tabs>
       </TabPane>
-      <Button fx:id="logoutBtn" layoutX="572.0" layoutY="3.0" mnemonicParsing="false" onAction="#handleLogoutBtn" prefHeight="22.0" prefWidth="87.0" text="로그아웃" />
+      <Button fx:id="logoutBtn" layoutX="572.0" layoutY="7.0" mnemonicParsing="false" onAction="#handleLogoutBtn" prefHeight="22.0" prefWidth="87.0" text="로그아웃" />
    </children>
 </AnchorPane>

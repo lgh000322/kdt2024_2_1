@@ -59,7 +59,7 @@ public class AdminUserManagementController {
     public void initialize() {
         // Define a list of dummy values for the positionComboBox
         ObservableList<String> positionValues = FXCollections.observableArrayList(
-            "사원", "주임", "대리", "팀장", "과장", "부장"
+            "사원", "주임", "대리", "팀장", "과장", "부장", "부사장", "사장"
         );
 
         // Add these values to the positionComboBox
