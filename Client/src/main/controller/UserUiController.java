@@ -869,7 +869,7 @@ public class UserUiController implements Initializable {
 		}
 	}
 
-	/* Q&A 리스트 아이템 선택 시, 선택된 아이템 창 연결 */
+	/* 메일함 리스트 아이템 선택 시, 선택된 아이템 창 연결 */
 	public void mailItemClickedMethod(Long mailNum, String receivedUserEmail) throws IOException {
 		CommunicationUtils communicationUtils = new CommunicationUtils();
 		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
@@ -904,14 +904,14 @@ public class UserUiController implements Initializable {
 								// QnA 상세 화면 로드
 								FXMLLoader fxmlLoader = new FXMLLoader(
 										getClass().getResource("/main/mail_ui/ShowMail.fxml"));
-								Parent qnaRoot = fxmlLoader.load();
+								Parent mailRoot = fxmlLoader.load();
 
 								MailShowController mailShowController = fxmlLoader.getController();
 								mailShowController.setMailWindow(mail, receivedUserEmail);
 
 								Stage mailStage = new Stage();
 								mailStage.setTitle("메일 상세보기");
-								mailStage.setScene(new Scene(qnaRoot));
+								mailStage.setScene(new Scene(mailRoot));
 
 								mailStage.show();
 
@@ -920,10 +920,10 @@ public class UserUiController implements Initializable {
 							}
 						});
 					} else {
-						System.out.println("게시글 정보를 가져오는 데 실패했습니다.");
+						System.out.println("메일 정보를 가져오는 데 실패했습니다.");
 					}
 				} else {
-					System.out.println("BoardAndAnswer 객체가 null입니다.");
+					System.out.println("Mail 객체가 null입니다.");
 				}
 			} else {
 				System.out.println("서버 응답이 null입니다.");
