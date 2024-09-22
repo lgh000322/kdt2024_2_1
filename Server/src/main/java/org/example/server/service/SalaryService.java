@@ -6,6 +6,8 @@ import org.example.server.domain.salary_log.SalaryLog;
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.salary_dto.BonusDto;
+import org.example.server.dto.salary_dto.UserSalaryDto;
 import org.example.server.repository.SalaryRepository;
 import org.example.server.repository.UserRepository;
 
@@ -13,6 +15,8 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -57,19 +61,41 @@ public class SalaryService {
 
         return responseData;
     }
-    
-    //월급내역을 추가
-    public ResponseData addSalary(User user) throws SQLException{
+
+
+    public ResponseData addSalary() throws SQLException {
         Connection con = null;
         ResponseData responseData = null;
 
-        try {
+        try{
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = addSalaryBizLogic(user, con);
+            responseData = insertSalaryBizLogic(con);
             con.commit();
         } catch (Exception e) {
-            con.rollback();
+            e.printStackTrace();
+            throw e;
+        } finally {
+            release(con);
+        }
+
+        return responseData;
+
+    }
+
+    public ResponseData addBonus(BonusDto bonus) throws SQLException {
+        Connection con = null;
+        ResponseData responseData = null;
+
+
+        try{
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = addBonusBizLogic(bonus, con);
+            con.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         } finally {
             release(con);
         }
@@ -77,29 +103,82 @@ public class SalaryService {
         return responseData;
     }
 
-    //월급내역을 추가하는 비즈니스로직 메소드
-    private ResponseData addSalaryBizLogic(User user,Connection con) throws SQLException{
-        // 사용자의 직급(Role)에 따른 기본급 설정 및 성과급 추가
-        int baseSalary=1000000;
-        //여기서 기본급값을 설정해줘야할거같음.
 
-        //여기서 성과급을 추가해도됨.
-        int bonusSalary = 0;
 
-        // 총 월급 계산
-        int totalSalary = baseSalary+bonusSalary;
+    private ResponseData insertSalaryBizLogic(Connection con) throws SQLException {
+        List<UserSalaryDto> userSalaryDtos = new ArrayList<>();
+        userSalaryDtos = salaryRepository.findUserNumAndSalary(con);
+        int row = 0;
+        for (UserSalaryDto userSalaryDto : userSalaryDtos) {
+             row = salaryRepository.addSalary(con, userSalaryDto);
+        }
 
-        // SalaryLog 객체 생성
-        SalaryLog salaryLog = new SalaryLog.Builder()
-                .receivedData(LocalDate.now()) // 현재 날짜를 급여 지급일로 설정
-                .totalSalary(totalSalary) // 총 월급 설정
-                .userNum(user.getUserNum()) // 유저 번호 설정
-                .build();
 
-        // 월급 정보를 데이터베이스에 삽입
-        return salaryRepository.insertSalaryonDB(con, user, salaryLog);
+        if (row > 0) {
+            return new ResponseData("월급 내역 등록 성공", null);
+        } else {
+            return new ResponseData("월급 내역 등록 실패", null);
+        }
     }
 
+
+    private ResponseData addBonusBizLogic(BonusDto bonus, Connection con) throws SQLException {
+
+        int row = 0;
+
+        row = salaryRepository.addBonus(bonus, con);
+
+        if(row == 0){
+            return new ResponseData("급여 내역 없음.", null);
+        }
+
+        return new ResponseData("성과급 추가 성공", null);
+    }
+
+
+
+    /* //월급내역을 추가
+     public ResponseData addSalary(User user) throws SQLException{
+         Connection con = null;
+         ResponseData responseData = null;
+
+         try {
+             con = dataSource.getConnection();
+             con.setAutoCommit(false);
+             responseData = addSalaryBizLogic(user, con);
+             con.commit();
+         } catch (Exception e) {
+             con.rollback();
+         } finally {
+             release(con);
+         }
+
+         return responseData;
+     }
+
+     //월급내역을 추가하는 비즈니스로직 메소드
+     private ResponseData addSalaryBizLogic(User user,Connection con) throws SQLException{
+         // 사용자의 직급(Role)에 따른 기본급 설정 및 성과급 추가
+         int baseSalary=1000000;
+         //여기서 기본급값을 설정해줘야할거같음.
+
+         //여기서 성과급을 추가해도됨.
+         int bonusSalary = 0;
+
+         // 총 월급 계산
+         int totalSalary = baseSalary+bonusSalary;
+
+         // SalaryLog 객체 생성
+         SalaryLog salaryLog = new SalaryLog.Builder()
+                 .receivedData(LocalDate.now()) // 현재 날짜를 급여 지급일로 설정
+                 .totalSalary(totalSalary) // 총 월급 설정
+                 .userNum(user.getUserNum()) // 유저 번호 설정
+                 .build();
+
+         // 월급 정보를 데이터베이스에 삽입
+         return salaryRepository.insertSalaryonDB(con, user, salaryLog);
+     }
+ */
     private ResponseData searchSalaryBizLogic(User user, Connection con) throws SQLException {
         /*
         2024-09-07수정
@@ -140,6 +219,7 @@ public class SalaryService {
             }
         }
     }
+
 
 
 }
