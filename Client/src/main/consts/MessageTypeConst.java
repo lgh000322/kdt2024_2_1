@@ -59,11 +59,22 @@ public abstract class MessageTypeConst {
     //급여 내역 추가
     public static final String MESSAGE_SALARY_ADD = "/salary/add";
 
-    //메일 추가
-    public static final String MESSAGE_MAIL_ADD = "/mail/add";
+
+	// 급여 내역 추가
+	public static final String MESSAGE_SALARY_ADD = "/salary/add";
+	
+	   // 사용자 급여내역 추가 ( 성과급)
+    public static final String MESSAGE_SALARY_EDIT = "/salary/edit";
+    
+    //사용자 급여내역 추가 (월급)
+    public static final String MESSAGE_SALARY_PLUS = "/salary/plus";
+    
+  	// 메일 추가
+	  public static final String MESSAGE_MAIL_ADD = "/mail/add";
 
     //메일함 조회
     public static final String MESSAGE_STORE_SEARCH = "/mail/store/search";
+
 
     //특정 메일 조회
     public static final String MESSAGE_MAIL_ONE_SEARCH = "/mail/one/search";
