@@ -31,7 +31,7 @@ public class Scheduler {
 
     public Scheduler(SchedulerService schedulerService) {
         this.schedulerService = schedulerService;
-        schedulerExecutors = Executors.newScheduledThreadPool(2); // 두 개의 작업을 스케줄링하기 위해 스레드 풀 크기를 2로 설정
+        schedulerExecutors = Executors.newScheduledThreadPool(2); // 3 개의 작업을 스케줄링하기 위해 스레드 풀 크기를 2로 설정
     }
 
     public void start() {
@@ -106,6 +106,5 @@ public class Scheduler {
             System.out.println("저녁 스케줄링 수행중 오류가 발생했습니다.");
             e.printStackTrace();
         }
-
     }
 }

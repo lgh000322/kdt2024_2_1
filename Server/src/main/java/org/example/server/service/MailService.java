@@ -16,7 +16,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class MailService {
     private final MailRepository mailRepository;
@@ -116,11 +115,11 @@ public class MailService {
 
     private ResponseData mailDeleteOneBizLogic(Connection con, MailDeleteDto mailDeleteDto) throws SQLException {
         if (mailDeleteDto.getMailType() == MailType.SEND) {
-            return mailRepository.changeMailStoreNum(con, mailDeleteDto.getMailNum()) ?
+            return mailRepository.changeMailIsDeleted(con, mailDeleteDto.getMailNum()) ?
                     new ResponseData("보낸 메일함에서 특정 메일 삭제 성공", null) :
                     new ResponseData("보낸 메일함에서 특정 메일 삭제 실패", null);
         } else {
-            return mailRepository.deleteMailByMailNum(con, mailDeleteDto.getMailNum())
+            return mailRepository.changeReceivedMailIsDeleted(con, mailDeleteDto.getMailNum())
                     ? new ResponseData("받은 메일함에서 특정 메일 삭제 성공", null)
                     : new ResponseData("받은 메일함에서 특정 메일 삭제 실패", null);
         }

@@ -5,7 +5,6 @@ import org.example.server.domain.mail.MailStore;
 import org.example.server.domain.mail.MailType;
 import org.example.server.domain.mail.ReceivedMail;
 import org.example.server.dto.mail_dto.MailAllDto;
-import org.example.server.dto.mail_dto.MailDeleteDto;
 import org.example.server.dto.mail_dto.MailSearchDto;
 import org.example.server.dto.mail_dto.UserAndMailStore;
 
@@ -271,7 +270,7 @@ public class MailRepository {
                 " from mail" +
                 " left join received_mail on mail.mai_num = received_mail.mail_num" +
                 " left join user on received_mail.user_num = user.user_num" +
-                " where user.email = ?" +
+                " where user.email = ? and received_mail.is_deleted = ?" +
                 " order by mail.mai_num desc";
 
 
@@ -282,6 +281,7 @@ public class MailRepository {
         try {
             pstmt = con.prepareStatement(sql);
             pstmt.setString(1, mailSearchDto.getEmail());
+            pstmt.setBoolean(2, false);
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -378,28 +378,27 @@ public class MailRepository {
         }
     }
 
-    public boolean deleteMailByMailNum(Connection con, Long  mailNum) throws SQLException {
-
-        String sql = "delete from received_mail where mail_num = ?";
+    public boolean changeReceivedMailIsDeleted(Connection con, Long  mailNum) throws SQLException {
+        String sql = "update received_mail set is_deleted = ? where mail_num = ?";
 
         PreparedStatement pstmt = null;
-        ResultSet rs = null;
 
         try {
             pstmt = con.prepareStatement(sql);
-            pstmt.setLong(1, mailNum);
-            int rows = pstmt.executeUpdate();
+            pstmt.setBoolean(1, true);
+            pstmt.setLong(2, mailNum);
 
-            return rows > 0;
+            int rows = pstmt.executeUpdate();
+            return rows > 0;  // 업데이트된 행의 수가 0보다 크면 true 반환
 
         } catch (SQLException e) {
-            throw e;
+            throw e;  // 예외를 다시 던짐
         } finally {
-            close(pstmt, rs);
+            close(pstmt, null);
         }
     }
 
-    public boolean changeMailStoreNum(Connection con, Long mailNum) throws SQLException {
+    public boolean changeMailIsDeleted(Connection con, Long mailNum) throws SQLException {
         String sql = "update mail set is_deleted = ? where mai_num = ?";
 
         PreparedStatement pstmt = null;
