@@ -41,6 +41,7 @@ public class UserController implements Controller {
     public ResponseData execute(RequestData requestData) throws SQLException {
         String requestURL = requestData.getMessageType();
         ResponseData result = null;
+      
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
                 .registerTypeAdapter(LocalTime.class, new LocalTimeTypeAdapter())
@@ -50,6 +51,7 @@ public class UserController implements Controller {
             case MessageTypeConst.MESSAGE_JOIN -> {
                 if (requestData.getData() instanceof LinkedTreeMap<?, ?> map) {
                     System.out.println("회원가입 실행");
+                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
                     UserJoinDto userJoinDto = gson.fromJson(gson.toJson(map), UserJoinDto.class);
                     result = userService.join(userJoinDto);
                 }

@@ -1,0 +1,36 @@
+# Eclipse 관련 파일
+.metadata/
+
+# Java 컴파일된 파일
+/bin/
+.out/
+
+
+
+# Gradle 또는 Maven 빌드 파일
+.gradle/
+build/
+target/
+
+<<<<<<< HEAD
+=======
+# Java 컴파일된 파일
+out/
+
+>>>>>>> 602af695727f06d68fe7fe99a19f49be58b431bc
+# IDE 특정 파일
+*.swp
+*.iml
+.idea/
+
+<<<<<<< HEAD
+# JavaFX 관련 (종속성 라이브러리 등)
+lib/
+
+# OS-specific 파일 (예: macOS, Windows)
+.DS_Store
+Thumbs.db
+=======
+# JavaFX 관련
+lib/
+>>>>>>> 602af695727f06d68fe7fe99a19f49be58b431bc
