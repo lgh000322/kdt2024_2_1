@@ -8,6 +8,7 @@ import org.example.server.adapter.LocalTimeTypeAdapter;
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.board_dto.BoardDelDto;
 import org.example.server.dto.board_dto.BoardSaveDto;
 import org.example.server.dto.board_dto.BoardUpdateDto;
 import org.example.server.service.BoardService;
@@ -93,14 +94,11 @@ public class BoardController implements Controller {
                 // 데이터 타입 확인 로그 추가
                 System.out.println("데이터 타입: " + requestData.getData().getClass().getName());
 
-                if (requestData.getData() instanceof Double) {
+                if (requestData.getData() instanceof LinkedTreeMap) {
+                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
+                    BoardDelDto boardDelDto = gson.fromJson(gson.toJson(map), BoardDelDto.class);
                     // Double을 Long으로 변환
-                    Double removeBoardNumDouble = (Double) requestData.getData();
-                    Long removeBoardNum = removeBoardNumDouble.longValue(); // Long으로 변환
-                    result = boardService.removeBoard(removeBoardNum);
-                } else if (requestData.getData() instanceof Long) {
-                    Long removeBoardNum = (Long) requestData.getData();
-                    result = boardService.removeBoard(removeBoardNum);
+                    result = boardService.removeBoard(boardDelDto);
                 } else {
                     result = new ResponseData("잘못된 데이터 타입", null);
                     // 예외 처리 또는 로깅
