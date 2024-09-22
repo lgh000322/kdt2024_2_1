@@ -1,17 +1,14 @@
 package org.example.server.controller;
 
 import com.google.gson.Gson;
-<<<<<<< HEAD
-import com.google.gson.internal.LinkedTreeMap;
-=======
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 import org.example.server.adapter.LocalDateTypeAdapter;
 import org.example.server.adapter.LocalTimeTypeAdapter;
->>>>>>> 633866c38578d2111eed6bb86c2b93a492dc204d
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.user_dto.UpdateUserDto;
 import org.example.server.dto.user_dto.UserIdAndRole;
 import org.example.server.dto.user_dto.UserJoinDto;
 import org.example.server.dto.user_dto.UserLoginDto;
@@ -44,14 +41,7 @@ public class UserController implements Controller {
     public ResponseData execute(RequestData requestData) throws SQLException {
         String requestURL = requestData.getMessageType();
         ResponseData result = null;
-<<<<<<< HEAD
-        Gson gson = new Gson();
-
-        switch (requestURL) {
-            case MessageTypeConst.MESSAGE_JOIN -> {
-                System.out.println("회원가입 실행");
-                if (requestData.getData() instanceof LinkedTreeMap) {
-=======
+      
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
                 .registerTypeAdapter(LocalTime.class, new LocalTimeTypeAdapter())
@@ -59,18 +49,16 @@ public class UserController implements Controller {
 
         switch (requestURL) {
             case MessageTypeConst.MESSAGE_JOIN -> {
-                if (requestData.getData() instanceof LinkedTreeMap) {
+                if (requestData.getData() instanceof LinkedTreeMap<?, ?> map) {
                     System.out.println("회원가입 실행");
->>>>>>> 633866c38578d2111eed6bb86c2b93a492dc204d
                     LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
                     UserJoinDto userJoinDto = gson.fromJson(gson.toJson(map), UserJoinDto.class);
                     result = userService.join(userJoinDto);
                 }
             }
             case MessageTypeConst.MESSAGE_LOGIN -> {
-                if (requestData.getData() instanceof LinkedTreeMap) {
+                if (requestData.getData() instanceof LinkedTreeMap<?, ?> map) {
                     System.out.println("로그인 실행");
-                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
                     UserLoginDto userLoginDto = gson.fromJson(gson.toJson(map), UserLoginDto.class);
                     result = userService.login(userLoginDto);
                 }
@@ -79,23 +67,41 @@ public class UserController implements Controller {
                 System.out.println("로그아웃 실행");
             }
             case MessageTypeConst.MESSAGE_SEARCH -> {
-                if (requestData.getData() instanceof LinkedTreeMap) {
+                if (requestData.getData() instanceof LinkedTreeMap<?, ?> map) {
                     System.out.println("특정 회원 조회");
-                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
                     UserIdAndRole userIdAndRole = gson.fromJson(gson.toJson(map), UserIdAndRole.class);
                     result = userService.findByUserId(userIdAndRole);
                 }
             }
+            case MessageTypeConst.MESSAGE_SEARCH_ADMIN -> {
+                if (requestData.getData() instanceof String userName) {
+                    System.out.println("회원 이름으로 회원 정보 조회");
+                    result = userService.findByUserName(userName);
+                }
+            }
             case MessageTypeConst.MESSAGE_SEARCH_ALL -> {
                 System.out.println("모든 회원 조회");
-                result=userService.findAll();
+                result = userService.findAll();
+            }
+            case MessageTypeConst.MESSAGE_UPDATE -> {
+                System.out.println("특정 회원 정보 수정");
+                UpdateUserDto updateUserDto = gson.fromJson(gson.toJson(requestData.getData()), UpdateUserDto.class);
+                result = userService.updateUser(updateUserDto);
+            }
+            case MessageTypeConst.MESSAGE_SEARCH_ALL_BYADMIN -> {
+                System.out.println("모든 회원 조회 (관리자)");
+                result = userService.findAllByAdmin();
             }
             case MessageTypeConst.MESSAGE_USER_ID_VALIDATION -> {
-                if (requestData.getData() instanceof String) {
+                if (requestData.getData() instanceof String userId) {
                     System.out.println("아이디 중복 검사");
-                    String userId = (String) requestData.getData();  // 바로 String으로 캐스팅
+                    // 바로 String으로 캐스팅
                     result = userService.idValidation(userId);  // userId 유효성 검사
                 }
+            }
+            case MessageTypeConst.MESSAGE_SEARCH_ALL_USERNAME_AND_EMAIL -> {
+                System.out.println("모든 회원의 이름과 이메일 조회");
+                result = userService.findUsernameAndEmailAll();  // userId 유효성 검사
             }
         }
 

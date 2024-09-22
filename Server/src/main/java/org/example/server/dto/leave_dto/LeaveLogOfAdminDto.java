@@ -18,6 +18,9 @@ public class LeaveLogOfAdminDto
     private LocalDate endDate;
     private String deptName;
     private Boolean status;
+    private Integer remainedLeave;
+    private Boolean checkStatus;
+    private String userId;
 
     public String getUserName() {
         return userName;
@@ -27,10 +30,19 @@ public class LeaveLogOfAdminDto
         return leaveNum;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public Boolean getCheckStatus() {
+        return checkStatus;
+    }
+
     public String getDeptName() {
         return deptName;
     }
 
+    public Integer getRemainedLeave() {return remainedLeave;}
 
     public LocalDate getRequestDate() {
         return requestDate;
@@ -48,6 +60,8 @@ public class LeaveLogOfAdminDto
         return status;
     }
 
+
+
     public LeaveLogOfAdminDto(LeaveLogOfAdminDto.Builder builder) {
         this.requestDate = builder.requestDate;
         this.startDate = builder.startDate;
@@ -56,7 +70,9 @@ public class LeaveLogOfAdminDto
         this.deptName = builder.deptName;
         this.leaveNum = builder.leaveNum;
         this.userName = builder.userName;
-
+        this.remainedLeave = builder.remainedLeave;
+        this.userId = builder.userId;
+        this.checkStatus = builder.checkStatus;
     }
 
     public static class Builder {
@@ -65,9 +81,21 @@ public class LeaveLogOfAdminDto
         private LocalDate endDate;
         private Boolean status;
         private String deptName;
-
+        private Integer remainedLeave;
         private Long leaveNum;
         private String userName;
+        private Boolean checkStatus;
+        private String userId;
+
+        public LeaveLogOfAdminDto.Builder checkStatus(Boolean checkStatus) {
+            this.checkStatus = checkStatus;
+            return this;
+        }
+
+        public LeaveLogOfAdminDto.Builder userId(String userId) {
+            this.userId = userId;
+            return this;
+        }
 
         public LeaveLogOfAdminDto.Builder requestDate(LocalDate requestDate) {
             this.requestDate = requestDate;
@@ -76,6 +104,11 @@ public class LeaveLogOfAdminDto
 
         public LeaveLogOfAdminDto.Builder startDate(LocalDate startDate) {
             this.startDate = startDate;
+            return this;
+        }
+
+        public LeaveLogOfAdminDto.Builder remainedLeave(Integer remainedLeave) {
+            this.remainedLeave = remainedLeave;
             return this;
         }
 

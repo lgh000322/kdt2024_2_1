@@ -8,10 +8,7 @@ import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.*;
 import org.example.server.dto.leave_dto.LeaveDay;
-import org.example.server.dto.user_dto.UserIdAndRole;
-import org.example.server.dto.user_dto.UserInfo;
-import org.example.server.dto.user_dto.UserJoinDto;
-import org.example.server.dto.user_dto.UserLoginDto;
+import org.example.server.dto.user_dto.*;
 import org.example.server.repository.DeptRepository;
 import org.example.server.repository.MailRepository;
 import org.example.server.repository.PositionRepository;
@@ -20,6 +17,7 @@ import org.example.server.repository.UserRepository;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -112,6 +110,24 @@ public class UserService {
         return responseData;
     }
 
+    public ResponseData findByUserName(String userName) throws SQLException {
+        ResponseData responseData = null;
+        Connection con = null;
+
+        try{
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = findByUserNameBizLogic(userName, con);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+        return responseData;
+    }
+
+
 
     /**
      * 특정 회원을 찾는 메소드
@@ -185,8 +201,131 @@ public class UserService {
         return responseData;
     }
 
+
+
+    public ResponseData findAllByAdmin() throws SQLException {
+       ResponseData responseData = null;
+        Connection con = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = findAllByAdminBizLogic(con);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+        return responseData;     
+    }
+  
+    public ResponseData findUsernameAndEmailAll() throws SQLException {
+
+        ResponseData responseData = null;
+        Connection con = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = findUsernameAndEmailAllBizLogic(con);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+        return responseData;
+    }
+
+
+
+    /**
+    *  회원정보 수정 ( 관리자 페이지)
+    * */
+    public ResponseData updateUser(UpdateUserDto updateUserDto) throws SQLException {
+
+        ResponseData responseData = null;
+        Connection con = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = updateUserBizLogic(updateUserDto, con);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+        return responseData;
+    }
+
+
+    private ResponseData findByUserNameBizLogic(String userName, Connection con) throws SQLException {
+        List<UserInfo> userInfos = new ArrayList<>();
+
+        userInfos = userRepository.findUsersByName(con, userName);
+
+        return new ResponseData("회원 이름으로 매칭된 정보 검색 성공", userInfos);
+    }
+
+    private ResponseData updateUserBizLogic(UpdateUserDto updateUserDto, Connection con) throws SQLException {
+
+        int row = 0;
+
+        // deptname이 null이고  positioname이 null이 아닐경우 position만 바꿔줌.
+        if(updateUserDto.getDeptName() == null && updateUserDto.getPositionName() != null) {
+            LeaveDay positionNumByPositionName = positionRepository.findPositionNumByPositionName(con, updateUserDto.getPositionName());
+            Long positionNum = positionNumByPositionName.getPositionNum();
+
+            row = userRepository.updatePosition(updateUserDto.getEmail(), positionNum, con);
+        }
+        // deptName만 null이 아니라면  deptName만 수정한다.
+        else if(updateUserDto.getPositionName() == null && updateUserDto.getDeptName() != null) {
+            Long deptNumByDeptName = deptRepository.findDeptNumByDeptName(con, updateUserDto.getDeptName());
+
+            row = userRepository.updatedept(updateUserDto.getEmail(), deptNumByDeptName, con);
+        }
+        // 만약 둘다 다른 값을 가진다면 직위, 부서 모두 변경
+        else if(updateUserDto.getPositionName() != null && updateUserDto.getDeptName() != null) {
+            LeaveDay positionNumByPositionName = positionRepository.findPositionNumByPositionName(con, updateUserDto.getPositionName());
+            Long deptNumByDeptName = deptRepository.findDeptNumByDeptName(con, updateUserDto.getDeptName());
+            row = userRepository.updatePositionAndDept(updateUserDto.getEmail(), positionNumByPositionName.getPositionNum(), deptNumByDeptName, con);
+        }
+
+        if(row == 0){
+            return new ResponseData("관리자 회원 정보 수정 실패", null);
+        }
+
+        return new ResponseData("관리자 회원 정보 수정 성공", null);
+    }
+
+
+    private ResponseData findAllByAdminBizLogic(Connection con) throws SQLException {
+        List<UserInfo> userInfos = userRepository.findAllForAdmin(con);
+        if (userInfos.isEmpty()) {
+            return new ResponseData("관리자 회원 조회 실패(회원 없음)", null);
+        }
+
+        return new ResponseData("회원 전체 조회 성공(관리자 페이지)", userInfos);
+    }
+
+
+
+    private ResponseData findUsernameAndEmailAllBizLogic(Connection con) throws SQLException {
+        List<UserNameAndEmailDto> usernameAndEmailAll = userRepository.findUsernameAndEmailAll(con);
+
+        if (usernameAndEmailAll.isEmpty()) {
+            return new ResponseData("회원이 존재하지 않음(실패)", null);
+        }
+
+        return new ResponseData("회원 조회 성공", usernameAndEmailAll);
+
+    }
+
     private ResponseData findAllBizLogic(Connection con) throws SQLException {
-        List<User> users = userRepository.findAll(con);
+        List<User> users = userRepository.findAll(con,Role.USER);
         if (users.isEmpty()) {
             return new ResponseData("회원 조회 실패(회원 없음)", null);
         }
@@ -206,21 +345,27 @@ public class UserService {
     }
 
 
-    private ResponseData loginBizLogicUser(UserLoginDto user, Connection con) throws SQLException {
-        Optional<UserInfo> findUser = Optional.empty();
+    private ResponseData loginBizLogicUser(UserLoginDto userLoginDto, Connection con) throws SQLException {
+        Optional<User> findUserOptional = Optional.empty();
 
-        findUser = userRepository.findUserInfoByIDAndRole(con, user.getUserId(), user.getRole());
-        if (findUser.isEmpty()) {
+        findUserOptional = userRepository.findUserByIDAndRole(con, userLoginDto.getUserId(), userLoginDto.getRole());
+        if (findUserOptional.isEmpty()) {
             return new ResponseData("실패(존재하지 않는 회원)", null);
         }
 
-        if (!user.getPassword().equals(user.getPassword())) {
+        User findUser = findUserOptional.get();
+
+        if (!findUser.getPassword().equals(userLoginDto.getPassword())) {
             return new ResponseData("로그인 실패", null);
         }
 
-        //이름, 사용자 번호, 이메일, 부서, 직급,
-        UserInfo userInfo = findUser.get();
-
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserNum(findUser.getUserNum());
+        userInfo.setPositionName(findUser.getPositionName());
+        userInfo.setDeptName(findUser.getDeptName());
+        userInfo.setEmail(findUser.getEmail());
+        userInfo.setTel(findUser.getTel());
+        userInfo.setName(findUser.getName());
 
         return new ResponseData("로그인 성공", userInfo);
     }
@@ -272,6 +417,7 @@ public class UserService {
         mailRepository.mailStoreSave(con,mailStore);
         return new ResponseData("성공", null);
     }
+
 
     private void release(Connection con) {
         if (con != null) {

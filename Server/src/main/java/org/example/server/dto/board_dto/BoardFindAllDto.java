@@ -11,11 +11,18 @@ public class BoardFindAllDto {
 
     private LocalDate createdDate;
 
+    private Long userNum;
+
     private BoardFindAllDto(Builder builder) {
         this.boardNum = builder.boardNum;
         this.title = builder.title;
         this.userId = builder.userId;
         this.createdDate = builder.createdDate;
+        this.userNum=builder.userNum;
+    }
+
+    public Long getUserNum() {
+        return userNum;
     }
 
     public LocalDate getCreatedDate() {
@@ -44,6 +51,12 @@ public class BoardFindAllDto {
         private String title;
         private String userId;
         private LocalDate createdDate;
+        private Long userNum;
+
+        public Builder userNum(Long userNum) {
+            this.userNum=userNum;
+            return this;
+        }
 
         public Builder boardNum(Long boardNum) {
             this.boardNum = boardNum;

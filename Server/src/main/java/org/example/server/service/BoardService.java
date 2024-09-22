@@ -1,6 +1,9 @@
 package org.example.server.service;
 
 import org.example.server.db_utils.DBUtils;
+import org.example.server.domain.board.Board;
+import org.example.server.domain.user.Role;
+import org.example.server.domain.user.User;
 import org.example.server.dto.*;
 import org.example.server.dto.answer_dto.AnswerInBoardDto;
 import org.example.server.dto.board_dto.*;
@@ -46,7 +49,7 @@ public class BoardService {
     /**
     * 게시물 삭제.
     * */
-    public ResponseData removeBoard(Long boardNum) throws SQLException {
+    public ResponseData removeBoard(BoardDelDto boardDelDto) throws SQLException {
         Connection conn = null;
         ResponseData responseData = null;
 
@@ -54,7 +57,7 @@ public class BoardService {
 
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-            responseData = removeBoardBizLogic(boardNum, conn);
+            responseData = removeBoardBizLogic(boardDelDto, conn);
 
             conn.commit();
         } catch (SQLException e) {
@@ -228,7 +231,7 @@ public class BoardService {
      * 선택된 게시물 + 댓글을 보여주는 비즈니스 로직
     * */
     private ResponseData findOneBoardBizLogic(Long boardNum, Connection conn) throws SQLException {
-        BoardInfoDto boardInfoDto = null;
+        BoardInfoDto2 boardInfoDto2 = null;
 
         List<AnswerInBoardDto> answerInBoardDtos = null;
 
@@ -238,13 +241,13 @@ public class BoardService {
 
 
         // 게시물 번호로 게시물 정보를 가져옴.
-        boardInfoDto = boardRepository.getOneBoard(boardNum, conn);
+        boardInfoDto2 = boardRepository.getOneBoard(boardNum, conn);
 
         // 게시물 번호로 게시물 댓글을 가져옴.
         answerInBoardDtos = answerRepository.searchBoardAndTakeAnswerOnDB(conn, boardNum);
 
         //위의 가져온 게시물과 댓글로 dto 생성
-        boardAndAnswer = new BoardAndAnswer(boardInfoDto, answerInBoardDtos);
+        boardAndAnswer = new BoardAndAnswer(boardInfoDto2, answerInBoardDtos);
 
         //만들어진 게시물 + 댓글 dto를 responseData로 만듦.
         responseData = new ResponseData("특정 게시물 조회 성공", boardAndAnswer);
@@ -257,20 +260,31 @@ public class BoardService {
     * 게시물과 게시물에 달린 댓글 삭제를 구현한 로직.
     * */
 
-    private ResponseData removeBoardBizLogic(Long boardNum, Connection conn) throws SQLException {
-
+    private ResponseData removeBoardBizLogic(BoardDelDto boardDelDto, Connection conn) throws SQLException {
         int checkRemove = 0;
         ResponseData responseData = null;
-        // 게시물 댓글 삭제 -> 삭제로직 구현시 추가.
-        // answerRepository.deleteAnswer()
 
-        // 게시물 삭제
-        checkRemove =  boardRepository.deleteBoard(boardNum, conn);
+        // 1. 유저가 관리자이거나, 게시물 작성자와 동일한지 확인
+        User user = boardDelDto.getUser();
+        Board board = boardDelDto.getBoard();
 
+        if (user.getRole() != Role.ADMIN && !user.getUserNum().equals(board.getUserNum())) {
+            // 유저가 관리자도 아니고, 게시물 작성자도 아닌 경우
+            return new ResponseData("게시글 삭제 권한 없음", null);
+        }
 
-        if(checkRemove == 0) {
+        // 2. 댓글 삭제 로직
+        int answerDeleteCount = answerRepository.deleteAnswersByBoardNum(board.getBoardNum(), conn);
+        System.out.println("삭제된 댓글 개수: " + answerDeleteCount);
+
+        // 3. 게시물 삭제 로직
+        checkRemove = boardRepository.deleteBoard(board.getBoardNum(), conn);
+
+        // 4. 삭제 결과 확인
+        if (checkRemove == 0) {
             return new ResponseData("게시글 삭제 실패 (일치하는 게시글 없음)", null);
         }
+
         return new ResponseData("게시글 삭제 성공", null);
     }
 

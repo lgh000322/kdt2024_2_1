@@ -8,6 +8,7 @@ import org.example.server.adapter.LocalTimeTypeAdapter;
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.mail_dto.MailDeleteDto;
 import org.example.server.dto.mail_dto.MailReceivedData;
 import org.example.server.dto.mail_dto.MailSearchDto;
 import org.example.server.service.MailService;
@@ -44,27 +45,30 @@ public class MailController implements Controller {
 
         switch (requestURL) {
             case MessageTypeConst.MESSAGE_MAIL_ADD -> {
-                if (requestData.getData() instanceof LinkedTreeMap) {
+                if (requestData.getData() instanceof LinkedTreeMap<?, ?> map) {
                     System.out.println("메일 전송 실행");
-                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
                     MailReceivedData mailReceivedData = gson.fromJson(gson.toJson(map), MailReceivedData.class);
                     result = mailService.mailSend(mailReceivedData);
                 }
             }
             case MessageTypeConst.MESSAGE_STORE_SEARCH -> {
-                if (requestData.getData() instanceof LinkedTreeMap) {
+                if (requestData.getData() instanceof LinkedTreeMap<?, ?> map) {
                     System.out.println("전체 메일 조회 실행");
-                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
                     MailSearchDto mailSearchDto = gson.fromJson(gson.toJson(map), MailSearchDto.class);
-                    result=mailService.mailSearchAll(mailSearchDto);
+                    result = mailService.mailSearchAll(mailSearchDto);
                 }
             }
             case MessageTypeConst.MESSAGE_MAIL_ONE_SEARCH -> {
-                if (requestData.getData() instanceof LinkedTreeMap) {
-                    System.out.println("특정 메일 조회");
-                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
-                    Long mailNum = (Long) map.get("mailNum");
-                    result=mailService.mailSearchOne(mailNum);
+                System.out.println("특정 메일 조회");
+                Double data = (Double) requestData.getData();
+                Long mailNum = data.longValue();
+                result = mailService.mailSearchOne(mailNum);
+            }
+            case MessageTypeConst.MESSAGE_MAIL_ONE_DELETE -> {
+                if (requestData.getData() instanceof LinkedTreeMap<?, ?> map) {
+                    System.out.println("특정 메일 삭제");
+                    MailDeleteDto mailDeleteDto = gson.fromJson(gson.toJson(map), MailDeleteDto.class);
+                    result = mailService.mailDeleteOne(mailDeleteDto);
                 }
             }
         }

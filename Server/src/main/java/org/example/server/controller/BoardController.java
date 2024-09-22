@@ -8,6 +8,7 @@ import org.example.server.adapter.LocalTimeTypeAdapter;
 import org.example.server.consts.MessageTypeConst;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.board_dto.BoardDelDto;
 import org.example.server.dto.board_dto.BoardSaveDto;
 import org.example.server.dto.board_dto.BoardUpdateDto;
 import org.example.server.service.BoardService;
@@ -68,8 +69,9 @@ public class BoardController implements Controller {
             }
             case MessageTypeConst.MESSAGE_BOARD_ONE_SEARCH -> {
                 System.out.println("특정 게시글 조회 실행");
-                if (requestData.getData() instanceof Long) {
-                    Long boardNum = (Long) requestData.getData();
+                if (requestData.getData() instanceof Double) {
+                    Double num = (Double) requestData.getData();
+                    Long boardNum = num.longValue(); // 소수점 이하가 버려짐
                     result = boardService.findOneBoard(boardNum);
                 } else {
                     result = new ResponseData("잘못된 데이터 타입", null);
@@ -83,16 +85,20 @@ public class BoardController implements Controller {
                 if (requestData.getData() instanceof LinkedTreeMap) {
                     LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
                     BoardSaveDto boardSaveDto = gson.fromJson(gson.toJson(map), BoardSaveDto.class);
-
                     result = boardService.createBoard(boardSaveDto);
                 }
 
             }
             case MessageTypeConst.MESSAGE_BOARD_DELETE -> {
                 System.out.println("게시글 삭제 조회 실행");
-                if (requestData.getData() instanceof Long) {
-                    Long removeBoardNum = (Long) requestData.getData();
-                    result = boardService.removeBoard(removeBoardNum);
+                // 데이터 타입 확인 로그 추가
+                System.out.println("데이터 타입: " + requestData.getData().getClass().getName());
+
+                if (requestData.getData() instanceof LinkedTreeMap) {
+                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
+                    BoardDelDto boardDelDto = gson.fromJson(gson.toJson(map), BoardDelDto.class);
+                    // Double을 Long으로 변환
+                    result = boardService.removeBoard(boardDelDto);
                 } else {
                     result = new ResponseData("잘못된 데이터 타입", null);
                     // 예외 처리 또는 로깅

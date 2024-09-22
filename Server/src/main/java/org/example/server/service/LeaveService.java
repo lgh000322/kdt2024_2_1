@@ -9,6 +9,7 @@ import org.example.server.repository.UserRepository;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -115,25 +116,48 @@ public class LeaveService {
     /**
      * 휴가 수정 비즈니스 로직
      */
+
+
+    /**
+     * 수정 예정 2024 9 15
+     * leave num으로 user_num을 찾고 user_num에서 userId찾아서 reamainedLeave를 찾아야한다.
+    *  admin에서 넘겨오는값이 이름으로 넘겨옴. (이름 중복되는게 여러개 있을수 있다.)
+     *  userId를 leaveNum으로 확인하고  확인된 id의 남은 휴가일수를 확인한다
+    *
+    * */
     public ResponseData updateLeaveBizLogic(ForUpdateLeaveDto leaveLog, Connection conn) throws SQLException {
 
         //남은 후가일수
         int remainedLeave = 0;
+        Long userNum = null;
 
+        Date startDate = Date.valueOf(leaveLog.getStartDate());
+        Date endDate = Date.valueOf(leaveLog.getEndDate());
 
+        Optional<User> userById = userRepository.findUserById(conn, leaveLog.getUserId());
+        if(userById.isPresent()) {
+            userNum = userById.get().getUserNum();
+        }
 
         /**
         *  휴가  거절 클릭시 실행.
+         *
+         *  유저아이디로 유저넘을찾는다.  유저넘으로 유저의 휴가들을 찾는다.  유저넘과 startdate가 일치하는 휴가를 찾고 해당 휴가의 확인여부를 true로변경
         * */
         if(leaveLog.getStatus() == LeaveStatus.REJECT) {
-            Long leaveNum = leaveLog.getLeaveNum();
-            int row = leaveRepository.rejectLeave(leaveNum ,conn);
+
+
+            int row = leaveRepository.rejectLeave(userNum, startDate, endDate,conn);
 
             if (row == 0) {
                 return new ResponseData("휴가 거절 실패", null);
             }
 
-            return new ResponseData("휴가 거절 성공", null);
+
+            List<LeaveLogOfAdminDto> leaveLogOfAdmin = leaveRepository.getLeaveLogOfAdmin(conn);
+
+
+            return new ResponseData("휴가 거절 성공", leaveLogOfAdmin);
         }
 
 
@@ -153,28 +177,31 @@ public class LeaveService {
         int daysBetween = calculateDaysBetween(leaveLog.getStartDate(), leaveLog.getEndDate());
 
         // 남은 휴가일수 갱신.
-        remainedLeave = remainedLeave - daysBetween;
+        remainedLeave = remainedLeave - daysBetween - 1;
 
         // 남은 휴가일수가 없거나 신청일수가 많다면, null값 반환
-        if(remainedLeave <= 0) {
+        if(remainedLeave < 0) {
                 return new ResponseData("휴가 수락 실패 (신청 일수가 남은 일수를 초과함.)", null);
         }
 
+        int checkUpdate = leaveRepository.acceptLeave(userNum, startDate, endDate,conn);
+
+        if(checkUpdate == 0) {
+            return new ResponseData("휴가 수락 실패", null);
+        }
+
+
         // 휴가 수정하고 유저데이터에서 남은 휴가일수 갱신
         int row = userRepository.updateRemainedLeave(leaveLog.getUserId(), remainedLeave ,conn);
+
 
         if(row == 0) {
             return new ResponseData("남은 휴가 일수 수정 실패", null);
         }
 
 
-        int checkUpdate = leaveRepository.acceptLeave(leaveLog.getLeaveNum(), conn);
-
-        if(checkUpdate == 0) {
-            return new ResponseData("휴가 수락 실패", null);
-        }
-
-        return new ResponseData("휴가 수락 성공", null);
+        List<LeaveLogOfAdminDto> leaveLogOfAdmin = leaveRepository.getLeaveLogOfAdmin(conn);
+        return new ResponseData("휴가 수락 성공", leaveLogOfAdmin);
     }
 
 

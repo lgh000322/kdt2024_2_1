@@ -1,8 +1,9 @@
-package org.example.server.domain.user;
+package org.example.server.dto.user_dto;
 
-import java.time.LocalDate;
+import org.example.server.domain.user.Role;
+import org.example.server.domain.user.User;
 
-public class User {
+public class UserSearchDto {
     private Long userNum;
 
     private String userId;
@@ -23,28 +24,10 @@ public class User {
 
     private Long deptNum;
 
-    private String deptName;
+    private UserSearchData userSearchData;
 
-    private String positionName;
-
-    private LocalDate moneySearchDate;
-
-    private String searchUserName;
-
-    public String getSearchUserName() {
-        return searchUserName;
-    }
-
-    public LocalDate getMoneySearchDate() {
-        return moneySearchDate;
-    }
-
-    public String getDeptName() {
-        return deptName;
-    }
-
-    public String getPositionName() {
-        return positionName;
+    public UserSearchData getUserSearchData() {
+        return userSearchData;
     }
 
     public void changePositionNum(Long positionNum) {
@@ -95,7 +78,7 @@ public class User {
         return deptNum;
     }
 
-    private User(Builder builder) {
+    private UserSearchDto(Builder builder) {
         this.userNum=builder.userNum;
         this.userId=builder.userId;
         this.password=builder.password;
@@ -106,10 +89,7 @@ public class User {
         this.remainedLeave=builder.remainedLeave;
         this.positionNum=builder.positionNum;
         this.deptNum = builder.deptNum;
-        this.deptName=builder.deptName;
-        this.positionName=builder.positionName;
-        this.moneySearchDate=builder.moneySearchDate;
-        this.searchUserName=builder.searchUserName;
+        this.userSearchData=builder.userSearchData;
     }
 
     public static class Builder{
@@ -133,36 +113,12 @@ public class User {
 
         private Long deptNum;
 
-        private String deptName;
+        private UserSearchData userSearchData;
 
-        private String positionName;
-
-        private LocalDate moneySearchDate;
-
-        private String searchUserName;
-
-        public Builder searchUserName(String searchUserName) {
-            this.searchUserName=searchUserName;
+        public Builder userSearchData(UserSearchData userSearchData) {
+            this.userSearchData=userSearchData;
             return this;
         }
-
-        public Builder moneyTitle(LocalDate moneySearchDate) {
-            this.moneySearchDate=moneySearchDate;
-            return this;
-        }
-
-        public Builder deptName(String deptName) {
-            this.deptName=deptName;
-            return this;
-        }
-
-        public Builder positionName(String positionName) {
-            this.positionName = positionName;
-            return this;
-        }
-
-
-
         public Builder userNum(Long userNum) {
             this.userNum = userNum;
             return this;
@@ -213,8 +169,8 @@ public class User {
             return this;
         }
 
-        public User build() {
-            return new User(this);
+        public UserSearchDto build() {
+            return new UserSearchDto(this);
         }
     }
 }

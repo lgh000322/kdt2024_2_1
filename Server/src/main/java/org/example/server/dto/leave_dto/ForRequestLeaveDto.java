@@ -5,8 +5,6 @@ import java.util.Date;
 
 public class ForRequestLeaveDto {
 
-
-
     private LocalDate requestDate;
 
     private LocalDate startDate;
@@ -16,7 +14,6 @@ public class ForRequestLeaveDto {
     private String userId;
 
     private ForRequestLeaveDto(Builder builder) {
-
         this.requestDate=builder.requestDate;
         this.startDate=builder.startDate;
         this.endDate=builder.endDate;

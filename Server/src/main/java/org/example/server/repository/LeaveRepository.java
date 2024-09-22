@@ -25,8 +25,8 @@ public class LeaveRepository {
     }
 
     /**
-    *  휴가신청
-    * */
+     *  휴가신청
+     * */
     public Long createLeave(ForRequestLeaveDto forRequestLeaveDto, Long userNum, Connection conn) throws SQLException {
         String sql = "insert into leave_log " +
                 "(request_date, start_date, end_date, user_num)" +
@@ -65,15 +65,15 @@ public class LeaveRepository {
 
 
     /**
-    *  휴가 상태 업데이트 (관리자가 실행)
-    * */
+     *  휴가 상태 업데이트 (관리자가 실행)
+     * */
 
     // 휴가 승락시 실행 -> acceptance_status와 check_status를 모두 true로 바꿔줌
-    public int acceptLeave(Long leaveNum, Connection conn) throws SQLException {
+    public int acceptLeave(Long userNum, Date startDate, Date endDate,Connection conn) throws SQLException {
         PreparedStatement ps = null;
 
-        String sql = "update leave_log set " +
-                "acceptance_status = ?, check_status = ? where leave_num = ?";
+        String sql = "update leave_log set check_status = ?, acceptance_status = ?" +
+                " where user_num = ? and start_date = ? and end_date = ?";
 
         int row = 0;
 
@@ -81,7 +81,9 @@ public class LeaveRepository {
             ps = conn.prepareStatement(sql);
             ps.setBoolean(1, true);
             ps.setBoolean(2, true);
-            ps.setLong(3, leaveNum);
+            ps.setLong(3, userNum);
+            ps.setDate(4, startDate);
+            ps.setDate(5, endDate);
             row = ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -93,16 +95,18 @@ public class LeaveRepository {
     }
 
     //휴가 거절시 실행 -> 체크스테이터스만 true로 바꿔줌.
-    public int rejectLeave(Long leaveNum, Connection conn) throws SQLException {
+    public int rejectLeave(Long userNum, Date startDate, Date endDate, Connection conn) throws SQLException {
         PreparedStatement ps = null;
-        String sql = "update leave_log set check_status = ? where leave_num = ?";
+        String sql = "update leave_log set check_status = ? where user_num = ? and start_date = ? and end_date = ?";
 
         int row = 0;
 
         try{
             ps = conn.prepareStatement(sql);
             ps.setBoolean(1, true);
-            ps.setLong(2, leaveNum);
+            ps.setLong(2, userNum);
+            ps.setDate(3, startDate);
+            ps.setDate(4, endDate);
             row = ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -116,8 +120,8 @@ public class LeaveRepository {
 
 
     /**
-    * 휴가 조회 -> admin 의 휴가 조회. ( 모든 유저 휴가조회)
-    * */
+     * 휴가 조회 -> admin 의 휴가 조회. ( 모든 유저 휴가조회)
+     * */
     public List<LeaveLogOfAdminDto> getLeaveLogOfAdmin(Connection conn) throws SQLException {
         LeaveLogOfAdminDto leaveLogOfAdminDto = null;
         List<LeaveLogOfAdminDto> leaveLogOfAdminDtos = new ArrayList<>();
@@ -125,9 +129,9 @@ public class LeaveRepository {
         ResultSet rs = null;
 
         //모든 leave_log를 가져오기위한 쿼리
-        String sql = "select l.leave_num, u.name, l.request_date, l.start_date, l.end_date, d.dept_name, l.acceptance_status" +
+        String sql = "select l.leave_num, u.name, l.request_date, l.start_date, l.end_date, d.dept_name, l.acceptance_status, u.remained_leave, l.check_status, u.user_id" +
                 " from leave_log l inner join user u on l.user_num = u.user_num" +
-                "inner join dept d on u.dept_num = d.dept_num";
+                " inner join dept d on u.dept_num = d.dept_num";
 
         try{
             ps = conn.prepareStatement(sql);
@@ -142,6 +146,9 @@ public class LeaveRepository {
                         .endDate(rs.getDate("end_date").toLocalDate())
                         .deptName(rs.getString("dept_name"))
                         .status(rs.getBoolean("acceptance_status"))
+                        .remainedLeave(rs.getInt("remained_leave"))
+                        .checkStatus(rs.getBoolean("check_status"))
+                        .userId(rs.getString("user_id"))
                         .build();
 
                 leaveLogOfAdminDtos.add(leaveLogOfAdminDto);
@@ -157,8 +164,8 @@ public class LeaveRepository {
 
 
     /**
-    *  휴가 조회 -> admin의 휴가조회 (특정 유저 휴가조회)
-    * */
+     *  휴가 조회 -> admin의 휴가조회 (특정 유저 휴가조회)
+     * */
     public List<LeaveLogOfAdminDto> getMatchedByUserName(String userName, Connection conn) throws SQLException {
 
         LeaveLogOfAdminDto leaveLogOfAdminDto = null;
@@ -168,12 +175,13 @@ public class LeaveRepository {
         ResultSet rs = null;
 
         //모든 leave_log를 가져오기위한 쿼리
-        String sql = "select l.leave_num, u.name, l.request_date, l.start_date, l.end_date, d.dept_name, l.acceptance_status" +
+        String sql = "select l.leave_num, u.name, l.request_date, l.start_date, l.end_date, d.dept_name, l.acceptance_status, u.remained_leave, l.check_status, u.user_id" +
                 " from leave_log l inner join user u on l.user_num = u.user_num" +
-                "inner join dept d on u.dept_num = d.dept_num";
+                " inner join dept d on u.dept_num = d.dept_num where u.name like ?";
 
         try{
             ps = conn.prepareStatement(sql);
+            ps.setString(1, "%" + userName + "%");
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -185,6 +193,9 @@ public class LeaveRepository {
                         .endDate(rs.getDate("end_date").toLocalDate())
                         .deptName(rs.getString("dept_name"))
                         .status(rs.getBoolean("acceptance_status"))
+                        .remainedLeave(rs.getInt("remained_leave"))
+                        .checkStatus(rs.getBoolean("check_status"))
+                        .userId(rs.getString("user_id"))
                         .build();
 
                 leaveLogOfAdminDtos.add(leaveLogOfAdminDto);
@@ -198,6 +209,8 @@ public class LeaveRepository {
         return leaveLogOfAdminDtos;
 
     }
+
+
 
 
     /**
@@ -246,8 +259,8 @@ public class LeaveRepository {
     }
 
     /**
-    * 휴가 조회 -> user 의 휴가조회.
-    * */
+     * 휴가 조회 -> user 의 휴가조회.
+     * */
     public List<LeaveLogOfUserDto> getLeaveLogsOfUser(String userId, Connection conn) throws SQLException {
 
         LeaveLogOfUserDto leaveLogOfUserDto;

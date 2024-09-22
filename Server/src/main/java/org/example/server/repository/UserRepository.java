@@ -2,7 +2,10 @@ package org.example.server.repository;
 
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
+import org.example.server.dto.salary_dto.SalaryScheduleDto;
+import org.example.server.dto.user_dto.UpdateUserDto;
 import org.example.server.dto.user_dto.UserInfo;
+import org.example.server.dto.user_dto.UserNameAndEmailDto;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -37,6 +40,9 @@ public class UserRepository {
      */
 
 
+
+
+
     /**
      * 휴가일수 수정 메서드 -> leaveService 에서 사용
      * */
@@ -62,10 +68,77 @@ public class UserRepository {
         return row; // 0 일경우 수정 실패 , 0이 아니면 수정 성공.
     }
 
+    public int updatePosition(String email, Long positionNum, Connection conn) throws SQLException {
+        PreparedStatement pstmt = null;
+        String sql = "update user set position_num = ? where email = ?";
+        int row = 0;
+
+        try{
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, positionNum);
+            pstmt.setString(2, email);
+            row = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, null);
+        }
+
+        return row; // 0 일경우 수정 실패 , 0이 아니면 수정 성공.
+    }
+
+    public int updatedept(String email, Long deptNum, Connection conn) throws SQLException {
+        PreparedStatement pstmt = null;
+        String sql = "update user set dept_num = ? where email = ?";
+        int row = 0;
+
+        try{
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, deptNum);
+            pstmt.setString(2, email);
+            row = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, null);
+        }
+
+        return row; // 0 일경우 수정 실패 , 0이 아니면 수정 성공.
+    }
+
+
+    public int updatePositionAndDept(String email, Long positionNum, Long deptNum, Connection conn) throws SQLException {
+        PreparedStatement pstmt = null;
+        String sql = "update user set position_num = ?, dept_num = ? where email = ?";
+        int row = 0;
+
+        try{
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, positionNum);
+            pstmt.setLong(2, deptNum);
+            pstmt.setString(3, email);
+            row = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, null);
+        }
+
+        return row; // 0 일경우 수정 실패 , 0이 아니면 수정 성공.
+    }
 
 
     public Optional<User> findUserByIDAndRole(Connection conn, String userId, Role role) throws SQLException {
-        String sql = "select * from user where user_id = ? and role = ?";
+        String sql = "select * from user" +
+                " left join dept on user.dept_num = dept.dept_num" +
+                " left join position on user.position_num = position.position_num" +
+                " where user_id = ? and role = ?";
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -80,16 +153,18 @@ public class UserRepository {
 
             if (rs.next()) {
                 user = new User.Builder()
-                        .userNum(rs.getLong("user_num"))
-                        .userId(rs.getString("user_id"))
-                        .password(rs.getString("password"))
-                        .name(rs.getString("name"))
-                        .tel(rs.getString("tel"))
-                        .email(rs.getString("email"))
-                        .role(Role.fromString(rs.getString("role")))
-                        .remainedLeave(rs.getInt("remained_leave"))
-                        .positionNum(rs.getLong("position_num"))
-                        .deptNum(rs.getLong("dept_num"))
+                        .userNum(rs.getLong("user.user_num"))
+                        .userId(rs.getString("user.user_id"))
+                        .password(rs.getString("user.password"))
+                        .name(rs.getString("user.name"))
+                        .tel(rs.getString("user.tel"))
+                        .email(rs.getString("user.email"))
+                        .role(Role.fromString(rs.getString("user.role")))
+                        .remainedLeave(rs.getInt("user.remained_leave"))
+                        .positionNum(rs.getLong("user.position_num"))
+                        .deptNum(rs.getLong("user.dept_num"))
+                        .positionName(rs.getString("position.position_name"))
+                        .deptName(rs.getString("dept.dept_name"))
                         .build();
             }
 
@@ -176,6 +251,8 @@ public class UserRepository {
         }
     }
 
+
+
     public Optional<User> findUserByEmail(Connection conn, String email) throws SQLException {
         String sql = "select * from user where email = ?";
 
@@ -251,15 +328,80 @@ public class UserRepository {
         }
     }
 
+    public List<UserInfo> findAllForAdmin(Connection conn) throws SQLException {
+        String sql = "select u.user_num, u.name, u.tel, u.email, d.dept_name, p.position_name" +
+                " from user u inner join dept d on u.dept_num = d.dept_num " +
+                "inner join position p on u.position_num = p.position_num";
 
-    public List<User> findAll(Connection conn) throws SQLException {
-        String sql = "select * from user";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<UserInfo> list = new ArrayList<>();
+
+        try{
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                UserInfo userInfo = new UserInfo();
+                userInfo.setUserNum(rs.getLong("user_num"));
+                userInfo.setName(rs.getString("name"));
+                userInfo.setTel(rs.getString("tel"));
+                userInfo.setEmail(rs.getString("email"));
+                userInfo.setDeptName(rs.getString("dept_name"));
+                userInfo.setPositionName(rs.getString("position_name"));
+                list.add(userInfo);
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public List<UserInfo> findUsersByName(Connection conn, String name) throws SQLException {
+        String sql = "select u.user_num, u.name, u.tel, u.email, d.dept_name, p.position_name" +
+                " from user u inner join dept d on u.dept_num = d.dept_num " +
+                "inner join position p on u.position_num = p.position_num where u.name like ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<UserInfo> list = new ArrayList<>();
+
+        try{
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "%" + name + "%");
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                UserInfo userInfo = new UserInfo();
+                userInfo.setUserNum(rs.getLong("user_num"));
+                userInfo.setName(rs.getString("name"));
+                userInfo.setTel(rs.getString("tel"));
+                userInfo.setEmail(rs.getString("email"));
+                userInfo.setDeptName(rs.getString("dept_name"));
+                userInfo.setPositionName(rs.getString("position_name"));
+                list.add(userInfo);
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public List<User> findAll(Connection conn,Role role) throws SQLException {
+        String sql = "select * from user where role = ?";
         List<User> list = new ArrayList<>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
         try {
             pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, String.valueOf(role));
             rs = pstmt.executeQuery();
 
 
@@ -278,6 +420,62 @@ public class UserRepository {
                         .build();
 
                 list.add(user);
+            }
+            return list;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public List<SalaryScheduleDto> findAllWithPositionInfo(Connection conn) throws SQLException {
+        String sql = "select user.user_num, user.remained_leave, position.basic_salary, position.leave_pay from user" +
+                " left join position on user.position_num = position.position_num";
+
+        List<SalaryScheduleDto> list = new ArrayList<>();
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+
+            while (rs.next()) {
+                SalaryScheduleDto salaryScheduleDto = new SalaryScheduleDto();
+                salaryScheduleDto.setUserNum(rs.getLong("user.user_num"));
+                salaryScheduleDto.setRemainedLeave(rs.getInt("user.remained_leave"));
+                salaryScheduleDto.setBasicSalary(rs.getInt("position.basic_salary"));
+                salaryScheduleDto.setLeavePay(rs.getInt("position.leave_pay"));
+
+                list.add(salaryScheduleDto);
+            }
+            return list;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public List<UserNameAndEmailDto> findUsernameAndEmailAll(Connection conn) throws SQLException {
+        String sql = "select * from user";
+        List<UserNameAndEmailDto> list = new ArrayList<>();
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+
+            while (rs.next()) {
+                UserNameAndEmailDto userNameAndEmailDto = new UserNameAndEmailDto();
+                userNameAndEmailDto.setUserEmail(rs.getString("email"));
+                userNameAndEmailDto.setUsername(rs.getString("name"));
+
+                list.add(userNameAndEmailDto);
             }
             return list;
         } catch (SQLException e) {

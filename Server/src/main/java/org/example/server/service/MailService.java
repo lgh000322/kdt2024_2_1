@@ -5,10 +5,8 @@ import org.example.server.domain.mail.Mail;
 import org.example.server.domain.mail.MailType;
 import org.example.server.domain.mail.ReceivedMail;
 import org.example.server.domain.user.User;
-import org.example.server.dto.mail_dto.MailReceivedData;
-import org.example.server.dto.mail_dto.MailSearchDto;
+import org.example.server.dto.mail_dto.*;
 import org.example.server.dto.ResponseData;
-import org.example.server.dto.mail_dto.UserAndMailStore;
 import org.example.server.repository.MailRepository;
 import org.example.server.repository.UserRepository;
 
@@ -85,7 +83,7 @@ public class MailService {
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData=mailSearchOneBizLogic(con, mailNum);
+            responseData = mailSearchOneBizLogic(con, mailNum);
             con.commit();
         } catch (Exception e) {
             con.rollback();
@@ -96,6 +94,39 @@ public class MailService {
         return responseData;
     }
 
+    public ResponseData mailDeleteOne(MailDeleteDto mailDeleteDto) throws SQLException {
+        Connection con = null;
+        ResponseData responseData = null;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            responseData = mailDeleteOneBizLogic(con, mailDeleteDto);
+            con.commit();
+        } catch (Exception e) {
+            con.rollback();
+        } finally {
+            release(con);
+        }
+
+        return responseData;
+    }
+
+
+    private ResponseData mailDeleteOneBizLogic(Connection con, MailDeleteDto mailDeleteDto) throws SQLException {
+        if (mailDeleteDto.getMailType() == MailType.SEND) {
+            return mailRepository.changeMailIsDeleted(con, mailDeleteDto.getMailNum()) ?
+                    new ResponseData("보낸 메일함에서 특정 메일 삭제 성공", null) :
+                    new ResponseData("보낸 메일함에서 특정 메일 삭제 실패", null);
+        } else {
+            return mailRepository.changeReceivedMailIsDeleted(con, mailDeleteDto.getMailNum())
+                    ? new ResponseData("받은 메일함에서 특정 메일 삭제 성공", null)
+                    : new ResponseData("받은 메일함에서 특정 메일 삭제 실패", null);
+        }
+
+    }
+
+
     private ResponseData mailSearchOneBizLogic(Connection con, Long mailNum) throws SQLException {
         Optional<Mail> mailOne = mailRepository.findMailOne(con, mailNum);
         if (mailOne.isEmpty()) {
@@ -105,19 +136,86 @@ public class MailService {
     }
 
     private ResponseData mailSearchBizLogic(Connection con, MailSearchDto mailSearchDto) throws SQLException {
-        if (mailSearchDto.getMailType() == MailType.RECEIVED) {
-            Optional<List<Mail>> sendMailAll = mailRepository.findSendMailAll(con, mailSearchDto);
+        if (mailSearchDto.getMailType() == MailType.SEND && mailSearchDto.getMailTitle().equals("")) {
+            Optional<List<MailAllDto>> sendMailAll = mailRepository.findSendMailAll(con, mailSearchDto);
             if (sendMailAll.isEmpty()) {
                 return new ResponseData("해당 유저의 송신메일함이 비어있습니다.", null);
             }
+            List<MailAllDto> mailAllDtos = sendMailAll.get();
 
-            return new ResponseData("유저의 송신메일함의 모든 메일 조회 성공", sendMailAll.get());
-        } else {
-            Optional<List<Mail>> receivedMailAll = mailRepository.findReceivedMailAll(con, mailSearchDto);
+            mailAllDtos.forEach(mailAllDto -> {
+                Long mailNum = mailAllDto.getMailNum();
+                String senderEmail = null;
+                try {
+                    senderEmail = mailRepository.findReceiverEmail(con, mailNum);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                mailAllDto.changeUserEmail(senderEmail);  // 기존 mailAllDto 객체 수정
+            });
+
+            return new ResponseData("유저의 송신메일함의 모든 메일 조회 성공", mailAllDtos);
+        } else if (mailSearchDto.getMailType() == MailType.SEND && !mailSearchDto.getMailTitle().equals("")) {
+            Optional<List<MailAllDto>> sendMailAllByTitle = mailRepository.findSendMailAllByTitle(con, mailSearchDto);
+            if (sendMailAllByTitle.isEmpty()) {
+                return new ResponseData("해당 유저의 송신메일함이 비어있습니다.", null);
+            }
+
+            List<MailAllDto> mailAllDtos = sendMailAllByTitle.get();
+
+            mailAllDtos.forEach(mailAllDto -> {
+                Long mailNum = mailAllDto.getMailNum();
+                String senderEmail = null;
+                try {
+                    senderEmail = mailRepository.findReceiverEmail(con, mailNum);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                mailAllDto.changeUserEmail(senderEmail);  // 기존 mailAllDto 객체 수정
+            });
+            return new ResponseData("유저의 송신메일함의 모든 메일 조회 성공", mailAllDtos);
+
+        } else if (mailSearchDto.getMailType() == MailType.RECEIVED && mailSearchDto.getMailTitle().equals("")) {
+            Optional<List<MailAllDto>> receivedMailAll = mailRepository.findReceivedMailAll(con, mailSearchDto);
             if (receivedMailAll.isEmpty()) {
                 return new ResponseData("해당 유저의 수신메일함이 비어있습니다.", null);
             }
-            return new ResponseData("유저의 수신 메일함의 모든 메일 조회 성공", receivedMailAll.get());
+
+            List<MailAllDto> mailAllDtos = receivedMailAll.get();
+
+            mailAllDtos.forEach(mailAllDto -> {
+                Long mailNum = mailAllDto.getMailNum();
+                String senderEmail = null;
+                try {
+                    senderEmail = mailRepository.findSenderEmail(con, mailNum);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                mailAllDto.changeUserEmail(senderEmail);  // 기존 mailAllDto 객체 수정
+            });
+
+            return new ResponseData("유저의 수신 메일함의 모든 메일 조회 성공", mailAllDtos);  // 수정된 기존 리스트 반환
+
+        } else {
+            Optional<List<MailAllDto>> receivedMailAllByTitle = mailRepository.findReceivedMailAllByTitle(con, mailSearchDto);
+            if (receivedMailAllByTitle.isEmpty()) {
+                return new ResponseData("해당 유저의 수신메일함이 비어있습니다.", null);
+            }
+
+            List<MailAllDto> mailAllDtos = receivedMailAllByTitle.get();
+
+            mailAllDtos.forEach(mailAllDto -> {
+                Long mailNum = mailAllDto.getMailNum();
+                String senderEmail = null;
+                try {
+                    senderEmail = mailRepository.findSenderEmail(con, mailNum);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                mailAllDto.changeUserEmail(senderEmail);  // 기존 mailAllDto 객체 수정
+            });
+
+            return new ResponseData("유저의 수신 메일함의 모든 메일 조회 성공", receivedMailAllByTitle.get());
         }
     }
 

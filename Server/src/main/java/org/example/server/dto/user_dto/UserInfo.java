@@ -10,7 +10,6 @@ public class UserInfo {
 
     private String deptName;
 
-
     private String tel;
 
     private String positionName;

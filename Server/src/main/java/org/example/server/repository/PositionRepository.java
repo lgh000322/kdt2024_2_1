@@ -19,6 +19,7 @@ public class PositionRepository {
         return positionRepository;
     }
 
+
     public LeaveDay findPositionNumByPositionName(Connection con, String positionName) throws SQLException {
 
         String sql = "select * from position where position_name = ?";

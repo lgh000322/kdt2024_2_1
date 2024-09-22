@@ -3,16 +3,16 @@ package org.example.server.dto.board_dto;
 import org.example.server.dto.answer_dto.AnswerInBoardDto;
 
 import java.util.List;
+import java.util.Map;
 
 public class BoardAndAnswer {
 
 
 
-    private BoardInfoDto boardInfoDto;
+    private BoardInfoDto2 boardInfoDto;
     private List<AnswerInBoardDto> answerInBoard;
 
-
-    public BoardInfoDto getBoardInfoDto() {
+    public BoardInfoDto2 getBoardInfoDto() {
         return boardInfoDto;
     }
 
@@ -22,7 +22,7 @@ public class BoardAndAnswer {
 
 
 
-    public BoardAndAnswer(BoardInfoDto boardInfoDto, List<AnswerInBoardDto> answerInBoard) {
+    public BoardAndAnswer(BoardInfoDto2 boardInfoDto, List<AnswerInBoardDto> answerInBoard) {
         this.boardInfoDto = boardInfoDto;
         this.answerInBoard = answerInBoard;
     }
