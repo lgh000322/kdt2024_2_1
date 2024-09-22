@@ -1,5 +1,7 @@
 package org.example.server.domain.user;
 
+import java.time.LocalDate;
+
 public class User {
     private Long userNum;
 
@@ -20,6 +22,38 @@ public class User {
     private Long positionNum;
 
     private Long deptNum;
+
+    private String deptName;
+
+    private String positionName;
+
+    private LocalDate moneySearchDate;
+
+    private String searchUserName;
+
+    public String getSearchUserName() {
+        return searchUserName;
+    }
+
+    public LocalDate getMoneySearchDate() {
+        return moneySearchDate;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public String getPositionName() {
+        return positionName;
+    }
+
+    public void changePositionNum(Long positionNum) {
+        this.positionNum = positionNum;
+    }
+
+    public void changeDeptNum(Long deptNum) {
+        this.deptNum = deptNum;
+    }
 
     public Long getUserNum() {
         return userNum;
@@ -72,6 +106,10 @@ public class User {
         this.remainedLeave=builder.remainedLeave;
         this.positionNum=builder.positionNum;
         this.deptNum = builder.deptNum;
+        this.deptName=builder.deptName;
+        this.positionName=builder.positionName;
+        this.moneySearchDate=builder.moneySearchDate;
+        this.searchUserName=builder.searchUserName;
     }
 
     public static class Builder{
@@ -94,6 +132,36 @@ public class User {
         private Long positionNum;
 
         private Long deptNum;
+
+        private String deptName;
+
+        private String positionName;
+
+        private LocalDate moneySearchDate;
+
+        private String searchUserName;
+
+        public Builder searchUserName(String searchUserName) {
+            this.searchUserName=searchUserName;
+            return this;
+        }
+
+        public Builder moneyTitle(LocalDate moneySearchDate) {
+            this.moneySearchDate=moneySearchDate;
+            return this;
+        }
+
+        public Builder deptName(String deptName) {
+            this.deptName=deptName;
+            return this;
+        }
+
+        public Builder positionName(String positionName) {
+            this.positionName = positionName;
+            return this;
+        }
+
+
 
         public Builder userNum(Long userNum) {
             this.userNum = userNum;

@@ -5,6 +5,20 @@ plugins {
 group 'org.example'
 version '1.0-SNAPSHOT'
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(JavaExec) {
+    jvmArgs += "--add-opens=java.base/java.time=ALL-UNNAMED"
+}
+
 repositories {
     mavenCentral()
 }

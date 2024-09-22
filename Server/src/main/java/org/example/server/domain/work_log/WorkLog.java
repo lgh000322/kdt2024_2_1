@@ -16,7 +16,6 @@ public class WorkLog {
 
     private Long userNum;
 
-    private Long leaveNum;
 
     private WorkLog(Builder builder) {
         this.logNum = builder.logNum;
@@ -25,7 +24,6 @@ public class WorkLog {
         this.status = builder.status;
         this.workDate=builder.workDate;
         this.userNum=builder.userNum;
-        this.leaveNum = builder.leaveNum;
     }
 
     public static class Builder{
@@ -41,7 +39,6 @@ public class WorkLog {
 
         private Long userNum;
 
-        private Long leaveNum;
 
         public Builder logNum(Long logNum) {
             this.logNum = logNum;
@@ -73,10 +70,6 @@ public class WorkLog {
             return this;
         }
 
-        public Builder leaveNum(Long leaveNum) {
-            this.leaveNum = leaveNum;
-            return this;
-        }
 
         public WorkLog build(){
             return new WorkLog(this);
@@ -106,7 +99,16 @@ public class WorkLog {
         return userNum;
     }
 
-    public Long getLeaveNum() {
-        return leaveNum;
+
+    @Override
+    public String toString() {
+        return "WorkLog{" +
+                "logNum=" + logNum +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", status=" + status +
+                ", workDate=" + workDate +
+                ", userNum=" + userNum +
+                '}';
     }
 }
