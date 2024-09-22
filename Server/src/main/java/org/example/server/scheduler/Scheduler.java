@@ -38,7 +38,7 @@ public class Scheduler {
         System.out.println("출근기록 자동저장 스케줄러 실행");
         scheduleTask(LocalTime.of(8, 00), this::morningTask, "아침 8시에 데이터베이스 저장 로직 호출");
         scheduleTask(LocalTime.of(18, 10), this::eveningTask, "저녁 6시 10분에 데이터베이스 저장 로직 호출");
-        scheduleTaskEveryMonth(LocalTime.of(22, 45), this::everyMonthTask, "매달 10일 저녁 10시 25분에 데이터베이스 저장 로직 호출");
+        scheduleTaskEveryMonth(LocalTime.of(18, 00), this::everyMonthTask, "매달 10일 저녁 10시 25분에 데이터베이스 저장 로직 호출");
     }
 
     private void scheduleTask(LocalTime targetTime, Runnable task, String message) {
@@ -93,7 +93,7 @@ public class Scheduler {
     }
 
     private LocalDateTime getNextExecutionTimeEveryMonth(LocalDateTime now, LocalTime targetTime) {
-        LocalDateTime nextExecution = now.withDayOfMonth(22).withHour(targetTime.getHour()).withMinute(targetTime.getMinute()).withSecond(0).withNano(0);
+        LocalDateTime nextExecution = now.withDayOfMonth(10).withHour(targetTime.getHour()).withMinute(targetTime.getMinute()).withSecond(0).withNano(0);
         if (now.isAfter(nextExecution)) {
             nextExecution = nextExecution.plusMonths(1);
         }
