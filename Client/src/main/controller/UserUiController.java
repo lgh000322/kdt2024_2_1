@@ -790,6 +790,7 @@ public class UserUiController implements Initializable {
 			alert.setContentText("삭제할 글을 선택해주세요.");
 			alert.showAndWait();
 		}
+
 	}
 
 	private boolean deleteQnAPostFromServer(BoardDelDto boardDelDto) throws IOException {
@@ -822,6 +823,7 @@ public class UserUiController implements Initializable {
 			// 서버 연결 종료
 			serverConnectUtils.close();
 		}
+
 	}
 
 	/* Q&A 탭에서 검색 버튼 버튼 클릭 시, 입력한 제목명으로 검색 처리 로칙 */
@@ -1513,6 +1515,44 @@ public class UserUiController implements Initializable {
 		alert.setHeaderText(null);
 		alert.setContentText(message);
 		alert.showAndWait();
+	}
+
+	private boolean deleteQnAPostFromServer(Long boardNum, Long writerUserNum) throws IOException {
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		User user = new User.Builder().userNum(UserInfoSavedUtil.getUserInfo().getUserNum()).role(Role.USER).build();
+
+		Board board = new Board.Builder().userNum(writerUserNum).boardNum(boardNum).build();
+
+		BoardDelDto boardDelDto = new BoardDelDto.Builder().user(user).board(board).build();
+
+		try {
+			// boardNum만 JSON으로 직렬화
+			String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_DELETE, boardDelDto);
+
+			// 서버로 삭제 요청 전송
+			communicationUtils.sendServer(jsonSendStr, dos);
+
+			// 서버 응답 수신
+			String jsonReceivedStr = dis.readUTF();
+
+			// 서버 응답을 처리하여 성공 여부 판단
+			ResponseData<String> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, String.class);
+			String messageType = responseData.getMessageType();
+
+			return messageType.contains("성공") ? true : false; // 성공 여부 반환
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false; // 삭제 실패 시 false 반환
+		} finally {
+			// 서버 연결 종료
+			serverConnectUtils.close();
+		}
 	}
 
 }
