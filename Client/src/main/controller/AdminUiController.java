@@ -60,8 +60,6 @@ import main.dto.mail_dto.MailSearchDto;
 import main.dto.mail_dto.UserAndEmailDto;
 import main.dto.salary_dto.AdminSalaryData;
 import main.dto.salary_dto.AdminSalaryRecord;
-import main.dto.salary_dto.SalaryAddData;
-import main.dto.user_dto.UpdateUserDto;
 import main.dto.user_dto.UserInfo;
 import main.dto.user_dto.UserRecord;
 import main.dto.user_dto.UserRoleDto;
@@ -1468,6 +1466,7 @@ public class AdminUiController {
 			try {
 				// 서버에 삭제 요청 (BoardDelDto 객체를 전송)
 				boolean deleteSuccess = deleteQnAPostFromServer(boardDelDto);
+
 
 				if (deleteSuccess) {
 					// Q&A 리스트에서 해당 boardNum와 일치하는 항목 삭제
