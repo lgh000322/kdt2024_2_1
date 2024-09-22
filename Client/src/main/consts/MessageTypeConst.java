@@ -59,9 +59,6 @@ public abstract class MessageTypeConst {
     //급여 내역 추가
     public static final String MESSAGE_SALARY_ADD = "/salary/add";
 
-
-	// 급여 내역 추가
-	public static final String MESSAGE_SALARY_ADD = "/salary/add";
 	
 	   // 사용자 급여내역 추가 ( 성과급)
     public static final String MESSAGE_SALARY_EDIT = "/salary/edit";
