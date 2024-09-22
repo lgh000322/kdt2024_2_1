@@ -10,6 +10,7 @@ import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
+import org.example.server.dto.salary_dto.BonusDto;
 import org.example.server.service.SalaryService;
 
 import java.sql.SQLException;
@@ -54,7 +55,7 @@ public class SalaryController implements Controller {
                     result = salaryService.searchSalary(user); // 급여내역 조회 결과를 result에 저장
                 }
             }
-
+/*
             case MessageTypeConst.MESSAGE_SALARY_ADD -> {
                 System.out.println("급여내역 추가 실행");
                 if (requestData.getData() instanceof LinkedTreeMap) { //프론트로부터 requestData에 linkedtreemap으로 넘어옴
@@ -69,6 +70,21 @@ public class SalaryController implements Controller {
                         result = new ResponseData("권한 없음: 관리자만 급여 내역을 추가할 수 있습니다.", null);
                     }
                 }
+            }*/
+
+            case MessageTypeConst.MESSAGE_SALARY_EDIT -> {
+                System.out.println("성과금 추가");
+                if (requestData.getData() instanceof LinkedTreeMap) { //프론트로부터 requestData에 linkedtreemap으로 넘어옴
+                    LinkedTreeMap<?, ?> map = (LinkedTreeMap<?, ?>) requestData.getData();
+                    BonusDto bonus = gson.fromJson(gson.toJson(map), BonusDto.class); //받아올 객체가 하나뿐이므로 이렇게 지정
+                    result = salaryService.addBonus(bonus); // 급여내역 조회 결과를 result에 저장
+                }
+            }
+
+            case MessageTypeConst.MESSAGE_SALARY_PLUS ->{
+                System.out.println("월급 추가");
+                //곧바로 서비스에서 월급추가 실행
+                result = salaryService.addSalary();
             }
 
         }
