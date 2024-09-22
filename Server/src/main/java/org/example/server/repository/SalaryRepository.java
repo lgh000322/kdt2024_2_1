@@ -151,6 +151,7 @@ public class SalaryRepository {
             close(pstmt, rs); // 자원 해제
         }
     }
+
     public ResponseData searchSalaryAdminOnDB(Connection conn) throws SQLException {
         /*
         2024-09-07수정
@@ -173,19 +174,72 @@ public class SalaryRepository {
 
             // 샐러리 로그가 생성되었을 경우 해당 로직 실행.
 
-                while (rs.next()) {
+            while (rs.next()) {
 
-                    // AdminSalaryData 객체를 생성하여 리스트에 추가
-                    AdminSalaryData adminSalary = new AdminSalaryData.Builder()
-                            .salaryNum(rs.getLong("user_num"))
-                            .name(rs.getString("name"))
-                            .deptName(rs.getString("d.dept_name"))
-                            .positionName(rs.getString("p.position_name"))
-                            .basicSalary(rs.getInt("basic_salary"))
-                            .build();
+                // AdminSalaryData 객체를 생성하여 리스트에 추가
+                AdminSalaryData adminSalary = new AdminSalaryData.Builder()
+                        .salaryNum(rs.getLong("user_num"))
+                        .name(rs.getString("name"))
+                        .deptName(rs.getString("d.dept_name"))
+                        .positionName(rs.getString("p.position_name"))
+                        .basicSalary(rs.getInt("basic_salary"))
+                        .build();
 
-                    salaryLogs.add(adminSalary);
-                }
+                salaryLogs.add(adminSalary);
+            }
+
+
+            if (!salaryLogs.isEmpty()) {
+                return new ResponseData("관리자 월급조회 성공", salaryLogs);
+            } else {
+                return new ResponseData("관리자 월급조회 실패", null);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public ResponseData searchSalaryAdminOnDBBySearchUserName(Connection conn,String searchUserName) throws SQLException {
+        /*
+        2024-09-07수정
+         */
+        // salary_log와 user 테이블을 JOIN해서 필요한 데이터를 가져옵니다.
+
+        // 샐러리 로그가 생성되지 않았을 경우 실행할 로직
+        String sql = "select u.user_num, u.name, d.dept_name, p.position_name, p.basic_salary from" +
+                " user u inner join dept d on u.dept_num = d.dept_num inner join position p on p.position_num = u.position_num" +
+                " where u.name like ?";
+
+
+        List<AdminSalaryData> salaryLogs = new ArrayList<>();
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "%" + searchUserName + "%");
+            rs = pstmt.executeQuery();
+
+            // 샐러리 로그가 생성되었을 경우 해당 로직 실행.
+
+            while (rs.next()) {
+
+                // AdminSalaryData 객체를 생성하여 리스트에 추가
+                AdminSalaryData adminSalary = new AdminSalaryData.Builder()
+                        .salaryNum(rs.getLong("user_num"))
+                        .name(rs.getString("name"))
+                        .deptName(rs.getString("d.dept_name"))
+                        .positionName(rs.getString("p.position_name"))
+                        .basicSalary(rs.getInt("basic_salary"))
+                        .build();
+
+                salaryLogs.add(adminSalary);
+            }
 
 
             if (!salaryLogs.isEmpty()) {
@@ -203,10 +257,9 @@ public class SalaryRepository {
     }
 
 
-
     /**
-     *  모든 유저 num 가져오는 함수 월급 지급 에서 사용
-     * */
+     * 모든 유저 num 가져오는 함수 월급 지급 에서 사용
+     */
     public List<UserSalaryDto> findUserNumAndSalary(Connection conn) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -215,11 +268,11 @@ public class SalaryRepository {
                 "FROM user u inner join position p WHERE " +
                 "user_Id != 'admin' and u.position_num = p.position_num";
 
-        try{
+        try {
             ps = conn.prepareStatement(sql);
             rs = ps.executeQuery();
 
-            while(rs.next()) {
+            while (rs.next()) {
                 UserSalaryDto userSalaryDto = new UserSalaryDto();
                 userSalaryDto.setUserNum(rs.getLong("user_num"));
                 userSalaryDto.setUserSalary(rs.getInt("basic_salary"));
@@ -248,7 +301,7 @@ public class SalaryRepository {
         LocalDate localDate = LocalDate.now();
         Date nowDate = Date.valueOf(localDate);
 
-        try{
+        try {
             ps = conn.prepareStatement(sql);
             ps.setDate(1, nowDate);
             ps.setInt(2, userSalaryDto.getUserSalary());
@@ -275,15 +328,14 @@ public class SalaryRepository {
         String sql = "UPDATE salary_log " +
                 "SET total_salary = ? " +
                 "WHERE user_num = ? " +
-                "AND received_date = (SELECT max_date FROM (SELECT max(received_date) AS max_date FROM salary_log WHERE user_num = ?) AS temp)";
-
-        try{
+                "AND received_date = (SELECT MAX(received_date) FROM (SELECT received_date FROM salary_log WHERE user_num = ?) AS temp)";
+        try {
             pstmt = con.prepareStatement(checkSql);
             pstmt.setLong(1, bonus.getUserNum());
             rs = pstmt.executeQuery();
 
 
-        // 샐러리 로그가 존재하면 실행.
+            // 샐러리 로그가 존재하면 실행.
             if (rs.next() && rs.getInt(1) > 0) {
 
                 pstmt = con.prepareStatement(sql);
@@ -319,7 +371,6 @@ public class SalaryRepository {
             }
         }
     }
-
 
 
 }

@@ -29,6 +29,12 @@ public class User {
 
     private LocalDate moneySearchDate;
 
+    private String searchUserName;
+
+    public String getSearchUserName() {
+        return searchUserName;
+    }
+
     public LocalDate getMoneySearchDate() {
         return moneySearchDate;
     }
@@ -103,6 +109,7 @@ public class User {
         this.deptName=builder.deptName;
         this.positionName=builder.positionName;
         this.moneySearchDate=builder.moneySearchDate;
+        this.searchUserName=builder.searchUserName;
     }
 
     public static class Builder{
@@ -131,6 +138,13 @@ public class User {
         private String positionName;
 
         private LocalDate moneySearchDate;
+
+        private String searchUserName;
+
+        public Builder searchUserName(String searchUserName) {
+            this.searchUserName=searchUserName;
+            return this;
+        }
 
         public Builder moneyTitle(LocalDate moneySearchDate) {
             this.moneySearchDate=moneySearchDate;

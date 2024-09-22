@@ -190,7 +190,11 @@ public class SalaryService {
         if (findUser.isPresent()) {
             User DBUser = findUser.get();
             if (DBUser.getRole() == Role.ADMIN) { // 관리자인 경우 전체 월급 데이터를 가져옴
-                salaryResponse = salaryRepository.searchSalaryAdminOnDB(con); // 관리자의 월급 데이터 조회
+                if (user.getSearchUserName().equals("")) {
+                    salaryResponse = salaryRepository.searchSalaryAdminOnDB(con); // 관리자의 월급 데이터 조회
+                }else{
+                    salaryResponse = salaryRepository.searchSalaryAdminOnDBBySearchUserName(con, user.getSearchUserName());
+                }
             } else { // 일반 유저의 월급을 조회
                 if (user.getMoneySearchDate() == null) {
                     salaryResponse = salaryRepository.searchSalaryUserOnDB(con, DBUser); // 일반 유저의 월급 데이터 조회
