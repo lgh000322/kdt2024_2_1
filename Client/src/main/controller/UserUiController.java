@@ -41,6 +41,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.consts.MessageTypeConst;
+import main.domain.board.Board;
 import main.domain.mail.Mail;
 import main.domain.mail.MailType;
 import main.domain.user.Role;
@@ -49,6 +50,7 @@ import main.domain.work_log.Status;
 import main.domain.work_log.WorkLog;
 import main.dto.ResponseData;
 import main.dto.board_dto.BoardAndAnswer;
+import main.dto.board_dto.BoardDelDto;
 import main.dto.board_dto.BoardFindAllDto;
 import main.dto.board_dto.QnARecord;
 import main.dto.leave_dto.ForFindLeaveDto;
@@ -459,7 +461,7 @@ public class UserUiController implements Initializable {
 			MailRecord mailRecord = mailRecordTableView.getSelectionModel().getSelectedItem();
 			String receivedUserEmail = mailRecord.getMailReceived();
 			mailNum = mailRecord.getMailKeyNo();
-      
+
 			if (event.getClickCount() == 2) {
 				try {
 					mailItemClickedMethod(mailNum, receivedUserEmail);
@@ -657,7 +659,7 @@ public class UserUiController implements Initializable {
 	/* 메일삭제 버튼 클릭 시, 메일삭제 처리 로직 */
 	public void handledeleteMailBtn() throws IOException {
 		System.out.println("메일 삭제 로직 실행");
-		
+
 		CommunicationUtils communicationUtils = new CommunicationUtils();
 		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
 
@@ -670,10 +672,10 @@ public class UserUiController implements Initializable {
 		/**
 		 * requestData의 data에 넣어줄 객체를 생성
 		 */
-		MailDeleteDto mailDeleteDto=new MailDeleteDto();
+		MailDeleteDto mailDeleteDto = new MailDeleteDto();
 		mailDeleteDto.setMailType(MailType.RECEIVED);
 		mailDeleteDto.setMailNum(mailNum);
-		
+
 		if (mailComboList.getValue() != null) {
 			if (mailComboList.getValue().equals("받은메일함")) {
 				mailDeleteDto.setMailType(MailType.RECEIVED);
@@ -681,17 +683,18 @@ public class UserUiController implements Initializable {
 				mailDeleteDto.setMailType(MailType.SEND);
 			}
 		}
-		
+
 		/**
 		 * requestData 생성
 		 */
-		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_MAIL_ONE_DELETE,mailDeleteDto);
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_MAIL_ONE_DELETE, mailDeleteDto);
 
 		try {
 			communicationUtils.sendServer(jsonSendStr, dos);
 			String jsonReceivedStr = dis.readUTF();
 
-			ResponseData<MailDeleteDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,MailDeleteDto.class);
+			ResponseData<MailDeleteDto> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,
+					MailDeleteDto.class);
 			String messageType = responseData.getMessageType();
 
 			if (messageType.contains("성공")) {
@@ -726,8 +729,99 @@ public class UserUiController implements Initializable {
 		}
 	}
 
-	/* Q&A 글 삭제 버튼 클릭 시, 글 삭제 처리 로칙 */
+	/* Q&A 글 삭제 버튼 클릭 시, 글 삭제 처리 로직 */
 	public void handledeletePostQnABtn() {
+
+		QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
+
+		if (selectedQnAItem != null) {
+			Long selectedBoardNum = selectedQnAItem.getKeyNo(); // 선택된 QnARecord의 getKey 가져오기
+			Long selectedUserNum = selectedQnAItem.getUserNum();
+
+			// 현재 접속 중인 사용자 정보 가져오기
+			User nowUser = new User.Builder()
+					.userId(UserInfoSavedUtil.getUserId())	
+					.userNum(UserInfoSavedUtil.getUserInfo().getUserNum())
+					.role(Role.USER)
+					.build();
+
+			// 선택된 게시물 정보와 현재 사용자 정보를 사용하여 BoardDelDto 생성
+			Board selectedBoard = new Board.Builder()
+					.boardNum(selectedBoardNum)
+					.title("")
+					.userNum(selectedUserNum)
+					.build();
+
+			BoardDelDto boardDelDto = new BoardDelDto.Builder().board(selectedBoard).user(nowUser).build();
+
+			try {
+				// 서버에 삭제 요청 (BoardDelDto 객체를 전송)
+				boolean deleteSuccess = deleteQnAPostFromServer(boardDelDto);
+
+				if (deleteSuccess) {
+					// Q&A 리스트에서 해당 boardNum와 일치하는 항목 삭제
+					qnaRecordList.removeIf(qna -> Long.valueOf(qna.getKeyNo()).equals(selectedBoardNum));
+
+					// UI 업데이트
+					qnaRecordTableView.refresh();
+
+					// 삭제 성공 메시지 출력
+					Alert alert = new Alert(Alert.AlertType.INFORMATION);
+					alert.setTitle("성공");
+					alert.setHeaderText(null);
+					alert.setContentText("해당 Q&A 게시물이 성공적으로 삭제되었습니다.");
+					alert.showAndWait();
+				} else {
+					// 삭제 실패 메시지 출력
+					Alert alert = new Alert(Alert.AlertType.ERROR);
+					alert.setTitle("오류");
+					alert.setHeaderText(null);
+					alert.setContentText("Q&A 게시물 삭제에 실패했습니다.");
+					alert.showAndWait();
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		} else {
+			// 글이 선택되지 않은 경우 경고 메시지를 표시
+			Alert alert = new Alert(Alert.AlertType.WARNING);
+			alert.setTitle("경고");
+			alert.setHeaderText(null);
+			alert.setContentText("삭제할 글을 선택해주세요.");
+			alert.showAndWait();
+		}
+	}
+
+	private boolean deleteQnAPostFromServer(BoardDelDto boardDelDto) throws IOException {
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		try {
+			// BoardDelDto를 JSON으로 직렬화하여 서버로 전송
+			String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_DELETE, boardDelDto);
+
+			// 서버로 삭제 요청 전송
+			communicationUtils.sendServer(jsonSendStr, dos);
+
+			// 서버 응답 수신
+			String jsonReceivedStr = dis.readUTF();
+
+			// 서버 응답을 처리하여 성공 여부 판단
+			ResponseData<String> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, String.class);
+			String messageType = responseData.getMessageType();
+
+			return messageType.contains("성공"); // 성공 여부 반환
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false; // 삭제 실패 시 false 반환
+		} finally {
+			// 서버 연결 종료
+			serverConnectUtils.close();
+		}
 	}
 
 	/* Q&A 탭에서 검색 버튼 버튼 클릭 시, 입력한 제목명으로 검색 처리 로칙 */
@@ -1412,7 +1506,7 @@ public class UserUiController implements Initializable {
 		}
 
 	}
-	
+
 	private void UiAlert(String title, String message) {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle(title);
