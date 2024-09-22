@@ -53,6 +53,7 @@ import main.dto.mail_dto.MailSearchDto;
 import main.dto.mail_dto.UserAndEmailDto;
 import main.dto.salary_dto.AdminSalaryData;
 import main.dto.salary_dto.AdminSalaryRecord;
+import main.dto.salary_dto.SalaryAddData;
 import main.dto.user_dto.UpdateUserDto;
 import main.dto.user_dto.UserInfo;
 import main.dto.user_dto.UserRecord;
@@ -168,8 +169,8 @@ public class AdminUiController {
 	private TableColumn<AdminSalaryRecord, String> usersalaryName;
 
 	@FXML
-	private TableColumn<AdminSalaryRecord, String> usersalaryPhone;
-
+	private TableColumn<AdminSalaryRecord, String> usersalaryBasic;
+	
 	@FXML
 	private TableColumn<AdminSalaryRecord, String> usersalaryDept;
 
@@ -177,7 +178,7 @@ public class AdminUiController {
 	private TableColumn<AdminSalaryRecord, String> usersalaryPosition;
 
 	@FXML
-	private TableColumn<AdminSalaryRecord, Integer> usersalaryPayment;
+	private Button salarySend;
 	
 	/*
 	 * Q&A관리 테이블 뷰
@@ -333,7 +334,7 @@ public class AdminUiController {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
+				
 				userRecordList.clear();
 				leaveRecordList.clear();
 
@@ -375,6 +376,8 @@ public class AdminUiController {
 		Timeline clock = new Timeline(new KeyFrame(Duration.ZERO, e -> {
 			LocalDateTime now = LocalDateTime.now();
 			currentTime.setText(now.format(formatter));
+			
+			updateSalarySendButton(); // 버튼 상태 갱신
 		}), new KeyFrame(Duration.seconds(1)));
 
 		clock.setCycleCount(Timeline.INDEFINITE);
@@ -398,16 +401,18 @@ public class AdminUiController {
 		deptNameColumn.setCellValueFactory(new PropertyValueFactory<>("deptName"));
 		statusColumn.setCellValueFactory(new PropertyValueFactory<>("leaveAcceptStatus"));
 		userleaveCount.setCellValueFactory(new PropertyValueFactory<>("remainedLeave"));
+		
 		userId.setCellValueFactory(new PropertyValueFactory<>("userId"));
 		checkStatus.setCellValueFactory(new PropertyValueFactory<>("checkStatus"));
 
 		// 컬럼과 급여관리
 		usersalaryNum.setCellValueFactory(new PropertyValueFactory<>("salaryNum"));
 		usersalaryName.setCellValueFactory(new PropertyValueFactory<>("salaryName"));
-		usersalaryPhone.setCellValueFactory(new PropertyValueFactory<>("salaryPhone"));
 		usersalaryDept.setCellValueFactory(new PropertyValueFactory<>("salaryDept"));
 		usersalaryPosition.setCellValueFactory(new PropertyValueFactory<>("salaryPosition"));
-		usersalaryPayment.setCellValueFactory(new PropertyValueFactory<>("salaryPayment"));
+		usersalaryBasic.setCellValueFactory(new PropertyValueFactory<>("basicSalary"));
+	
+	
 
 		try {
 			employeeTabClickedMethod();
@@ -495,13 +500,19 @@ public class AdminUiController {
 		// 급여관리 컬럼 클릭 이벤트
 		salaryTable.setOnMouseClicked((MouseEvent event) -> {
 		    if (event.getClickCount() == 2) { // 더블 클릭 확인
-		        AdminSalaryRecord selectedRecord = salaryTable.getSelectionModel().getSelectedItem();
+		    	AdminSalaryRecord selectedRecord = salaryTable.getSelectionModel().getSelectedItem();
 		        if (selectedRecord != null) { // 데이터가 있는 행이 선택되었는지 확인
+		        	
 		            try {
 		                // FXML 파일 로드
 		                FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/Admin_Ui/AdminSalary.fxml"));
 		                Parent root = loader.load();
 
+		                AdminSalaryController adminSalaryController = loader.getController();
+		                adminSalaryController.setAdminSalary(selectedRecord);
+		                adminSalaryController.setUserNum(selectedRecord.getKeyUserNum());
+//		                adminSalaryController.setAdminSalaryRecord(selectedRecord);
+		                
 		                // 새로운 스테이지(창) 생성 및 장면 설정
 		                Stage stage = new Stage();
 		                stage.setTitle("급여 관리");
@@ -649,6 +660,7 @@ public class AdminUiController {
 	}
 
 	private void salaryTabClickedMethod() throws IOException {
+		salaryRecordList.clear();
 		System.out.println("급여탭 클릭 이벤트 발생");
 		CommunicationUtils communicationUtils = new CommunicationUtils();
 		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
@@ -681,15 +693,36 @@ public class AdminUiController {
 
 			if (messageType.contains("성공")) {
 				List<AdminSalaryData> list = (List<AdminSalaryData>) responseData.getData();
+				long no = 1L;
 				for (int i = 0; i < list.size(); i++) {
-					Long no = Long.valueOf(i + 1);
-					AdminSalaryData adminSalaryData = list.get(i);
-
+					// 이름이 관리자일경우 스킵
+					if(list.get(i).getName().equals("admin")) {
+						continue;
+					}
 					
+					
+					
+					
+					AdminSalaryRecord adminSalaryRecord = new AdminSalaryRecord(no++, list.get(i).getSalaryNum(), list.get(i).getName(), list.get(i).getDeptName(),
+							list.get(i).getPositionName(), list.get(i).getBasicSalary());
+					
+					
+					/*
+					 * AdminSalaryRecord adminSalaryRecord = new AdminSalaryRecord(no,
+					 * adminSalaryData.getSalaryNum(), adminSalaryData.getName(),
+					 * adminSalaryData.getTel(), adminSalaryData.getDeptName(),
+					 * adminSalaryData.getPositionName(), adminSalaryData.getTotalSalary(),
+					 * adminSalaryData.getReceivedDate(), adminSalaryData.getLeavePay(),
+					 * adminSalaryData.getBasicSalary() ,adminSalaryData.getRemainedLeave(),
+					 * adminSalaryData.getBonus());
+					 */
+					
+					
+					salaryRecordList.add(adminSalaryRecord);
 				}
 
 				Platform.runLater(() -> {
-					leaveTable.setItems(leaveRecordList);
+					salaryTable.setItems(salaryRecordList);
 				});
 
 			}
@@ -1088,7 +1121,15 @@ public class AdminUiController {
 				.endDate(selectedLeaveEndDate)
 				.status(LeaveStatus.ACCEPT)
 				.build();
+		
+		
 
+		selectedUserId = null;
+		selectedLeaveNum = null;
+		selectedLeaveStartDate = null;
+		selectedLeaveEndDate = null;
+		
+		
 		/**
 		 * requestData 생성
 		 */
@@ -1153,6 +1194,51 @@ public class AdminUiController {
 	}
 	
 	
+	public void handleSalarySend() throws IOException {
+	
+		CommunicationUtils communicationUtils = new CommunicationUtils();
+
+		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
+
+		/**
+		 * 데이터를 주고받기 위해 stream을 받아옴
+		 */
+		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
+		DataInputStream dis = serverConnectUtils.getDataInputStream();
+
+		/**
+		 * requestData 생성
+		 */
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_SALARY_PLUS, null);
+		
+
+		try {
+			communicationUtils.sendServer(jsonSendStr, dos);
+			String jsonReceivedStr = dis.readUTF();
+
+	
+			ResponseData<SalaryAddData> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr,SalaryAddData.class);
+			String messageType = responseData.getMessageType();
+
+			if (messageType.contains("성공")) {
+
+				System.out.println("월급 지급 성공");
+			
+			}
+			
+		} catch (
+
+		IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			serverConnectUtils.close();
+		}
+	}
+	
+	
+	
 	public void handleUserEditSearchBtn() throws IOException {
 		userRecordList.clear();
 		CommunicationUtils communicationUtils = new CommunicationUtils();
@@ -1213,5 +1299,17 @@ public class AdminUiController {
 		} finally {
 			serverConnectUtils.close();
 		}
+	}
+	
+	
+	
+	private void updateSalarySendButton() {
+	    salarySend.setDisable(!isActivationDate());
+	}
+	
+	
+	private boolean isActivationDate() {
+	    LocalDate today = LocalDate.now();
+	    return today.getDayOfMonth() == 10; // 매달 1일에 활성화
 	}
 }
