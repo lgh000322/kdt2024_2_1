@@ -38,12 +38,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.consts.MessageTypeConst;
+import main.domain.board.Board;
 import main.domain.mail.Mail;
 import main.domain.mail.MailType;
 import main.domain.user.Role;
 import main.domain.user.User;
 import main.dto.ResponseData;
 import main.dto.board_dto.BoardAndAnswer;
+import main.dto.board_dto.BoardDelDto;
 import main.dto.board_dto.BoardFindAllDto;
 import main.dto.board_dto.QnARecord;
 import main.dto.leave_dto.ForFindLeaveDto;
@@ -58,7 +60,6 @@ import main.dto.mail_dto.MailSearchDto;
 import main.dto.mail_dto.UserAndEmailDto;
 import main.dto.salary_dto.AdminSalaryData;
 import main.dto.salary_dto.AdminSalaryRecord;
-import main.dto.user_dto.UpdateUserDto;
 import main.dto.user_dto.UserInfo;
 import main.dto.user_dto.UserRecord;
 import main.dto.user_dto.UserRoleDto;
@@ -259,7 +260,7 @@ public class AdminUiController {
 
 	@FXML
 	private Button acceptBtn;
-	
+
 	private Long mailNum;
 
 	/* 현재시간 표시 */
@@ -539,7 +540,7 @@ public class AdminUiController {
 			MailRecord mailRecord = mailRecordTableView.getSelectionModel().getSelectedItem();
 			String receivedUserEmail = mailRecord.getMailReceived();
 			mailNum = mailRecord.getMailKeyNo();
-      
+
 			if (event.getClickCount() == 2) {
 				try {
 					mailItemClickMethod(mailNum, receivedUserEmail);
@@ -1395,10 +1396,11 @@ public class AdminUiController {
 
 		if (selectedQnAItem != null) {
 			Long selectedQnAId = selectedQnAItem.getKeyNo(); // 선택된 QnARecord의 boardNum 가져오기
+			Long writerUserNum = selectedQnAItem.getUserNum();
 
 			try {
 				// 서버에 삭제 요청 (boardNum만 전송)
-				boolean deleteSuccess = deleteQnAPostFromServer(selectedQnAId);
+				boolean deleteSuccess = deleteQnAPostFromServer(selectedQnAId, writerUserNum);
 
 				if (deleteSuccess) {
 					// Q&A 리스트에서 해당 boardNum와 일치하는 항목 삭제
@@ -1435,16 +1437,22 @@ public class AdminUiController {
 	}
 
 	// Q&A탭 글 삭제 버튼 로직
-	private boolean deleteQnAPostFromServer(Long boardNum) throws IOException {
+	private boolean deleteQnAPostFromServer(Long boardNum, Long writerUserNum) throws IOException {
 		CommunicationUtils communicationUtils = new CommunicationUtils();
 		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
 
 		DataOutputStream dos = serverConnectUtils.getDataOutputStream();
 		DataInputStream dis = serverConnectUtils.getDataInputStream();
 
+		User user = new User.Builder().userNum(UserInfoSavedUtil.getUserInfo().getUserNum()).role(Role.ADMIN).build();
+
+		Board board = new Board.Builder().userNum(writerUserNum).boardNum(boardNum).build();
+
+		BoardDelDto boardDelDto = new BoardDelDto.Builder().user(user).board(board).build();
+
 		try {
 			// boardNum만 JSON으로 직렬화
-			String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_DELETE, boardNum);
+			String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_DELETE, boardDelDto);
 
 			// 서버로 삭제 요청 전송
 			communicationUtils.sendServer(jsonSendStr, dos);
@@ -1456,7 +1464,7 @@ public class AdminUiController {
 			ResponseData<String> responseData = communicationUtils.jsonToResponseData(jsonReceivedStr, String.class);
 			String messageType = responseData.getMessageType();
 
-			return messageType.contains("성공"); // 성공 여부 반환
+			return messageType.contains("성공") ? true : false; // 성공 여부 반환
 
 		} catch (IOException e) {
 			e.printStackTrace();
