@@ -2,6 +2,7 @@ package org.example.server.repository;
 
 import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
+import org.example.server.dto.salary_dto.SalaryScheduleDto;
 import org.example.server.dto.user_dto.UpdateUserDto;
 import org.example.server.dto.user_dto.UserInfo;
 import org.example.server.dto.user_dto.UserNameAndEmailDto;
@@ -419,6 +420,36 @@ public class UserRepository {
                         .build();
 
                 list.add(user);
+            }
+            return list;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(pstmt, rs);
+        }
+    }
+
+    public List<SalaryScheduleDto> findAllWithPositionInfo(Connection conn) throws SQLException {
+        String sql = "select user.user_num, user.remained_leave, position.basic_salary, position.leave_pay from user" +
+                " left join position on user.position_num = position.position_num";
+
+        List<SalaryScheduleDto> list = new ArrayList<>();
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+
+            while (rs.next()) {
+                SalaryScheduleDto salaryScheduleDto = new SalaryScheduleDto();
+                salaryScheduleDto.setUserNum(rs.getLong("user.user_num"));
+                salaryScheduleDto.setRemainedLeave(rs.getInt("user.remained_leave"));
+                salaryScheduleDto.setBasicSalary(rs.getInt("position.basic_salary"));
+                salaryScheduleDto.setLeavePay(rs.getInt("position.leave_pay"));
+
+                list.add(salaryScheduleDto);
             }
             return list;
         } catch (SQLException e) {

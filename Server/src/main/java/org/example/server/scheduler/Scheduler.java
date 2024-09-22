@@ -31,13 +31,14 @@ public class Scheduler {
 
     public Scheduler(SchedulerService schedulerService) {
         this.schedulerService = schedulerService;
-        schedulerExecutors = Executors.newScheduledThreadPool(2); // 3 개의 작업을 스케줄링하기 위해 스레드 풀 크기를 2로 설정
+        schedulerExecutors = Executors.newScheduledThreadPool(3); // 3개의 작업을 처리하기 위해 스레드 풀 크기를 3으로 설정
     }
 
     public void start() {
         System.out.println("출근기록 자동저장 스케줄러 실행");
         scheduleTask(LocalTime.of(8, 00), this::morningTask, "아침 8시에 데이터베이스 저장 로직 호출");
         scheduleTask(LocalTime.of(18, 10), this::eveningTask, "저녁 6시 10분에 데이터베이스 저장 로직 호출");
+        scheduleTaskEveryMonth(LocalTime.of(18, 00), this::everyMonthTask, "매달 10일 저녁 10시 25분에 데이터베이스 저장 로직 호출");
     }
 
     private void scheduleTask(LocalTime targetTime, Runnable task, String message) {
@@ -55,6 +56,21 @@ public class Scheduler {
         long initialDelay = calculateInitialDelay(now, nextExecution);
 
         schedulerExecutors.scheduleAtFixedRate(wrappedTask, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
+    }
+
+    private void scheduleTaskEveryMonth(LocalTime targetTime, Runnable task, String message) {
+        Runnable wrappedTask = () -> {
+            task.run();
+            System.out.println(message);
+        };
+
+        // 현재 시간을 기준으로 다음 실행 시점을 계산
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime nextExecution = getNextExecutionTimeEveryMonth(now, targetTime);
+
+        long initialDelay = calculateInitialDelay(now, nextExecution);
+
+        schedulerExecutors.scheduleAtFixedRate(wrappedTask, initialDelay, TimeUnit.DAYS.toSeconds(30), TimeUnit.SECONDS);
     }
 
     private long calculateInitialDelay(LocalDateTime now, LocalDateTime nextExecution) {
@@ -76,15 +92,21 @@ public class Scheduler {
         return today;
     }
 
+    private LocalDateTime getNextExecutionTimeEveryMonth(LocalDateTime now, LocalTime targetTime) {
+        LocalDateTime nextExecution = now.withDayOfMonth(10).withHour(targetTime.getHour()).withMinute(targetTime.getMinute()).withSecond(0).withNano(0);
+        if (now.isAfter(nextExecution)) {
+            nextExecution = nextExecution.plusMonths(1);
+        }
+        return nextExecution;
+    }
+
     private boolean isWeekday(LocalDate date) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         return dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY;
     }
 
-
     // 아침 8시에 수행할 작업
     private void morningTask() {
-        // 아침 8시에 수행할 로직을 구현
         System.out.println("아침 8시 작업 실행");
         try {
             schedulerService.morningAct();
@@ -92,18 +114,26 @@ public class Scheduler {
             System.out.println("아침 스케줄링 수행중 오류가 발생했습니다.");
             e.printStackTrace();
         }
-
     }
 
     // 오후 6시 10분에 수행할 작업
-    private void eveningTask()  {
-        // 오후 6시 10분에 수행할 로직을 구현
-        // 현재 출석한 회원중 퇴근버튼을 누르지 않은 회원을 결근으로 전환한다.
+    private void eveningTask() {
         System.out.println("저녁 6시 10분 작업 실행");
         try {
             schedulerService.eveningAct();
         } catch (SQLException e) {
             System.out.println("저녁 스케줄링 수행중 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+    }
+
+    // 매달 10일에 수행할 작업
+    private void everyMonthTask() {
+        System.out.println("매달 10일 작업 실행");
+        try {
+            schedulerService.everyMonthAct();
+        } catch (SQLException e) {
+            System.out.println("매달 스케줄링 수행중 오류가 발생했습니다.");
             e.printStackTrace();
         }
     }
