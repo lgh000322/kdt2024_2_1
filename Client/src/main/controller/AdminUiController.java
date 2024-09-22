@@ -38,12 +38,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.consts.MessageTypeConst;
+import main.domain.board.Board;
 import main.domain.mail.Mail;
 import main.domain.mail.MailType;
 import main.domain.user.Role;
 import main.domain.user.User;
 import main.dto.ResponseData;
 import main.dto.board_dto.BoardAndAnswer;
+import main.dto.board_dto.BoardDelDto;
 import main.dto.board_dto.BoardFindAllDto;
 import main.dto.board_dto.QnARecord;
 import main.dto.leave_dto.ForFindLeaveDto;
@@ -259,7 +261,7 @@ public class AdminUiController {
 
 	@FXML
 	private Button acceptBtn;
-	
+
 	private Long mailNum;
 
 	/* 현재시간 표시 */
@@ -539,7 +541,7 @@ public class AdminUiController {
 			MailRecord mailRecord = mailRecordTableView.getSelectionModel().getSelectedItem();
 			String receivedUserEmail = mailRecord.getMailReceived();
 			mailNum = mailRecord.getMailKeyNo();
-      
+
 			if (event.getClickCount() == 2) {
 				try {
 					mailItemClickMethod(mailNum, receivedUserEmail);
@@ -1388,21 +1390,29 @@ public class AdminUiController {
 		}
 	}
 
-	/* Q&A 글 삭제 버튼 클릭 시, 글 삭제 처리 로칙 */
+	/* Q&A 글 삭제 버튼 클릭 시, 글 삭제 처리 로직 */
 	public void handledeletePostQnABtn() {
 
 		QnARecord selectedQnAItem = qnaRecordTableView.getSelectionModel().getSelectedItem();
 
 		if (selectedQnAItem != null) {
-			Long selectedQnAId = selectedQnAItem.getKeyNo(); // 선택된 QnARecord의 boardNum 가져오기
+			Long selectedBoardNum = selectedQnAItem.getKeyNo(); // 선택된 QnARecord의 getKey 가져오기
+
+			// 현재 접속 중인 사용자 정보 가져오기
+			User nowUser = new User.Builder().userId(UserInfoSavedUtil.getUserId()).role(Role.ADMIN).build();
+
+			// 선택된 게시물 정보와 현재 사용자 정보를 사용하여 BoardDelDto 생성
+			Board selectedBoard = new Board.Builder().boardNum(selectedBoardNum).title("").build();
+
+			BoardDelDto boardDelDto = new BoardDelDto.Builder().board(selectedBoard).user(nowUser).build();
 
 			try {
-				// 서버에 삭제 요청 (boardNum만 전송)
-				boolean deleteSuccess = deleteQnAPostFromServer(selectedQnAId);
+				// 서버에 삭제 요청 (BoardDelDto 객체를 전송)
+				boolean deleteSuccess = deleteQnAPostFromServer(boardDelDto);
 
 				if (deleteSuccess) {
 					// Q&A 리스트에서 해당 boardNum와 일치하는 항목 삭제
-					qnaRecordList.removeIf(qna -> Long.valueOf(qna.getKeyNo()).equals(selectedQnAId));
+					qnaRecordList.removeIf(qna -> Long.valueOf(qna.getKeyNo()).equals(selectedBoardNum));
 
 					// UI 업데이트
 					qnaRecordTableView.refresh();
@@ -1434,8 +1444,7 @@ public class AdminUiController {
 		}
 	}
 
-	// Q&A탭 글 삭제 버튼 로직
-	private boolean deleteQnAPostFromServer(Long boardNum) throws IOException {
+	private boolean deleteQnAPostFromServer(BoardDelDto boardDelDto) throws IOException {
 		CommunicationUtils communicationUtils = new CommunicationUtils();
 		ServerConnectUtils serverConnectUtils = communicationUtils.getConnection();
 
@@ -1443,8 +1452,8 @@ public class AdminUiController {
 		DataInputStream dis = serverConnectUtils.getDataInputStream();
 
 		try {
-			// boardNum만 JSON으로 직렬화
-			String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_DELETE, boardNum);
+			// BoardDelDto를 JSON으로 직렬화하여 서버로 전송
+			String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_BOARD_DELETE, boardDelDto);
 
 			// 서버로 삭제 요청 전송
 			communicationUtils.sendServer(jsonSendStr, dos);
