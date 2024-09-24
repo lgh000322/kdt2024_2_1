@@ -148,17 +148,59 @@ public class WorkService {
                     // WorkLog가 존재하면 퇴근 시간과 상태를 업데이트
                     WorkLog workLog = workLogOpt.get();
 
-                    // 퇴근 시간이 18시 이후면 정상 출근(ATTENDANCE), 그 전일 경우 지각(TARDINESS)으로 처리
-                    Status status = endTime.isAfter(LocalTime.of(18, 0)) ? Status.ATTENDANCE : Status.TARDINESS;
 
-                    // WorkLog에 퇴근 시간과 상태를 업데이트
+                    // WorkLog에 퇴근 시간 업데이트
+                    workLog = new WorkLog.Builder()
+                            .logNum(workLog.getLogNum())
+                            .startTime(workLog.getStartTime())
+                            .endTime(endTime)
+                            .workDate(workDate)
+                            .status(workLog.getStatus())
+                            .userNum(DBUser.getUserNum())
+                            .build();
+
+                    return workRepository.updateEndWorkLogonDB(workLog, con);
+                } else {
+                    // WorkLog가 없는 경우 퇴근 기록을 남길 수 없음을 알림
+                    return new ResponseData("퇴근 실패: 출근 기록 없음", null);
+                }
+            } else {
+                return new ResponseData("퇴근 실패: 유저가 없음", null);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new ResponseData("퇴근 실패", null);
+        }
+    }
+
+    //퇴근 비즈니스 로직
+    private ResponseData WorkEndEarlyBizLogic(User user, Connection con) throws SQLException {
+        try {
+            // 현재 접속한 유저의 정보를 가져온다.
+            Optional<User> findUser = userRepository.findUserByIDAndRole(con, user.getUserId(), user.getRole());
+
+            // 만약 유저가 있으면
+            if (findUser.isPresent()) {
+                User DBUser = findUser.get(); // 유저를 user 객체화 시키고
+                LocalTime endTime = LocalTime.now(); // 현재 시간을 가져온다
+                LocalDate workDate = LocalDate.now(); // 오늘 날짜를 가져온다
+
+                // 오늘 날짜로 해당 유저의 출근 정보가 있는지 검색
+                Optional<WorkLog> workLogOpt = workRepository.findWorkLogByUserAndDate(DBUser.getUserNum(), workDate, con);
+
+                if (workLogOpt.isPresent()) {
+                    // WorkLog가 존재하면 퇴근 시간과 상태를 업데이트
+                    WorkLog workLog = workLogOpt.get();
+
+
+                    // WorkLog에 퇴근 시간 업데이트
                     workLog = new WorkLog.Builder()
                             .logNum(workLog.getLogNum())
                             .startTime(workLog.getStartTime())
                             .endTime(endTime)
                             .workDate(workDate)
                             .userNum(DBUser.getUserNum())
-                            .status(status)
+                            .status(Status.LEAVEPREV)
                             .build();
 
                     return workRepository.updateEndWorkLogonDB(workLog, con);
@@ -237,7 +279,7 @@ public class WorkService {
         try {
             con = dataSource.getConnection();
             con.setAutoCommit(false);
-            responseData = workEndBizLogic(user, con);
+            responseData = WorkEndEarlyBizLogic(user, con);
             con.commit();
         } catch (Exception e) {
             con.rollback();

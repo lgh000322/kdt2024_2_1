@@ -400,7 +400,7 @@ public class WorkRepository {
         try {
             pstmt = con.prepareStatement(updateSQL);
             pstmt.setTime(1, workLog.getEndTime() != null ? Time.valueOf(workLog.getEndTime()) : null);
-            pstmt.setString(2, workLog.getStatus().name());
+            pstmt.setString(2,workLog.getStatus().name());
             pstmt.setLong(3, workLog.getUserNum());
             pstmt.setDate(4, Date.valueOf(workLog.getWorkDate()));
 
