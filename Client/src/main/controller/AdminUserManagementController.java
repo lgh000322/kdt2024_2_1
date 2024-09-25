@@ -2,6 +2,7 @@ package main.controller;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -18,6 +19,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import main.consts.MessageTypeConst;
 import main.dto.ResponseData;
@@ -28,6 +31,9 @@ import main.util.CommunicationUtils;
 import main.util.ServerConnectUtils;
 
 public class AdminUserManagementController {
+	
+	@FXML
+	private ImageView userImage;
 
     @FXML
     private ComboBox<String> positionComboBox;
@@ -57,6 +63,14 @@ public class AdminUserManagementController {
     
     @FXML
     public void initialize() {
+    	File file = new File("src/UserImage/userImage.jpg");
+		if (file.exists()) {
+			Image image = new Image(file.toURI().toString());
+			userImage.setImage(image);
+		} else {
+			System.out.println("이미지 로딩 오류");
+		}
+		
         // Define a list of dummy values for the positionComboBox
         ObservableList<String> positionValues = FXCollections.observableArrayList(
             "사원", "주임", "대리", "팀장", "과장", "부장", "부사장", "사장"
