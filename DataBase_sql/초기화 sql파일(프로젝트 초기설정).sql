@@ -273,26 +273,27 @@ VALUES ('admin', 'admin', 'admin', '010-1111-1111', 'admin@knu.com', 'ADMIN', 21
 
 INSERT INTO `user` (user_id, password, name, tel, email, role, remained_leave, position_num, dept_num)
 VALUES 
-('normaluser1', 'normaluserpassword1', '홍길동', '010-2222-2222', 'normaluser1@naver.com', 'USER', 15, 1, 1),
-('normaluser2', 'normaluserpassword2', '김철수', '010-3333-3333', 'normaluser2@naver.com', 'USER', 15, 1, 1),
-('normaluser3', 'normaluserpassword3', '이영희', '010-4444-4444', 'normaluser3@naver.com', 'USER', 15, 1, 1),
-('normaluser4', 'normaluserpassword4', '박민수', '010-5555-5555', 'normaluser4@naver.com', 'USER', 15, 1, 1),
-('normaluser5', 'normaluserpassword5', '최지은', '010-6666-6666', 'normaluser5@naver.com', 'USER', 15, 1, 1),
-('normaluser6', 'normaluserpassword6', '이재영', '010-7777-7777', 'normaluser6@naver.com', 'USER', 15, 1, 1),
-('normaluser7', 'normaluserpassword7', '정하늘', '010-8888-8888', 'normaluser7@naver.com', 'USER', 15, 1, 1),
-('normaluser8', 'normaluserpassword8', '김소연', '010-9999-9999', 'normaluser8@naver.com', 'USER', 15, 1, 1),
-('normaluser9', 'normaluserpassword9', '이수민', '010-1010-1010', 'normaluser9@naver.com', 'USER', 15, 1, 1),
-('normaluser10', 'normaluserpassword10', '박지민', '010-2020-2020', 'normaluser10@naver.com', 'USER', 15, 1, 1),
-('normaluser11', 'normaluserpassword11', '최성훈', '010-3030-3030', 'normaluser11@naver.com', 'USER', 15, 1, 1),
-('normaluser12', 'normaluserpassword12', '양하나', '010-4040-4040', 'normaluser12@naver.com', 'USER', 15, 1, 1),
-('normaluser13', 'normaluserpassword13', '이재훈', '010-5050-5050', 'normaluser13@naver.com', 'USER', 15, 1, 1),
-('normaluser14', 'normaluserpassword14', '정민지', '010-6060-6060', 'normaluser14@naver.com', 'USER', 15, 1, 1),
-('normaluser15', 'normaluserpassword15', '이동준', '010-7070-7070', 'normaluser15@naver.com', 'USER', 15, 1, 1),
-('normaluser16', 'normaluserpassword16', '김태현', '010-8080-8080', 'normaluser16@naver.com', 'USER', 15, 1, 1),
-('normaluser17', 'normaluserpassword17', '정지우', '010-9090-9090', 'normaluser17@naver.com', 'USER', 15, 1, 1),
-('normaluser18', 'normaluserpassword18', '최유리', '010-1111-2222', 'normaluser18@naver.com', 'USER', 15, 1, 1),
-('normaluser19', 'normaluserpassword19', '이승현', '010-2222-3333', 'normaluser19@naver.com', 'USER', 15, 1, 1),
-('normaluser20', 'normaluserpassword20', '박상혁', '010-3333-4444', 'normaluser20@naver.com', 'USER', 15, 1, 1);
+('normaluser1', 'normaluserpassword1', '홍길동', '010-2222-2222', 'normaluser1@knu.com', 'USER', 15, 1, 1),
+('normaluser2', 'normaluserpassword2', '김철수', '010-3333-3333', 'normaluser2@knu.com', 'USER', 15, 1, 1),
+('normaluser3', 'normaluserpassword3', '이영희', '010-4444-4444', 'normaluser3@knu.com', 'USER', 15, 1, 1),
+('normaluser4', 'normaluserpassword4', '박민수', '010-5555-5555', 'normaluser4@knu.com', 'USER', 15, 1, 1),
+('normaluser5', 'normaluserpassword5', '최지은', '010-6666-6666', 'normaluser5@knu.com', 'USER', 15, 1, 1),
+('normaluser6', 'normaluserpassword6', '이재영', '010-7777-7777', 'normaluser6@knu.com', 'USER', 15, 1, 1),
+('normaluser7', 'normaluserpassword7', '정하늘', '010-8888-8888', 'normaluser7@knu.com', 'USER', 15, 1, 1),
+('normaluser8', 'normaluserpassword8', '김소연', '010-9999-9999', 'normaluser8@knu.com', 'USER', 15, 1, 1),
+('normaluser9', 'normaluserpassword9', '이수민', '010-1010-1010', 'normaluser9@knu.com', 'USER', 15, 1, 1),
+('normaluser10', 'normaluserpassword10', '박지민', '010-2020-2020', 'normaluser10@knu.com', 'USER', 15, 1, 1),
+('normaluser11', 'normaluserpassword11', '최성훈', '010-3030-3030', 'normaluser11@knu.com', 'USER', 15, 1, 1),
+('normaluser12', 'normaluserpassword12', '양하나', '010-4040-4040', 'normaluser12@knu.com', 'USER', 15, 1, 1),
+('normaluser13', 'normaluserpassword13', '이재훈', '010-5050-5050', 'normaluser13@knu.com', 'USER', 15, 1, 1),
+('normaluser14', 'normaluserpassword14', '정민지', '010-6060-6060', 'normaluser14@knu.com', 'USER', 15, 1, 1),
+('normaluser15', 'normaluserpassword15', '이동준', '010-7070-7070', 'normaluser15@knu.com', 'USER', 15, 1, 1),
+('normaluser16', 'normaluserpassword16', '김태현', '010-8080-8080', 'normaluser16@knu.com', 'USER', 15, 1, 1),
+('normaluser17', 'normaluserpassword17', '정지우', '010-9090-9090', 'normaluser17@knu.com', 'USER', 15, 1, 1),
+('normaluser18', 'normaluserpassword18', '최유리', '010-1111-2222', 'normaluser18@knu.com', 'USER', 15, 1, 1),
+('normaluser19', 'normaluserpassword19', '이승현', '010-2222-3333', 'normaluser19@knu.com', 'USER', 15, 1, 1),
+('normaluser20', 'normaluserpassword20', '박상혁', '010-3333-4444', 'normaluser20@knu.com', 'USER', 15, 1, 1);
+
 
 INSERT INTO mail_store (mail_type, user_num) VALUES ('SEND', 1);
 INSERT INTO mail_store (mail_type, user_num) VALUES ('RECEIVED', 1);
