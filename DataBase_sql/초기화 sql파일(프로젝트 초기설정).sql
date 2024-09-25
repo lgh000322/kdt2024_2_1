@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS `erp_db`.`work_log` (
   `log_num` BIGINT NOT NULL AUTO_INCREMENT,
   `start_time` TIME NULL,
   `end_time` TIME NULL,
-  `status` ENUM('ABSENCE', 'TARDINESS', 'ATTENDANCE', 'LEAVE') NOT NULL,
+  `status` ENUM('ABSENCE', 'TARDINESS', 'ATTENDANCE', 'LEAVE','LEAVEPREV') NOT NULL,
   `work_date` DATE NULL,
   `user_num` BIGINT NOT NULL,
   PRIMARY KEY (`log_num`),
@@ -348,6 +348,7 @@ INSERT INTO salary_log (received_date, total_salary, user_num) VALUES ('2024-09-
 
 DROP PROCEDURE IF EXISTS my_procedure;
 DROP PROCEDURE IF EXISTS insert_work_log;
+DROP PROCEDURE IF EXISTS insert_absence_log;
 
 -- User 2부터 20까지의 salary_log 삽입
 DELIMITER //
@@ -393,6 +394,25 @@ END //
 
 DELIMITER ;
 
+DELIMITER //
+
+CREATE PROCEDURE insert_absence_log()
+BEGIN
+    DECLARE i INT;
+
+    SET i = 1;
+    
+    WHILE i <= 21 DO
+        INSERT INTO work_log (start_time, end_time, status, work_date, user_num) 
+        VALUES ('08:00', NULL, 'ABSENCE', '2024-09-25', i);
+        SET i = i + 1;
+    END WHILE;
+END //
+
+DELIMITER ;
+
+
 CALL my_procedure();
 CALL insert_work_log();
+CALL insert_absence_log();
 

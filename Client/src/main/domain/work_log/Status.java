@@ -4,6 +4,7 @@ public enum Status {
     ABSENCE("결근"),
     TARDINESS("지각"),
     ATTENDANCE("출근"),
+    LEAVEPREV("조퇴"),
     LEAVE("휴가");
 
     private final String description;

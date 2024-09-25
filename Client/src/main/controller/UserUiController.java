@@ -260,7 +260,7 @@ public class UserUiController implements Initializable {
 	private ObservableList<MailRecord> mailRecordList = FXCollections.observableArrayList();
 
 	@FXML
-	private ObservableList<String> worklist = FXCollections.observableArrayList("출근", "결근", "조퇴");
+	private ObservableList<String> worklist = FXCollections.observableArrayList("출근", "결근", "조퇴","지각","휴가");
 
 	@FXML
 	private ObservableList<String> maillist = FXCollections.observableArrayList("받은메일함", "보낸메일함");
@@ -1061,10 +1061,21 @@ public class UserUiController implements Initializable {
 			status = Status.ATTENDANCE;
 		}
 
+		// 조퇴가 선택됨
+		if (workComboList.getValue() != null && workComboList.getValue().equals(Status.LEAVEPREV.getDescription())) {
+			status = Status.LEAVEPREV;
+		}
+		
 		// 지각이 선택됨
 		if (workComboList.getValue() != null && workComboList.getValue().equals(Status.TARDINESS.getDescription())) {
 			status = Status.TARDINESS;
 		}
+		
+		// 휴가가 선택됨
+		if (workComboList.getValue() != null && workComboList.getValue().equals(Status.LEAVE.getDescription())) {
+			status = Status.LEAVE;
+		}
+		
 
 		UserSearchData userSearchData = new UserSearchData.Builder().date(selectWorkDate.getValue()).status(status)
 				.build();
@@ -1476,7 +1487,7 @@ public class UserUiController implements Initializable {
 		/**
 		 * requestData 생성
 		 */
-		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_WORK_FINISH, user);
+		String jsonSendStr = communicationUtils.objectToJson(MessageTypeConst.MESSAGE_WORK_OUT_EARLY, user);
 
 		try {
 			communicationUtils.sendServer(jsonSendStr, dos);
