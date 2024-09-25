@@ -1,0 +1,2 @@
+--module-path "C:/Program Files/Java/javafx-sdk/lib" --add-modules=javafx.controls,javafx.fxml,javafx.web --add-opens=java.base/java.time=ALL-UNNAMED
+프론트 vm추가
