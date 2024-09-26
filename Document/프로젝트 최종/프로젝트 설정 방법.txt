@@ -1,0 +1,25 @@
+실행방법
+- 클라이언트
+  <이클립스 기준> 
+  WorkSpace 폴더를 새로 만들고 그 폴더를 작업 디렉토리로 지정한다.
+  File-Import를 누른 후 General-Existing projects into Workspace를 클릭한다.
+  클라이언트 디렉토리를 선택한 후 finish를 누른다
+  buildpath에 추가한 라이브러리의 경로를 맞춘다
+  Main 메소드를 실행한다.
+  Run - Run Configuration을 눌러 VM 옵션을 추가한다.
+  VM 옵션에 추가하는 내용은 "--module-path "C:/Program Files/Java/javafx-sdk/lib" --add-modules=javafx.controls,javafx.fxml,javafx.web --add-opens=java.base/java.time=ALL-UNNAMED" 이다.
+
+- 서버
+  <인텔리제이 기준>
+  build.gradle을 인텔리제이로 실행시킨다.
+  ctrl+alt+s를 눌러 설정창에 들어간 후 gradle를 검색한다.
+  빌드 및 실행을 gradle에서 인텔리제이로 변경한다.
+  gradle jvm을 자바 21버전으로 맞춘다.
+  ctrl+alt+shift+s 를 눌러 프로젝트 설정으로 들어간 후 sdk를 21버전으로 맞춘다.
+  build.gradle에 들어간 후 refresh 버튼을 눌러서 라이브러리를 다운받는다.
+
+- 데이터베이스
+  erb_db_setting을 눌러 sql문을 복사한다.
+  root로 열려있는 곳을 들어가 유저를 생성한다.
+  erp_user로 새로운 커넥션을 연다.
+  erp_user로 설정되어 있는 새로운 커넥션에서 초기화 sql파일을 실행한다.
