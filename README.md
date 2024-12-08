@@ -14,6 +14,7 @@
 ## 💻 개발환경
 - **Version** : Java 21
 - **IDE** : IntelliJ, Eclipse
+- **DataBase** : MySQL
 
 ## 서버 전체 구조
 ![서버 구성](https://github.com/user-attachments/assets/2604eac0-fe05-44e0-941a-2f1ecfc8d366)
