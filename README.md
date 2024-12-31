@@ -18,3 +18,7 @@
 
 ## 서버 전체 구조
 ![서버 구성](https://github.com/user-attachments/assets/2604eac0-fe05-44e0-941a-2f1ecfc8d366)
+
+## 📝 ERD
+![erd](https://github.com/user-attachments/assets/fee7826e-86dd-4148-aefb-9601dbb84836)
+
