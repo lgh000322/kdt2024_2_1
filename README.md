@@ -22,3 +22,5 @@
 ## 📝 ERD
 ![erd](https://github.com/user-attachments/assets/fee7826e-86dd-4148-aefb-9601dbb84836)
 
+## 프로젝트 설정 방법
+Document -> 프로젝트 최종 -> 프로젝트 설정 방법.txt
