@@ -15,18 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SalaryRepository {
-    private static SalaryRepository salaryRepository = null;
-
-    public static SalaryRepository createOrGetSalaryRepository() {
-        if (salaryRepository == null) {
-            salaryRepository = new SalaryRepository();
-            System.out.println("SalaryRepository 싱글톤 생성");
-            return salaryRepository;
-        }
-
-        System.out.println("SalaryRepository 싱글톤 반환");
-        return salaryRepository;
-    }
 
     //DB에 월급내역을 등록하는 메소드
     public ResponseData insertSalaryonDB(Connection conn, User user, SalaryLog salaryLog) throws SQLException {

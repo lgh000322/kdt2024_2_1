@@ -7,17 +7,6 @@ import java.sql.SQLException;
 
 public class DeptRepository {
 
-    private static DeptRepository deptRepository = null;
-
-    public static DeptRepository createOrGetDeptRepository() {
-        if (deptRepository == null) {
-            deptRepository = new DeptRepository();
-            return deptRepository;
-        }
-
-        return deptRepository;
-    }
-
     public Long findDeptNumByDeptName(Connection con, String deptName) throws SQLException {
 
         String sql = "select * from dept where dept_name = ?";

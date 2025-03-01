@@ -15,20 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class WorkRepository {
-    private static WorkRepository workRepository = null;
-
-    public static WorkRepository createOrGetWorkRepository() {
-        if (workRepository == null) {
-            workRepository = new WorkRepository();
-            System.out.println("WorkRepository 싱글톤 생성");
-            return workRepository;
-        }
-
-        System.out.println("WorkRepository 싱글톤 반환");
-        return workRepository;
-    }
-
-
     /**
      * 오전 8시 스케줄링에 사용되는 메소드. 회원의 근태로그를 미리 저장한다.
      *

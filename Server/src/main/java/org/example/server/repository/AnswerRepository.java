@@ -11,19 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AnswerRepository {
-    private static AnswerRepository answerRepository = null;
-
-    public static AnswerRepository createOrGetAnswerRepository() {
-        if (answerRepository == null) {
-            answerRepository = new AnswerRepository();
-            System.out.println("AnswerRepository 싱글톤 생성");
-            return answerRepository;
-        }
-
-        System.out.println("AnswerRepository 싱글톤 반환");
-        return answerRepository;
-    }
-
 
     public void searchAnswerDB(){
         /*

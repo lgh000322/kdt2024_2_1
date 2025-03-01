@@ -4,11 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.example.server.adapter.LocalDateTypeAdapter;
 import org.example.server.adapter.LocalTimeTypeAdapter;
+import org.example.server.container.ApplicationContext;
 import org.example.server.controller.front_controller.FrontController;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 import org.example.server.scheduler.Scheduler;
-import org.example.server.service.SchedulerService;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -27,9 +27,13 @@ public class Server {
     private final ExecutorService executorService;
     private final Scheduler scheduler;
 
-    public Server(FrontController frontController) {
-        this.frontController = frontController;
-        this.scheduler = new Scheduler(SchedulerService.createOrGetSchedulerService());
+    public Server() throws Exception {
+        // 컨테이너 초기화
+        ApplicationContext applicationContext = ApplicationContext.getInstance();
+        applicationContext.initialize();
+
+        this.frontController = new FrontController(applicationContext);
+        this.scheduler = applicationContext.getBean(Scheduler.class);
         this.executorService = Executors.newFixedThreadPool(100);
     }
 
@@ -65,11 +69,10 @@ public class Server {
     private void handleClient(Socket socket) throws IOException {
         DataInputStream dis = null;
         DataOutputStream dos = null;
-        Socket socket2 = socket;
 
         try {
-            dis = new DataInputStream(socket2.getInputStream());
-            dos = new DataOutputStream(socket2.getOutputStream());
+            dis = new DataInputStream(socket.getInputStream());
+            dos = new DataOutputStream(socket.getOutputStream());
 
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
@@ -83,12 +86,12 @@ public class Server {
 
             dos.close();
             dis.close();
-            socket2.close();
+            socket.close();
         } catch (IOException e) {
             System.out.println("클라이언트와의 연결이 끊김");
             if (dos != null) dos.close();
             if (dis != null) dis.close();
-            if (socket2 != null) socket2.close();
+            if (socket!= null) socket.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

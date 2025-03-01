@@ -1,6 +1,7 @@
 package org.example.server.scheduler;
 
-import org.example.server.service.SchedulerService;
+import org.example.server.service.SchedulerServiceImpl;
+import org.example.server.service.declare.SchedulerService;
 
 import java.sql.SQLException;
 import java.time.DayOfWeek;
@@ -14,20 +15,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Scheduler {
-    private static Scheduler scheduler = null;
     private final ScheduledExecutorService schedulerExecutors;
     private final SchedulerService schedulerService;
-
-    public static Scheduler createOrGetScheduler() {
-        if (scheduler == null) {
-            scheduler = new Scheduler(SchedulerService.createOrGetSchedulerService());
-            System.out.println("싱글톤 스케줄러 생성됨");
-            return scheduler;
-        }
-
-        System.out.println("싱글톤 스케줄러 반환됨");
-        return scheduler;
-    }
 
     public Scheduler(SchedulerService schedulerService) {
         this.schedulerService = schedulerService;

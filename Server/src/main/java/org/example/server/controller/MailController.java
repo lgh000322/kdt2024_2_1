@@ -11,27 +11,18 @@ import org.example.server.dto.ResponseData;
 import org.example.server.dto.mail_dto.MailDeleteDto;
 import org.example.server.dto.mail_dto.MailReceivedData;
 import org.example.server.dto.mail_dto.MailSearchDto;
-import org.example.server.service.MailService;
+import org.example.server.service.MailServiceImpl;
+import org.example.server.service.declare.MailService;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class MailController implements Controller {
-    private static MailController mailController = null;
     private final MailService mailService;
 
     public MailController(MailService mailService) {
         this.mailService = mailService;
-    }
-
-    public static MailController createOrGetMailController() {
-        if (mailController == null) {
-            mailController = new MailController(MailService.createOrGetMailService());
-            return mailController;
-        }
-
-        return mailController;
     }
 
     @Override

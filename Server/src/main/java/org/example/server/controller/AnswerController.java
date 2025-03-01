@@ -12,26 +12,14 @@ import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
-import org.example.server.service.AnswerService;
+import org.example.server.service.declare.AnswerService;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class AnswerController implements Controller {
-    private static AnswerController answerController = null;
     private final AnswerService answerService;
-
-    public static AnswerController createOrGetAnswerController() {
-        if (answerController == null) {
-            answerController = new AnswerController(AnswerService.createOrGetAnswerService());
-            System.out.println("AnswerController 싱글톤 생성");
-            return answerController;
-        }
-
-        System.out.println("AnswerController 싱글톤 반환");
-        return answerController;
-    }
 
     public AnswerController(AnswerService answerService) {
         this.answerService = answerService;

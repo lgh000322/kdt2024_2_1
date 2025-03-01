@@ -6,31 +6,19 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.example.server.adapter.LocalDateTypeAdapter;
 import org.example.server.adapter.LocalTimeTypeAdapter;
 import org.example.server.consts.MessageTypeConst;
-import org.example.server.domain.user.Role;
 import org.example.server.domain.user.User;
 import org.example.server.dto.RequestData;
 import org.example.server.dto.ResponseData;
 import org.example.server.dto.salary_dto.BonusDto;
-import org.example.server.service.SalaryService;
+import org.example.server.service.SalaryServiceImpl;
+import org.example.server.service.declare.SalaryService;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class SalaryController implements Controller {
-    private static SalaryController salaryController = null;
     private final SalaryService salaryService;
-
-    public static SalaryController createOrGetSalaryController() {
-        if (salaryController == null) {
-            salaryController = new SalaryController(SalaryService.createOrGetSalaryService());
-            System.out.println("AnswerController 싱글톤 생성");
-            return salaryController;
-        }
-
-        System.out.println("AnswerController 싱글톤 반환");
-        return salaryController;
-    }
 
     public SalaryController(SalaryService salaryService) {
         this.salaryService = salaryService;

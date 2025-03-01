@@ -9,28 +9,6 @@ import java.util.List;
 
 
 public class BoardRepository {
-    private static BoardRepository boardRepository = null;
-
-
-
-
-    // 싱글톤으로 보드 레포생성 -> 기존에 있으면 있는 레포를 사용, 없으면 레포를 새로 만듦.
-    public static BoardRepository createOrGetBoardRepository() {
-        if (boardRepository == null) {
-            boardRepository = new BoardRepository();
-            System.out.println("boardRepository 싱글톤 생성");
-            return boardRepository;
-        }
-
-        System.out.println("boardRepository 싱글톤 반환");
-        return boardRepository;
-    }
-
-
-
-
-
-
     /**
      * 특정 게시물(게시물 번호로 매칭) 가져오는 함수
      */

@@ -11,7 +11,8 @@ import org.example.server.dto.ResponseData;
 import org.example.server.dto.leave_dto.ForFindLeaveDto;
 import org.example.server.dto.leave_dto.ForRequestLeaveDto;
 import org.example.server.dto.leave_dto.ForUpdateLeaveDto;
-import org.example.server.service.LeaveService;
+import org.example.server.service.LeaveServiceImpl;
+import org.example.server.service.declare.LeaveService;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -21,22 +22,8 @@ import static org.example.server.consts.MessageTypeConst.MESSAGE_LEAVE_REQUEST;
 
 public class LeaveController implements Controller {
 
-    private static LeaveController leaveController = null;
     private final LeaveService leaveService;
 
-   //의존성 주입.
-    public static LeaveController createOrGetLeaveController() {
-
-        if (leaveController == null) {
-            leaveController = new LeaveController(LeaveService.createOrGetLeaveService());
-            System.out.println("LeaveController 싱글톤 생성");
-            return leaveController;
-        }
-
-        //기존 컨트롤러가 있으면 기존 컨트롤러 반환
-        System.out.println("LeaveController 싱글톤 반환");
-        return leaveController;
-    }
 
     public LeaveController(LeaveService leaveService) {
         this.leaveService = leaveService;

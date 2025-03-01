@@ -11,7 +11,8 @@ import org.example.server.dto.ResponseData;
 import org.example.server.dto.board_dto.BoardDelDto;
 import org.example.server.dto.board_dto.BoardSaveDto;
 import org.example.server.dto.board_dto.BoardUpdateDto;
-import org.example.server.service.BoardService;
+import org.example.server.service.BoardServiceImpl;
+import org.example.server.service.declare.BoardService;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -22,29 +23,11 @@ import static org.example.server.consts.MessageTypeConst.MESSAGE_BOARD_LIST_SEAR
 
 public class BoardController implements Controller {
 
-    private static BoardController boardController = null;
     private final BoardService boardService;
-
-    // 의존성 주입.
-    public static BoardController createOrGetBoardController() {
-        // 보드 컨트롤러가 없으면.
-        if (boardController == null) {
-            // 보드 컨트롤러에 보드 서비스를 주입한다.
-            boardController = new BoardController(BoardService.createOrGetBoardService());
-            System.out.println("boardController 싱글톤 생성");
-            return boardController;
-        }
-
-        // 보드 컨트롤러가 있으면 기존 컨트롤러 반환
-        System.out.println("boardController 싱글톤 반환");
-        return boardController;
-    }
 
     public BoardController(BoardService boardService) {
         this.boardService = boardService;
     }
-
-
 
     @Override
     public ResponseData execute(RequestData requestData) throws SQLException {
@@ -63,9 +46,6 @@ public class BoardController implements Controller {
                     String title = (String) requestData.getData();
                     result = boardService.findAllBoards(title);
                 }
-
-
-
             }
             case MessageTypeConst.MESSAGE_BOARD_ONE_SEARCH -> {
                 System.out.println("특정 게시글 조회 실행");

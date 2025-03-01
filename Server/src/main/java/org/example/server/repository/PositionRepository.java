@@ -8,17 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class PositionRepository {
-    private static PositionRepository positionRepository = null;
-
-    public static PositionRepository createOrGetPositionRepository() {
-        if (positionRepository == null) {
-            positionRepository = new PositionRepository();
-            return positionRepository;
-        }
-
-        return positionRepository;
-    }
-
 
     public LeaveDay findPositionNumByPositionName(Connection con, String positionName) throws SQLException {
 
